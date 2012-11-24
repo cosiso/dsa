@@ -42,26 +42,26 @@ function smarty_function_carto_button($params, &$smarty)
    switch ($params['type']) {
       case 'remove':
          $params[type] = 'button';
-         if (empty($params[value])) $params[value] = 'Verwijderen';
+         if (empty($params[value])) $params[value] = 'Remove';
          if (empty($params['class'])) $params['class'] = 'menu-button-reset';
          break;
       case 'save':
          $params[type] = 'button';
-         if (empty($params[value])) $params[value] = 'Opslaan';
+         if (empty($params[value])) $params[value] = 'Save';
          if (empty($params['class'])) $params['class'] = 'menu-button-submit';
          break;
       case "close":
          $params['type'] = 'button';
          if (empty($params['onClick'])) $params['onClick'] = "window.close()";
-         if (empty($params['value'])) $params['value'] = 'Sluiten';
+         if (empty($params['value'])) $params['value'] = 'Close';
          if (empty($params['class'])) $params['class'] = 'menu-button-reset';
          break;
       case "submit":
-         if (empty($params['value'])) $params['value'] = 'Opslaan';
+         if (empty($params['value'])) $params['value'] = 'Save';
          if (empty($params['class'])) $params['class'] = 'menu-button-submit';
          break;
       case "reset":
-         if (empty($params['value'])) $params['value'] = 'Annuleren';
+         if (empty($params['value'])) $params['value'] = 'Cancel';
          if (empty($params['class'])) $params['class'] = 'menu-button-reset';
          break;
    }

@@ -4,9 +4,23 @@ body {
    font-size: 12px;
 }
 
+/* Make br end floats */
+br {
+   float: none;
+}
+
 /* divs */
 #head {
    margin-bottom: 10px;
+}
+
+.caption_left {
+   font-weight: bold;
+   font-variant: small-caps;
+   margin-left: 10px;
+   font-style: italic;
+   color: #2f4f4f;
+   font-size: 14px;
 }
 
 /* links with images */
