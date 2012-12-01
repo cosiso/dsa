@@ -31,7 +31,7 @@
       {carto_spacer width='200px'}
       {carto_button id='btn_add_trait' value='Add trait' onclick='add_trait()'}
       <br />
-      <div id="add_trait" style="position: absolute; display: none; width: 240px; height: 130px; background-color: #ffe4c4; border: 2px solid black">
+      <div id="add_trait" class="popup" style="display: none">
          {html_hidden name='trait_id' value=0}
          Name:<br />
          {html_text name='trait_name' style='width: 10em'}<br />

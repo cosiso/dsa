@@ -23,7 +23,8 @@ function smarty_block_carto_form($params, $content, &$smarty, &$repeat) {
    }
    if (! $name)
       $smarty->trigger_error("carto_form: missin required attribute 'name'", E_USER_NOTICE);
-   
+   if (! $id) $id = $name;
+
    $result = '<form name="' . $name . '" id="' . $id . '" class="' . $class . '" method="' . $method . '"';
    if ($extra) $result .= $extra;
    $result .= ">\n" . $content . "</form>\n";
