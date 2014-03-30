@@ -2,23 +2,51 @@
 <html>
    <head>
       <title>DSA - setup</title>
+      <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
       <link href="css/dsa.css" rel="stylesheet" type="text/css" />
       {$xajax_script}
    </head>
    <body>
+      <script type="text/javascript" src="scripts/prototype.js"></script>
+      <script type="text/javascript" src="scriptaculous-js/src/scriptaculous.js?load=effects"></script>
+      <script src="scripts/jquery.js"></script>
+      <script src="tools/jquery-ui-1.10.4/ui/minified/jquery-ui.min.js"></script>
+      <script type="text/javascript">
+         <!--{literal}
+         jQuery.noConflict();
+         jQuery(document).ready(function( $ ) {
+            // give hover action to rows with attribute rowhover
+            $( "tr[rowhover]" ).hover(function(){$(this).toggleClass('row-hover')});
+            // Position add_trait div
+            var div = $('#add_trait');
+            var btn = $('#btn_add_trait');
+            var pos = btn.position();
+            div.css({top:  pos.top + 30,
+                     left: pos.left + btn.width() - div.width() + 15}); 
+            // Capture enter key on inputs for add_trait div
+            $('#add_trait').on('keydown', 'input', function(e) {
+               if (e.keyCode == 13) {
+                  submit_add_trait();
+               }
+            });
+         });
+         //-->{/literal}
+      </script>
       {include file="head.tpl"}
-      <div class="caption_left" style="width: 200px; float: left">Traits</div>
+      <div class="caption_left" style="width: 200px; float: left">Eigenschaften</div>
       <div style="float: left">
-         <table cellspacing="0">
+         <table id="table_traits" cellspacing="0">
+            <thead>
             <tr id="traits_head">
                <th style="text-align: left">Name</th>
                <th style="text-align: left">Abbreviation</th>
                <th>&nbsp;</th>
             </tr>
+            </thead>
             {section name=idx loop=$traits}
-               <tr id="row_{$traits[idx].id}" onmouseover="highlight_row({$traits[idx].id})" onmouseout="unhighlight_row({$traits[idx].id})">
-                  <td style="padding-right: 5px">{$traits[idx].name|escape}</td>
-                  <td style="padding-right: 5px">{$traits[idx].abbr|escape}</td>
+               <tr rowhover="yes" id="row_{$traits[idx].id}">
+                  <td style="padding-right: 5px" id="cell_name">{$traits[idx].name|escape}</td>
+                  <td style="padding-right: 5px" id="cell_abbr">{$traits[idx].abbr|escape}</td>
                   <td>
                      <a href="javascript:edit_trait({$traits[idx].id})" class="link-edit">edit</a>
                      | <a href="javascript:remove_trait({$traits[idx].id})" class="link-cancel">remove</a>
@@ -38,96 +66,69 @@
          Abbreviation:<br />
          {html_text name='trait_abbr' style='width: 3em' maxlength=3}<br /><br />
          {carto_button type='submit' onclick="submit_add_trait()"}
-         {carto_button type='close' onclick="$('add_trait').hide()"}
+         {carto_button type='close' onclick="jQuery('#add_trait').slideUp()"}
       </div>
    </body>
-   <script type="text/javascript" src="scripts/prototype.js"></script>
-   <script type="text/javascript" src="scriptaculous-js/src/scriptaculous.js?load=effects"></script>
    <script type="text/javascript">
       <!--{literal}
-      var old_bg = document.body.style.backgroundColor
-      var hi_bg = '#ffe4c4'
-      function highlight_row(row_id) {
-         $('row_' + row_id).style.backgroundColor = hi_bg
-      }
-      function unhighlight_row(row_id) {
-         $('row_' + row_id).style.backgroundColor = old_bg
-      }
       function show_add_trait() {
-         var div = $('add_trait')
-         if (! div.visible()) {
-            // Place div
-            var div = $('add_trait')
-            var off = $('btn_add_trait').cumulativeOffset()
-            div.style.left = off[0] + 'px'
-            var newtop = off[1] +25
-            div.style.top = newtop + 'px'
-            // Make div visible
-               new Effect.toggle(div, 'blind', {duration: 0.3})
-         }
+         jQuery('#add_trait').slideDown();
+         jQuery('#trait_name').focus();
+      }
+      function fill_trait_form(id, name, abbr) {
+         jQuery('#trait_id').val(id);
+         jQuery('#trait_name').val(name);
+         jQuery('#trait_abbr').val(abbr);
       }
       function edit_trait(trait_id) {
          // Fetch row and get current values
-         var children = $('row_' + trait_id).childElements()
-         $('trait_name').value = children[0].innerHTML.unescapeHTML()
-         $('trait_abbr').value = children[1].innerHTML.unescapeHTML()
-         $('trait_id').value = trait_id
-         show_add_trait()
+         var row = '#row_' + trait_id;
+         var name = row + ' > #cell_name';
+         var abbr = row + ' > #cell_abbr';
+         fill_trait_form(trait_id, jQuery(name).text(), jQuery(abbr).text());
+         show_add_trait();
       }
       function add_trait() {
          // Set empty values
-         $('trait_id').value = 0
-         $('trait_name').value = ''
-         $('trait_abbr').value = ''
-         show_add_trait()
+         fill_trait_form(0, '', '');
+         show_add_trait();
       }
       function do_edit_trait(trait_id, trait_name, trait_abbr) {
          // Get the row that needs updating
-         var row = $('row_' + trait_id)
-         var children = row.childElements()
-         // Update fields
-         children[0].update(trait_name.escapeHTML())
-         children[1].update(trait_abbr.escapeHTML())
-         new Effect.Highlight(row, {duration: 1})
+         jQuery('#row_' + trait_id + ' > #cell_name').text(trait_name);
+         jQuery('#row_' + trait_id + ' > #cell_abbr').text(trait_abbr);
+         jQuery('#row_' + trait_id).effect('highlight', {}, 2000);
       }
       function do_add_trait(trait_id, trait_name, trait_abbr) {
+         // Find where to insert
+         var row_id = 0; var cur_row = 0; var last = true;
+         jQuery('#table_traits td#cell_name').each(function() {
+            cur_row++;
+            row_text = jQuery(this).text();
+            // alert('Current row = ' + cur_row + ', Trait: ' + trait_name + ', Row: ' + row_text);
+            if (trait_name.localeCompare(row_text) <= 0) {
+              // New trait should be before inspected trait
+              row_id = cur_row;
+              last = false;
+              return false;
+            }
+         });
          // Build the element
-         var row = '<tr id="row_' + trait_id +'" style="display:none" onmouseover="highlight_row(' + trait_id + ')" onmouseout="unhighlight_row(' + trait_id + ')">'
-         row += '<td>' + trait_name.escapeHTML() + '</td>'
-         row += '<td>' + trait_abbr.escapeHTML() + '</td>'
-         row += '<td><a href="javascript:add_trait(' + trait_id + ')" class="link-edit">edit</a> | '
-         row += '<a href="javascript:remove_trait(' + trait_id +')" class="link-cancel">remove</a></td></tr>'
-         // Get the siblings of the table head row, i.e. the defined rows
-         var siblings = $('traits_head').siblings()
-         if ( siblings.length == 0) {
-            // No traits defined yet, insert after table header
-            is_inserted = 1
-            $('traits_head').insert({after: row})
+         var row = '<tr rowhover="yes" id="row_' + trait_id +'" >';
+         row += '<td style="padding-right: 5px" id="cell_name">' + trait_name.escapeHTML() + '</td>';
+         row += '<td style="padding-right: 5px" id="cell_abbr">' + trait_abbr.escapeHTML() + '</td>';
+         row += '<td><a href="javascript:edit_trait(' + trait_id + ')" class="link-edit">edit</a> | ';
+         row += '<a href="javascript:remove_trait(' + trait_id + ')" class="link-cancel">remove</a></td></tr>';
+         // Insert new element
+         if (last == true) {
+            jQuery(row).insertAfter(jQuery('#table_traits tr').last());
          } else {
-            var is_inserted = 0
-            var newrow     //declare newrow here, so it can be accessed outside of the loop
-            // We have an array of siblings, find our spot
-            for (var idx=0; idx < siblings.length; idx++) {
-               newrow = siblings[idx]
-               // Get the childelements
-               var childs = newrow.childElements()
-               // We need to have the name, which is in the first child
-               var name = childs[0].innerHTML
-               if (trait_name.localeCompare(name) < 0) {
-                  // We should be before this one, insert element
-                  is_inserted = 1
-                  newrow.insert({before: row})
-                  break
-               }
-            }
-            // Check to see if we still need to be inserted
-            if (is_inserted == 0) {
-               // Put us at the back, newrow contains the last row
-               newrow.insert({after: row})
-            }
+            jQuery(row).insertBefore(jQuery('#table_traits tr:nth(' + row_id + ')'));
          }
-         // Row is at the right spot, show it
-         new Effect.Appear('row_' + trait_id)
+         // Highlight element
+         jQuery('#row_' + trait_id).effect('highlight', {}, 2000);
+         // Add hover-class to element
+         jQuery('#row_' + trait_id).hover(function(){jQuery(this).toggleClass('row-hover')});
       }
       function submit_add_trait() {
          // Check values
@@ -147,15 +148,13 @@
          return false
       }
       function remove_trait(trait_id) {
+         var row = jQuery('#row_' + trait_id);
+         row.addClass('row-highlight');
          // Set different old_bg to prevent highlight from disappearing
-         var tmp = old_bg
-         old_bg = '#cd5c5c'
-         $('row_' + trait_id).style.backgroundColor = '#cd5c5c'
          if (confirm('Do you really want to delete this trait?')) {
             xajax_remove_trait(trait_id)
          }
-         old_bg = tmp
-         $('row_' + trait_id).style.backgroundColor = old_bg
+         row.removeClass('row-highlight');
       }
       function do_remove_trait(trait_id) {
          var row = $('row_' + trait_id)

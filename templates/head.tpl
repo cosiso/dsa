@@ -1,4 +1,3 @@
-<img src="/images/dsa.png" alt="" border="0" style="float: left" />
 <div id="head">
    {carto_button id='home' value='home' onclick="location = 'index.php'"}
    {carto_spacer width='10px'}

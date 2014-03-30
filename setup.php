@@ -65,7 +65,7 @@ function add_trait($trait_id, $name, $abbr) {
       $qry .= "'" . pg_escape_string($new_trait) . "', ";
       $qry .= "'" . pg_escape_string($abbr) . "')";
       if (! @$db->do_query($qry, false)) {
-         $or->addAlert('Database-error: could not insert new trait');
+         $or->addAlert('Database-error: could not insert new trait: ' .pg_last_error());
          return $or;
       }
       $or->addScriptCall('do_add_trait', $db->insert_id('traits'), $new_trait, $abbr);

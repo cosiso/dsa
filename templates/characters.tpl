@@ -2,6 +2,7 @@
 <html>
    <head>
       <title>DSA - setup</title>
+      <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
       <link href="css/dsa.css" rel="stylesheet" type="text/css" />
       {$xajax_script}
    </head>
