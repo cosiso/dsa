@@ -22,7 +22,7 @@
             var btn = $('#btn_add_trait');
             var pos = btn.position();
             div.css({top:  pos.top + 30,
-                     left: pos.left + btn.width() - div.width() + 15}); 
+                     left: pos.left + btn.width() - div.width() + 15});
             // Capture enter key on inputs for add_trait div
             $('#add_trait').on('keydown', 'input', function(e) {
                if (e.keyCode == 13) {
@@ -33,7 +33,7 @@
          //-->{/literal}
       </script>
       {include file="head.tpl"}
-      <div class="caption_left" style="width: 200px; float: left">Eigenschaften</div>
+      {include file="setup_menu.tpl" selected_category="Eigenschaften"}
       <div style="float: left">
          <table id="table_traits" cellspacing="0">
             <thead>
@@ -57,16 +57,18 @@
       </div>
       <br style="float: none" /><br />
       {carto_spacer width='200px'}
-      {carto_button id='btn_add_trait' value='Add trait' onclick='add_trait()'}
+      {carto_button id='btn_add_trait' value='Add Eigenschaft' onclick='add_trait()'}
       <br />
       <div id="add_trait" class="popup" style="display: none">
          {html_hidden name='trait_id' value=0}
-         Name:<br />
+         <label>Name:</label>
          {html_text name='trait_name' style='width: 10em'}<br />
-         Abbreviation:<br />
-         {html_text name='trait_abbr' style='width: 3em' maxlength=3}<br /><br />
-         {carto_button type='submit' onclick="submit_add_trait()"}
-         {carto_button type='close' onclick="jQuery('#add_trait').slideUp()"}
+         <label>Abbreviation:</label>
+         {html_text name='trait_abbr' style='width: 3em' maxlength=3}<br />
+         <div class="button_bar">
+            {carto_button type='submit' onclick="submit_add_trait()"}
+            {carto_button type='close' onclick="jQuery('#add_trait').slideUp()"}
+         </div>
       </div>
    </body>
    <script type="text/javascript">

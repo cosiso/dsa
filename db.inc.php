@@ -11,7 +11,7 @@ class db {
       $this->dbh = pg_connect('dbname=dsa') or die('Could not connect to database');
    }
 	function do_query($qry, $die=true) {
-      $rid = pg_query($this->dbh, $qry);
+      $rid = @pg_query($this->dbh, $qry);
       if (!$rid) {
          if ($die)
             die("<br>Could not execute query: $qry<br>" . pg_last_error() . "<br>");
