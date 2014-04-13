@@ -52,7 +52,7 @@ function smarty_function_carto_button($params, &$smarty)
          break;
       case "close":
          $params['type'] = 'button';
-         if (empty($params['onClick'])) $params['onClick'] = "window.close()";
+         if (empty($params['onclick'])) $params['onclick'] = "window.close()";
          if (empty($params['value'])) $params['value'] = 'Close';
          if (empty($params['class'])) $params['class'] = 'menu-button-reset';
          break;
