@@ -37,6 +37,7 @@ ul.tabs {
 	list-style: none;
 	padding-left: 0px;
 }
+
 #tab-container li {
 	list-style: none;
 	display: inline-block;
@@ -61,6 +62,11 @@ ul.tabs {
 .tab-active {
 	color: #a64646 !important;
 }
+
+#tab-container > div {
+	text-align: left;
+}
+/* error indication */
 input.error {
 	border:2px solid #FF0000 !important;
 	background-color: #FFBBBB !important;
@@ -70,15 +76,17 @@ input.error {
 label.error {
 	font-weight: bold;
 	color: #A64646;
-	padding-left: 32px;
+	padding-left: 20px;
 	background-image: url(/dsa/images/warning.png);
 	background-repeat: no-repeat;
 	background-color: #FFECEC;
-	display: inline;
+	background-position: center left;
+	display: inline-block;
 	/* z-index: 5; */
-	position: relative 50px 20px;
-	padding-top: 12px;
-	padding-bottom: 12px;
+	position: relative;
+	left: 10px;
+	/* padding-top: 12px;
+	padding-bottom: 12px; */
 	border-radius: 10px;
 }
 label {

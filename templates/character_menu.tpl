@@ -1,5 +1,12 @@
 <div id="div_menu_left" class="caption_left" style="width: 200px; float: left">
-   <div class="selected_menu">Heldendokument</div>
+   {if $selected == 'main'}
+      <div class="selected_menu">Heldendokument</div>
+      <ol class="sub-menu" id="sub-menu-helden">
+         {section name="idx" loop=$characters}
+            <li id="li-char-{$characters[idx].id}" onclick="select_char({$characters[idx].id})"><a href="#">{$characters[idx].name|escape}</a></li>
+         {/section}
+      </ol>
+   {/if}
    {*}
    {if $selected_category == 'Talenten'}
       <div class="selected_menu">Talente</div>
