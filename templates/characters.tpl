@@ -19,6 +19,27 @@
                {carto_spacer width=40}
                <img id="img_edit_name" src="images/page_white_paint.png" alt="edit" border="0" style="cursor: pointer" />
             </div>
+            <div id="data">
+               <h3>General data</h3>
+               <div style="float: left">
+                  <label for="geschlecht">Geschlecht:</label>
+                  {html_text name='geschlecht'}
+                  <label for="alter">Alter:</label>
+                  {html_text name='alter'}
+                  <label for="haarfarbe">Haarfarbe:</label>
+                  {html_text name='haarfarbe'}
+               </div>
+               <div style="float: left; margin-left: 8px">
+                  <label for="grosse">Grösse</label>
+                  {html_text name='grosse'}
+                  <label for="gewicht">Gewicht:</label>
+                  {html_text name='gewicht'}
+                  <label for='augenfarbe'>Augenfarbe</label>
+                  {html_text name='augenfarbe'}
+               </div><br />
+               <label for="aussehen">Aussehen:</label>
+               {html_textarea name='aussehen' style='width: 100%; height: 60px'}
+            </div>
          </div>
          {carto_button name='btn_new_character' value='New Character' onclick="new_character()"}
       </div>
@@ -48,6 +69,24 @@
                   $('#div_name').slideUp();
                   return false;
                }
+            });
+            // Set onblur on edit-fields
+            $('#data input').blur(function(e) {
+               // Update edit field in database
+               if (this.id == 'alter' ||
+                   this.id == 'grosse' ||
+                   this.id == 'gewicht') {
+                  // Should be a number, show error if not and focus field again
+                  var v = $(this).val();
+                  var intRegEx = /^\d*$/;
+                  if (! intRegEx.test(v)) {
+                     $(this).addClass('error');
+                     return;
+                  } else {
+                     $(this).removeClass('error');
+                  }
+               }
+               // Send ajax-request
             });
          });
          function showRequest(formData, jqForm, options) {
@@ -131,6 +170,13 @@
             data = character.data;
             // Set data
             $('#main_name').text(htmlescape(data.name));
+            $('#geschlecht').val(htmlescape(data.geschlecht));
+            $('#alter').val(htmlescape(data.alter));
+            $('#haarfarbe').val(htmlescape(data.haarfarbe));
+            $('#grosse').val(htmlescape(data.grosse));
+            $('#gewicht').val(htmlescape(data.gewicht));
+            $('#augenfarbe').val(htmlescape(data.augenfarbe));
+            $('#aussehen').val(htmlescape(data.aussehen));
             // Set function
             $('#img_edit_name').click(function() {
                edit_name(data.id);

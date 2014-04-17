@@ -31,6 +31,25 @@ h2 {
 	width: 100%;
    color: #a64646;
 }
+h3 {
+	background-image: url('../images/arrow-branch-gyr-16.png');
+	background-position: left center;
+	background-repeat: no-repeat;
+	padding-left: 18px;
+}
+
+/* input fields */
+input {
+	border: 1px groove #A68646;
+}
+textarea {
+	border: 1px groove #A68646;
+}
+/* error indication */
+input.error {
+	border:2px solid #FF0000 !important;
+	background-color: #FFBBBB !important;
+}
 
 /* tabs */
 ul.tabs {
@@ -65,11 +84,6 @@ ul.tabs {
 
 #tab-container > div {
 	text-align: left;
-}
-/* error indication */
-input.error {
-	border:2px solid #FF0000 !important;
-	background-color: #FFBBBB !important;
 }
 
 /* labels */
