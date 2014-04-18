@@ -20,25 +20,44 @@
                <img id="img_edit_name" src="images/page_white_paint.png" alt="edit" border="0" style="cursor: pointer" />
             </div>
             <div id="data">
-               <h3>General data</h3>
-               <div style="float: left">
-                  <label for="geschlecht">Geschlecht:</label>
-                  {html_text name='geschlecht'}
-                  <label for="alter">Alter:</label>
-                  {html_text name='alter'}
-                  <label for="haarfarbe">Haarfarbe:</label>
-                  {html_text name='haarfarbe'}
+               <h3 onclick="toggle_h3('general_data')">General data</h3>
+               <div id="general_data">
+                  <div class="column" style="margin-left: 0px">
+                     <label for="rasse">Rasse:</label>
+                     {html_text name='rasse'}
+                     <label for="kultur">Kultur:</label>
+                     {html_text name='kultur'}
+                     <label for="profession">Profession:</label>
+                     {html_text name='profession'}
+                  </div>
+                  <div class="column">
+                     <label for="geschlecht">Geschlecht:</label>
+                     {html_text name='geschlecht'}
+                     <label for="alter">Alter:</label>
+                     {html_text name='alter'}
+                     <label for="haarfarbe">Haarfarbe:</label>
+                     {html_text name='haarfarbe'}
+                  </div>
+                  <div class="column">
+                     <label for="grosse">Grösse</label>
+                     {html_text name='grosse'}
+                     <label for="gewicht">Gewicht:</label>
+                     {html_text name='gewicht'}
+                     <label for='augenfarbe'>Augenfarbe</label>
+                     {html_text name='augenfarbe'}
+                  </div><br />
+                  <label for="aussehen">Aussehen:</label>
+                  {html_textarea name='aussehen' style='width: 100%; height: 60px'}
                </div>
-               <div style="float: left; margin-left: 8px">
-                  <label for="grosse">Grösse</label>
-                  {html_text name='grosse'}
-                  <label for="gewicht">Gewicht:</label>
-                  {html_text name='gewicht'}
-                  <label for='augenfarbe'>Augenfarbe</label>
-                  {html_text name='augenfarbe'}
-               </div><br />
-               <label for="aussehen">Aussehen:</label>
-               {html_textarea name='aussehen' style='width: 100%; height: 60px'}
+               <h3 onclick="toggle_h3('eigenschaften')">Eigenschaften &amp; Basiswerte</h3>
+               <div id="eigenschaften" style="display: none">
+                  <div class="column" style="margin-left: 0px">
+                     {section name=idx loop=$eigenschaften}
+                        <label for="{$eigenschaften[idx].name|lower}">{$eigenschaften[idx].name|capitalize|escape}</label>
+                        {html_text name=`$eigenschaften[idx].name|lower`}
+                     {/section}
+                  </div><br />
+               </div>
             </div>
          </div>
          {carto_button name='btn_new_character' value='New Character' onclick="new_character()"}
@@ -56,7 +75,9 @@
          </form>
       </div>
       <script type="text/javascript">
-         <!--{literal}
+         <!--
+         var old_val = new Array();
+         var character_id = 0;{literal}
          $(document).ready(function() {
             // Set validation on new character-form
             $('#frm_name').validate({
@@ -70,14 +91,24 @@
                   return false;
                }
             });
+            // Set onfocus on edit-fields
+            $('#data input[type=text], #data textarea').focus(function(e) {
+               // Save original value
+               old_val[this.id] = $(this).val();
+               console.log('Old value of ' + this.id + ' = ' + old_val[this.id]);
+            });
             // Set onblur on edit-fields
-            $('#data input').blur(function(e) {
+            $('#data input[type=text], #data textarea').blur(function(e) {
+               var v = $(this).val();
+               if (old_val[this.id] == v) {
+                  // Nothing changed, return
+                  return;
+               }
                // Update edit field in database
                if (this.id == 'alter' ||
                    this.id == 'grosse' ||
                    this.id == 'gewicht') {
                   // Should be a number, show error if not and focus field again
-                  var v = $(this).val();
                   var intRegEx = /^\d*$/;
                   if (! intRegEx.test(v)) {
                      $(this).addClass('error');
@@ -87,8 +118,43 @@
                   }
                }
                // Send ajax-request
+               $.ajax({
+                  datatype: 'json',
+                  type    : 'post',
+                  url     : 'characters.php',
+                  data    : {stage    : 'update_field',
+                             char_id  : character_id,
+                             fieldname: this.id,
+                             value    : v},
+                  success : update_field
+               });
             });
          });
+         function toggle_h3(div_name) {
+            // Opens the div with the given name, closes all others
+            $('#data h3 + div').slideUp();
+            $('#' + div_name).slideDown();
+         }
+         function update_field(data) {
+            try {
+               data = $.parseJSON(data);
+            } catch(e) {
+                  alert(e + "\nData: " + data.toSource());
+                  return false;
+            }
+            if (! data.success) {
+               if (data.message) {
+                  alert('Error: ' + data.message);
+               }
+               // Something went wrong, restore old value
+               alert('Could not update ' + data.fieldname + ', reset to ' + old_val[data.fieldname]);
+               fid = '#' + data.fieldname;
+               console.log('Field is ' + fid)
+               $(fid).val(old_val[data.fieldname]);
+               return false;
+            }
+
+         }
          function showRequest(formData, jqForm, options) {
             // formData is an array; here we use $.param to convert it to a string to display it
             // but the form plugin does this for you automatically when it submits the data
@@ -168,6 +234,7 @@
             character = $.parseJSON(data);
             // Character data is in an array called data, retrieve that
             data = character.data;
+            character_id = data.id;
             // Set data
             $('#main_name').text(htmlescape(data.name));
             $('#geschlecht').val(htmlescape(data.geschlecht));
@@ -177,6 +244,9 @@
             $('#gewicht').val(htmlescape(data.gewicht));
             $('#augenfarbe').val(htmlescape(data.augenfarbe));
             $('#aussehen').val(htmlescape(data.aussehen));
+            $('#rasse').val(htmlescape(data.rasse));
+            $('#kultur').val(htmlescape(data.kultur));
+            $('#profession').val(htmlescape(data.profession));
             // Set function
             $('#img_edit_name').click(function() {
                edit_name(data.id);

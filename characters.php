@@ -17,6 +17,15 @@ function show() {
       $characters[] = $row;
    }
    $smarty->assign('characters', $characters);
+   # Get list of traits
+   $qry = 'SELECT name ';
+   $qry .= 'FROM  traits ';
+   $qry .= 'ORDER BY name';
+   $rid = $db->do_query($qry, true);
+   while ($row = $db->get_array($rid)) {
+      $eigenschaften[] = $row;
+   }
+   $smarty->assign('eigenschaften', $eigenschaften);
 }
 
 function add_character($name) {
@@ -110,6 +119,37 @@ function edit_name($char_id, $name) {
                 'name'    => $name);
 }
 
+function update_field() {
+   global $db, $debug;
+
+   $field = trim($_REQUEST[fieldname]);
+   $_field = pg_escape_string($field);
+   if (! $_field) {
+      return array('success' => false,
+                   'message' => 'invalid field specified');
+   }
+   if (! $_REQUEST[char_id] or
+       $_REQUEST[char_id] != intval($_REQUEST[char_id])) {
+      return array('success' => false,
+                   'message' => 'invalid character id given');
+   }
+   $qry = 'UPDATE characters SET ';
+   $qry .= $_field . " = '" . pg_escape_string($_REQUEST[value]) . "' ";
+   $qry .= 'WHERE id = ' . $_REQUEST[char_id];
+   #return array('success' => false,
+                #'message' => $qry);
+
+   if (! $db->do_query($qry, false)) {
+      if ($debug) {
+         return array('success'   => false,
+                      'message'   => 'database-error ' + pg_last_error(),
+                      'fieldname' => $field);
+      }
+      return array('success'   => false,
+                   'fieldname' => $field);
+   }
+   return array('success' => true);
+}
 switch ($_REQUEST[stage]) {
    case 'main':
       echo json_encode(show_main($_REQUEST[char_id]));
@@ -119,6 +159,9 @@ switch ($_REQUEST[stage]) {
          echo json_encode(edit_name($_REQUEST[char_id], $_REQUEST[name]));
       else
          echo json_encode(add_character($_REQUEST[name]));
+      break;
+   case 'update_field':
+      echo json_encode(update_field());
       break;
    default:
       show();
