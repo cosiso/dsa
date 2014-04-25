@@ -46,6 +46,10 @@ input {
 textarea {
 	border: 1px groove #A68646;
 }
+input.show_disabled {
+	color: #A64646;
+	font-weight: bold;
+}
 /* error indication */
 input.error {
 	border:2px solid #FF0000 !important;

@@ -54,7 +54,10 @@
                   <div class="column" style="margin-left: 0px">
                      {section name=idx loop=$eigenschaften}
                         <label for="{$eigenschaften[idx].name|lower}">{$eigenschaften[idx].name|capitalize|escape}</label>
-                        {html_text name=`$eigenschaften[idx].name|lower`}
+                        <b>Current</b> {html_text name=$eigenschaften[idx].name|lower class='show_disabled' style='width: 40px' disabled=true}
+                        <b>Base</b> {html_text name=$eigenschaften[idx].name|lower|cat:'_base' style='width: 25px'}
+                        <b>Bought</b> {html_text name=$eigenschaften[idx].name|lower|cat:'_zugekauft' style='width: 25px'}
+                        <b>Modifier</b> {html_text name=$eigenschaften[idx].name|lower|cat:'_modifier' style='width: 25px'}
                      {/section}
                   </div><br />
                </div>
@@ -98,38 +101,102 @@
                console.log('Old value of ' + this.id + ' = ' + old_val[this.id]);
             });
             // Set onblur on edit-fields
-            $('#data input[type=text], #data textarea').blur(function(e) {
-               var v = $(this).val();
-               if (old_val[this.id] == v) {
-                  // Nothing changed, return
-                  return;
-               }
-               // Update edit field in database
-               if (this.id == 'alter' ||
-                   this.id == 'grosse' ||
-                   this.id == 'gewicht') {
-                  // Should be a number, show error if not and focus field again
-                  var intRegEx = /^\d*$/;
-                  if (! intRegEx.test(v)) {
-                     $(this).addClass('error');
-                     return;
-                  } else {
-                     $(this).removeClass('error');
-                  }
-               }
-               // Send ajax-request
-               $.ajax({
-                  datatype: 'json',
-                  type    : 'post',
-                  url     : 'characters.php',
-                  data    : {stage    : 'update_field',
-                             char_id  : character_id,
-                             fieldname: this.id,
-                             value    : v},
-                  success : update_field
-               });
-            });
+            $('#data #general_data input[type=text], #data textarea').blur(blur_general_data);
+            $('#data #eigenschaften input[type=text], #data textarea').blur(blur_eigenschaften);
          });
+         function blur_eigenschaften(e) {
+            // Verify if this field may be edited
+            fieldname = this.id;
+            if (! fieldname.match(/_(base|zugekauft|modifier)$/)) {
+               alert('This field (' + fieldname + ') cannot be edited');
+               return false;
+            }
+            // See if value actually changed
+            var v = $(this).val();
+            if (v != old_val[fieldname]) {
+               // New value must be an integer
+               var intRegEx = /^\d*$/;
+               if (! intRegEx.test(v)) {
+                  $(this).addClass('error');
+                  return false;
+               } else {
+                  $(this).removeClass('error');
+                  // Disable field and make Ajax-request
+                  this.disabled = true;
+                  $.ajax({
+                     datatype: 'json',
+                     type    : 'post',
+                     url     : 'characters.php',
+                     data    : {'stage'    : 'update_eigenschaft',
+                                'char_id'  : character_id,
+                                'fieldname': fieldname,
+                                'value'    : v},
+                     success : update_eigenschaft
+                  });
+               }
+            }
+         }
+         function extract_json(data) {
+            try {
+               data = $.parseJSON(data);
+            } catch(e) {
+                  alert(e + "\nData: " + data.toSource());
+                  return false;
+            }
+            if (! data.success && data.message) {
+               alert('Error: ' + data.message);
+            }
+            return data;
+         }
+         function update_eigenschaft(data) {
+            data = extract_json(data)
+            if (! data.success) {
+               // Something went wrong, restore old value
+               if (! data.fieldname) {
+                  alert('Unexpected error');
+                  return false;
+               }
+               alert('Could not update ' + data.fieldname + ', reset to ' + old_val[data.fieldname]);
+               $('#eigenschaften #' + data.fieldname).val(old_val[data.fieldname]);
+               $('#eigenschaften #' + data.fieldname).prop('disabled', false);
+               return false;
+            }
+            // All went fine, enable field
+            $('#eigenschaften #' + data.fieldname).prop('disabled', false);
+         }
+         function blur_general_data(e) {
+            var v = $(this).val();
+            if (old_val[this.id] == v) {
+               // Nothing changed, return
+               return;
+            }
+            // Update edit field in database
+            if (this.id == 'alter' ||
+                this.id == 'grosse' ||
+                this.id == 'gewicht') {
+               // Should be a number, show error if not and focus field again
+               var intRegEx = /^\d*$/;
+               if (! intRegEx.test(v)) {
+                  $(this).addClass('error');
+                  return;
+               } else {
+                  $(this).removeClass('error');
+               }
+            }
+            // Disable field
+            this.disabled = true;
+            // Send ajax-request
+            $.ajax({
+               datatype: 'json',
+               type    : 'post',
+               url     : 'characters.php',
+               data    : {stage    : 'update_field',
+                          char_id  : character_id,
+                          fieldname: this.id,
+                          value    : v},
+               success : update_field
+            });
+         }
          function toggle_h3(div_name) {
             // Opens the div with the given name, closes all others
             $('#data h3 + div').slideUp();
@@ -148,12 +215,12 @@
                }
                // Something went wrong, restore old value
                alert('Could not update ' + data.fieldname + ', reset to ' + old_val[data.fieldname]);
-               fid = '#' + data.fieldname;
-               console.log('Field is ' + fid)
-               $(fid).val(old_val[data.fieldname]);
+               $('#' + data.fieldname).val(old_val[data.fieldname]);
+               $('#' + data.fieldname).prop('disabled', false);
                return false;
             }
-
+            // All went fine, enable field
+            $('#' + data.fieldname).prop('disabled', false);
          }
          function showRequest(formData, jqForm, options) {
             // formData is an array; here we use $.param to convert it to a string to display it
@@ -231,7 +298,18 @@
             });
          }
          function show_char_main(data) {
-            character = $.parseJSON(data);
+            try {
+               character = $.parseJSON(data);
+            } catch(e) {
+                  alert(e + "\nData: " + character.toSource());
+                  return false;
+            }
+            if (! character.success) {
+               if (character.message) {
+                  alert('Error: ' + character.message);
+               }
+               return false;
+            }
             // Character data is in an array called data, retrieve that
             data = character.data;
             character_id = data.id;
@@ -253,6 +331,21 @@
             });
             // Show main
             $('#main').show();
+            // Set eigenschaften from array 'eigenschaften'
+            $.each(character.eigenschaften, function(index, value) {
+               var eigenschaft = value.name.toLowerCase();
+               $('#eigenschaften #' + eigenschaft + '_base').val(value.base);
+               var total = value.base;
+               if (value.zugekauft) {
+                  total += value.zugekauft;
+                  $('#eigenschaften #' + eigenschaft + '_zugekauft').val(value.zugekauft);
+               }
+               if (value.modifier) {
+                  total += value.modifier;
+                  $('#eigenschaften #' + eigenschaft + '_modifier').val(value.modifier);
+               }
+               $('#eigenschaften #' + eigenschaft).val(total);
+            });
          }
          function new_character() {
             // Empty fields
