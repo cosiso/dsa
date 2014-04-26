@@ -1,6 +1,6 @@
 <?php
 function smarty_function_carto_spacer($params, &$smarty) {
-   $src = '/images/spacer.gif';
+   $src = '/dsa/images/spacer.gif';
    $width = '1';
    $height = '1';
    $border = '0';

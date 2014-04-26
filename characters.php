@@ -78,7 +78,7 @@ function show_main($char_id) {
    $qry = 'SELECT character_eigenschaften.*, traits.name ';
    $qry .= 'FROM  character_eigenschaften, traits ';
    $qry .= 'WHERE traits.id = character_eigenschaften.eigenschaft AND ';
-   $qry .= "      character_eigenschaften.eigenschaft = $char_id ";
+   $qry .= "      character_eigenschaften.character = $char_id ";
 #   return array('success' => false,
                 #'message' => $qry);
    $rid = $db->do_query($qry, true);
@@ -95,6 +95,10 @@ function update_eigenschaft() {
    if (! $_REQUEST[char_id] or intval($_REQUEST[char_id] != $_REQUEST[char_id])) {
       return array('success' => false,
                    'message' => 'invalid character id');
+   }
+   if (! $_REQUEST[value] or intval($_REQUEST[value] != $_REQUEST[value])) {
+      return array('success' => false,
+                   'message' => 'invalid value given');
    }
    $fieldname = trim($_REQUEST[fieldname]);
    if (! $fieldname) {
@@ -121,8 +125,29 @@ function update_eigenschaft() {
    $qry .= 'WHERE character = ' . $_REQUEST[char_id] . ' AND ';
    $qry .= "      eigenschaft = $eigenschaft_id";
    $row_id = $db->fetch_field($qry, true);
-   return array('success' => false,
-                'message' => 'Returned from update_eigenschaft with row: ' . $row_id,
+   if ($row_id) {
+      # Update value
+      $qry = 'UPDATE character_eigenschaften SET ';
+      $qry .= "      $column = {$_REQUEST[value]} ";
+      $qry .= "WHERE id = $row_id";
+   } else {
+      # Insert value
+      $base = 0; $zugekauft = 0; $modifier = 0;
+      $$column = $_REQUEST[value];
+      $qry = 'INSERT INTO character_eigenschaften ';
+      $qry .= '(character, eigenschaft, base, zugekauft, modifier) VALUES (';
+      $qry .= $_REQUEST[char_id] . ', ';
+      $qry .= "$eigenschaft_id, ";
+      $qry .= "$base, ";
+      $qry .= "$zugekauft, ";
+      $qry .= "$modifier)";
+   }
+   if (! @$db->do_query($qry, false)) {
+      return array('success'   => false,
+                   'message'   => 'database error' . ( ($debug) ? ': ' . pg_last_error() : ''),
+                   'fieldname' => $fieldname);
+   }
+   return array('success'   => true,
                 'fieldname' => $fieldname);
 }
 function edit_name($char_id, $name) {

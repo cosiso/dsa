@@ -98,7 +98,6 @@
             $('#data input[type=text], #data textarea').focus(function(e) {
                // Save original value
                old_val[this.id] = $(this).val();
-               console.log('Old value of ' + this.id + ' = ' + old_val[this.id]);
             });
             // Set onblur on edit-fields
             $('#data #general_data input[type=text], #data textarea').blur(blur_general_data);
@@ -156,12 +155,13 @@
                   alert('Unexpected error');
                   return false;
                }
-               alert('Could not update ' + data.fieldname + ', reset to ' + old_val[data.fieldname]);
                $('#eigenschaften #' + data.fieldname).val(old_val[data.fieldname]);
                $('#eigenschaften #' + data.fieldname).prop('disabled', false);
                return false;
             }
-            // All went fine, enable field
+            // All went fine, recalc total and enable field
+            var field = data.fieldname.split('_');
+            recalc_total(field[0], true);
             $('#eigenschaften #' + data.fieldname).prop('disabled', false);
          }
          function blur_general_data(e) {
@@ -221,6 +221,21 @@
             }
             // All went fine, enable field
             $('#' + data.fieldname).prop('disabled', false);
+            return true;
+         }
+         function recalc_total(name, highlight) {
+            var total = 0;
+            var fields = new Array('base', 'zugekauft', 'modifier');
+            for (var i = 0, l = fields.length; i < l; i++) {
+               var v = parseInt($('#eigenschaften #' + name + '_' + fields[i]).val());
+               if (v) {
+                  total += v;
+               }
+            }
+            $('#eigenschaften #' + name).val(total);
+            if (highlight) {
+               $('#eigenschaften #' + name).effect('highlight', {}, 2000);
+            }
          }
          function showRequest(formData, jqForm, options) {
             // formData is an array; here we use $.param to convert it to a string to display it
@@ -331,20 +346,21 @@
             });
             // Show main
             $('#main').show();
+            // Clear eigenschaften first
+            $('#eigenschaften input').val('');
             // Set eigenschaften from array 'eigenschaften'
             $.each(character.eigenschaften, function(index, value) {
                var eigenschaft = value.name.toLowerCase();
-               $('#eigenschaften #' + eigenschaft + '_base').val(value.base);
-               var total = value.base;
+               if (value.base) {
+                  $('#eigenschaften #' + eigenschaft + '_base').val(value.base);
+               }
                if (value.zugekauft) {
-                  total += value.zugekauft;
                   $('#eigenschaften #' + eigenschaft + '_zugekauft').val(value.zugekauft);
                }
                if (value.modifier) {
-                  total += value.modifier;
                   $('#eigenschaften #' + eigenschaft + '_modifier').val(value.modifier);
                }
-               $('#eigenschaften #' + eigenschaft).val(total);
+               recalc_total(eigenschaft, false);
             });
          }
          function new_character() {

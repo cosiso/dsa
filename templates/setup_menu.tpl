@@ -17,4 +17,9 @@
    {else}
       <div><a href="setup_talenten.php">Talente</a></div>
    {/if}
+   {if $selected_category eq 'Vorteile'}
+      <div class="selected_menu">Vor- &amp; Nachteile</div>
+   {else}
+      <div><a href="setup_vorteile.php">Vor- &amp; Nachteile</a></div>
+   {/if}
 </div>
