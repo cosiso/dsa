@@ -8,6 +8,14 @@ body {
    background-repeat: no-repeat;
    color: #215452;
 }
+/* No underlining of links */
+a {
+	text-decoration: none;
+}
+/* remove colors for visited links */
+a:visited {
+	color: #215452;
+}
 
 /* hover color for tables */
 .row-hover {
@@ -17,8 +25,42 @@ body {
    background-color: #c5e9e9 !important;
 }
 
+/* Tables */
 th {
 	text-align: left;
+	background-color: #9bafaf;
+	padding: 4px;
+	padding-right: 20px;
+	border: 1px solid #FFF;
+}
+/* header is set by tablesorter */
+th.header {
+	background-image: url('../images/arrow_ns.png');
+	background-position: right center;
+	background-repeat: no-repeat;
+	background-color: #9bafaf;
+	cursor: pointer;
+	padding: 4px;
+	padding-right: 20px;
+	border: 1px solid #FFF;
+}
+/* headerSortUp and headerSortDown are set by tablesorter */
+th.headerSortUp {
+	background-color: #409898;
+	background-image: url('../images/arrow_up.png');
+}
+th.headerSortDown {
+	background-color: #409898;
+	background-image: url('../images/arrow_down.png');
+}
+/* hover class for sortable rows */
+tbody.hover > tr:hover {
+   background-color: #c5e9e9;
+}
+/* Give sortable rows a border */
+tbody.hover td {
+	border: 1px solid #FFF;
+	padding: 2px;
 }
 
 /* Make br end floats */
@@ -124,6 +166,7 @@ label {
 .button_bar {
 	margin-top: 5px;
 }
+
 .popup {
    width:  240px;
    height: 130px;
@@ -144,6 +187,17 @@ div.column {
 	margin-left: 8px;
 }
 
+/* simpletip */
+.tooltip {
+	position: absolute;
+	top: 0;
+	left: 0;
+	z-index: 3;
+	display: none;
+	background-color: #F5F5B5;
+   border: 1px solid #DECA7E;
+   color: #303030;
+}
 /* Menu */
 ol.sub-menu {
 	list-style: none;
@@ -220,6 +274,26 @@ a.link-cancel {
 	background-repeat: no-repeat;
 	padding-left: 16px;
 	padding-bottom: 5px;
+}
+a.link-info {
+	background-image: url('../images/information-balloon.png');
+	background-repeat: no-repeat;
+	padding-left: 16px;
+	padding-bottom: 5px;
+}
+a.link-add {
+	background-image: url('../images/plus-24.png');
+	background-repeat: no-repeat;
+	background-position: left center;
+	border-radius: 12px;
+	padding: 8px;
+	padding-left: 28px;
+	font-size: 12px;
+	font-variant: small-caps;
+	border: 1px solid #AAA;
+}
+a.link-add:hover {
+	background-color: #F5F5B5;
 }
 
 /* Menu buttons */
