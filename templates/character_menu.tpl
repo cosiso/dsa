@@ -6,6 +6,8 @@
             <li id="li-char-{$characters[idx].id}" onclick="select_char({$characters[idx].id})"><a href="#">{$characters[idx].name|escape}</a></li>
          {/section}
       </ol>
+      <br />
+      <a id="btn_add_character" class="link-add" href="#" onclick="ask_new_character()">Add character</a>
    {/if}
    {*}
    {if $selected_category == 'Talenten'}

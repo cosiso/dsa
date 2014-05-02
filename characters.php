@@ -188,9 +188,70 @@ function edit_name($char_id, $name) {
       return array('success' => false,
                    'message' => $msg);
    }
+   return array('success'      => true,
+                'update'       => true,
+                'character_id' => $char_id,
+                'name'         => $name);
+}
+
+function remove_char() {
+   global $db, $debug;
+
+   if (! $_REQUEST[id] or
+       $_REQUEST[id] != intval($_REQUEST[id])) {
+      return array('success' => false,
+                   'message' => 'invalid id specified');
+   }
+   $qry = 'DELETE FROM characters ';
+   $qry .= 'WHERE id = ' . $_REQUEST[id];
+   $rid = @$db->do_query($qry, false);
+   if (! $rid) {
+      return array('success' => false,
+                   'message' => 'database-error while removing');
+   }
    return array('success' => true,
-                'update'  => true,
-                'name'    => $name);
+                'id'      => $_REQUEST[id]);
+}
+function retrieve_vorteile() {
+   global $db, $debug, $smarty;
+
+   if (! $_REQUEST[id] or
+       $_REQUEST[id] != intval($_REQUEST[id])) {
+      return array('success' => false,
+                   'message' => 'invalid id specified');
+   }
+   $qry = 'SELECT vorteile.name, vorteile.effect, char_vorteile.value, ';
+   $qry .= '      char_vorteile.note, char_vorteile.id ';
+   $qry .= 'FROM  char_vorteile, vorteile ';
+   $qry .= 'WHERE char_vorteile.character_id = ' . $_REQUEST[id] . ' AND ';
+   $qry .= '      vorteile.id = char_vorteile.vorteil_id ';
+   $qry .= 'ORDER BY name';
+   $rid = @$db->do_query($qry, false);
+   if (! $rid) {
+      return array('success' => false,
+                   'message' => 'database-error while retrieving vorteile' . ($debug) ? ': ' . pg_last_error() : '');
+   }
+   while ($row = $db->get_array($rid)) {
+      $vorteile[] = $row;
+   }
+   $smarty->assign('vorteile', $vorteile);
+   $out = $smarty->fetch('character_vorteile.tpl');
+   return array('success' => true,
+                'html'    => $out);
+}
+function fetch_vorteile() {
+   global $db, $debug, $smarty;
+
+   $qry = 'SELECT id, name, vorteil ';
+   $qry .= 'FROM  vorteile ';
+   $qry .= 'ORDER BY name';
+   $rid = $db->do_query($qry, true);
+   while ($row = $db->get_array($rid)) {
+      $vorteile[] = $row;
+   }
+   $smarty->assign('vorteile', $vorteile);
+   $out = $smarty->fetch('character_vorteile_frm.tpl');
+   return $out;
 }
 
 function update_field() {
@@ -226,6 +287,12 @@ function update_field() {
                 'fieldname' => $field);
 }
 switch ($_REQUEST[stage]) {
+   case 'fetch_vorteile':
+      echo fetch_vorteile();
+      break;
+   case 'retrieve_vorteile':
+      echo json_encode(retrieve_vorteile());
+      break;
    case 'main':
       echo json_encode(show_main($_REQUEST[char_id]));
       break;
@@ -240,6 +307,9 @@ switch ($_REQUEST[stage]) {
       break;
    case 'update_eigenschaft':
       echo json_encode(update_eigenschaft());
+      break;
+   case 'remove':
+      echo json_encode(remove_char());
       break;
    default:
       show();

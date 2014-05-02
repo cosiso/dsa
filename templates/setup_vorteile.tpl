@@ -4,6 +4,7 @@
       <title>DSA - setup</title>
       <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
       <link href="css/dsa.css" rel="stylesheet" type="text/css" />
+      <link href="css/alertify.css" rel="stylesheet" type="text/css" />
    </head>
    <body>
       {include file="head.tpl"}
@@ -33,7 +34,7 @@
                               <span id="span_desc_{$vorteile[idx].id}" style="display: none"></span>
                               <a id="tip_desc_{$vorteile[idx].id}" href="#" class="link-info">info</a>
                               | <a id="edit_desc_{$vorteile[idx].id}" href="#" class="link-edit">edit</a>
-                              | <a href="#" onclick="alert('delete')" class="link-cancel">remove</a>
+                              | <a href="#" onclick="confirm_delete({$vorteile[idx].id})" class="link-cancel">remove</a>
                            </td>
                         </tr>
                      {/section}
@@ -88,6 +89,7 @@
       <script type="text/javascript" src="scripts/jquery.form.min.js"></script>
       <script type="text/javascript" src="scripts/jquery.simpletip-1.3.1.min.js"></script>
       <script type="text/javascript" src="scripts/jquery.tablesorter.min.js"></script>
+      <script type="text/javascript" src="scripts/alertify.min.js"></script>
       <script type="text/javascript">
          <!--{literal}
          $(document).ready(function() {
@@ -126,6 +128,32 @@
                onContentLoad : add_popup_validation
             });
          })
+         function confirm_delete(id) {
+            // Retrieve name of vorteil
+            var name=$('#vorteil_' + id + ' #cell_name').text();
+            alertify.confirm('Remove: ' + name + '?', function(e) {
+               if (e) {
+                  $.ajax({
+                     type     : 'post',
+                     url      : 'setup_vorteile.php',
+                     data     : {'stage' : 'remove',
+                                 'id'    : id},
+                     datatype : 'json',
+                     success  : do_delete_vorteil
+                  });
+                  alertify.log('Removing: ' + name);
+               }
+            });
+            return false;
+         }
+         function do_delete_vorteil(data) {
+            data = extract_json(data);
+            if (data.success) {
+               var row = $('#vorteil_' + data.id);
+               row.effect('highlight', {}, 2000);
+               row.remove();
+            }
+         }
          function destroy_popup_form() {
             var form = $('#frm_vorteil').unbind('validate');
             form.remove();
@@ -262,7 +290,7 @@
                row += '<td id="cell_links">';
                row += '<a id="tip_desc_' + response.id + '" class="link-info" href="#">info</a>';
                row += ' | <a id="edit_desc_' + response.id + '" class="link-edit" href="#">edit</a>';
-               row += ' | <a class="link-cancel" href="#">remove</a>';
+               row += ' | <a class="link-cancel" onclick="confirm_delete(' + response.id + ')" href="#">remove</a>';
                row += '</td></tr>';
                // Append the row to the table
                if (response.vorteil) {

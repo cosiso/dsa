@@ -151,7 +151,29 @@ function show_edit() {
    }
 }
 
+function remove_vorteil() {
+   global $db, $debug;
+
+   if (! $_REQUEST[id] or
+       $_REQUEST[id] != intval($_REQUEST[id])) {
+      return array('success' => false,
+                   'message' => 'invalid id specified');
+   }
+   $qry = 'DELETE FROM vorteile ';
+   $qry .= 'WHERE id = ' . $_REQUEST[id];
+   $rid = @$db->do_query($qry, false);
+   if (! $rid) {
+      return array('success' => false,
+                   'message' => 'database-error while deleting');
+   }
+   return array('success' => true,
+                'id'      => $_REQUEST[id]);
+}
+
 switch ($_REQUEST[stage]) {
+   case 'remove':
+      echo json_encode(remove_vorteil());
+      break;
    case "new":
       echo json_encode(update_vorteil());
       break;
