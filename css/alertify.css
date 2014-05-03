@@ -178,3 +178,12 @@
 	background: #DFF0D8;
 	border: 1px solid #D6E9C6;
 }
+.alertify-alert .alertify-message {
+	font-weight: bold;
+	background: #F66;
+   box-shadow: inset 0 2px 4px #F00, 0 1px 2px #F66;
+}
+.alertify-alert .alertify-buttons {
+	background: #F66;
+   box-shadow: inset 0 2px 4px #F66, 0 1px 2px #F66;
+}

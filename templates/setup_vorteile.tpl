@@ -214,13 +214,10 @@
             var api;
             // Find element to which simpletip was added
             var id = $('#frm_vorteil #id').val();
-            console.log('ID: ' + id);
             if (id == '' || id == '0') {
                // We were called with an add button
-               console.log('Which add button??');
                // Check if vorteil is 1
                var vorteil = $('#frm_vorteil #is_vorteil').val();
-               console.log('Vorteil: ' + vorteil);
                if (vorteil == '1') {
                   api = $('#btn_add_vorteil').eq(0).simpletip();
                } else {

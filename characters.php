@@ -212,47 +212,6 @@ function remove_char() {
    return array('success' => true,
                 'id'      => $_REQUEST[id]);
 }
-function retrieve_vorteile() {
-   global $db, $debug, $smarty;
-
-   if (! $_REQUEST[id] or
-       $_REQUEST[id] != intval($_REQUEST[id])) {
-      return array('success' => false,
-                   'message' => 'invalid id specified');
-   }
-   $qry = 'SELECT vorteile.name, vorteile.effect, char_vorteile.value, ';
-   $qry .= '      char_vorteile.note, char_vorteile.id ';
-   $qry .= 'FROM  char_vorteile, vorteile ';
-   $qry .= 'WHERE char_vorteile.character_id = ' . $_REQUEST[id] . ' AND ';
-   $qry .= '      vorteile.id = char_vorteile.vorteil_id ';
-   $qry .= 'ORDER BY name';
-   $rid = @$db->do_query($qry, false);
-   if (! $rid) {
-      return array('success' => false,
-                   'message' => 'database-error while retrieving vorteile' . ($debug) ? ': ' . pg_last_error() : '');
-   }
-   while ($row = $db->get_array($rid)) {
-      $vorteile[] = $row;
-   }
-   $smarty->assign('vorteile', $vorteile);
-   $out = $smarty->fetch('character_vorteile.tpl');
-   return array('success' => true,
-                'html'    => $out);
-}
-function fetch_vorteile() {
-   global $db, $debug, $smarty;
-
-   $qry = 'SELECT id, name, vorteil ';
-   $qry .= 'FROM  vorteile ';
-   $qry .= 'ORDER BY name';
-   $rid = $db->do_query($qry, true);
-   while ($row = $db->get_array($rid)) {
-      $vorteile[] = $row;
-   }
-   $smarty->assign('vorteile', $vorteile);
-   $out = $smarty->fetch('character_vorteile_frm.tpl');
-   return $out;
-}
 
 function update_field() {
    global $db, $debug;
@@ -287,12 +246,6 @@ function update_field() {
                 'fieldname' => $field);
 }
 switch ($_REQUEST[stage]) {
-   case 'fetch_vorteile':
-      echo fetch_vorteile();
-      break;
-   case 'retrieve_vorteile':
-      echo json_encode(retrieve_vorteile());
-      break;
    case 'main':
       echo json_encode(show_main($_REQUEST[char_id]));
       break;

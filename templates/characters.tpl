@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html>
    <head>
-      <title>DSA - setup</title>
+      <title>DSA - characters</title>
       <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
       <link href="css/dsa.css" rel="stylesheet" type="text/css" />
       <link href="css/alertify.css" rel="stylesheet" type="text/css" />
@@ -47,6 +47,7 @@
                   <label for="aussehen">Aussehen:</label>
                   {html_textarea name='aussehen' style='width: 100%; height: 60px'}
                </div>
+               <hr />
                <h3 onclick="toggle_h3('eigenschaften')">Eigenschaften &amp; Basiswerte</h3>
                <div id="eigenschaften" style="display: none">
                   <div class="column" style="margin-left: 0px">
@@ -59,11 +60,13 @@
                      {/section}
                   </div>
                </div>
+               <hr />
                {* Vor- & Nachteile *}
                <h3 id="h3_vorteile">Vor- &amp; Nachteile</h3>
                <div id="vorteile"></div>
+               <hr />
             </div>
-            <a id="btn_remove_char" class="link-del">Remove character</a>
+            {carto_spacer height=16}<br /><a id="btn_remove_char" class="link-del">Remove character</a>
          </div>
       </div>
       <script src="scripts/jquery.js"></script>
@@ -99,39 +102,6 @@
             $('#data #general_data input[type=text], #data textarea').blur(blur_general_data);
             $('#data #eigenschaften input[type=text], #data textarea').blur(blur_eigenschaften);
          });
-         function do_update_vorteile(data) {
-            data = extract_json(data);
-            if (data.success) {
-               $('#vorteile').html(data.html);
-               $('#btn_add_vorteil').simpletip({
-                  persistent    : true,
-                  focus         : true,
-                  onBeforeShow  : function() {
-                     this.load('characters.php', {'stage' : 'fetch_vorteile'});
-                  },
-                  onContentLoad : add_select_to_vorteile});
-            }
-         }
-         function vorteil_selected() {
-            alert('Vorteil selected');
-            $('#btn_add_vorteil').eq(0).simpletip().hide();
-
-         }
-         function add_select_to_vorteile() {
-            $('#list_vorteile').select2();
-         }
-         function retrieve_vorteile(id) {
-            var name = $('#main_name').text();
-            alertify.log('Retrieving vorteile for ' + name);
-            $.ajax({
-               datatype : 'json',
-               type     : 'post',
-               url      : 'characters.php',
-               data     : {'stage' : 'retrieve_vorteile',
-                           'id'    : id},
-               success  : do_update_vorteile
-            });
-         }
          function ask_new_character() {
             alertify.prompt('Name of new character', function(e, str) {
                if (e && str != '') {
@@ -150,7 +120,7 @@
             // Verify if this field may be edited
             fieldname = this.id;
             if (! fieldname.match(/_(base|zugekauft|modifier)$/)) {
-               alert('This field (' + fieldname + ') cannot be edited');
+               alertify.alert('This field (' + fieldname + ') cannot be edited');
                return false;
             }
             // See if value actually changed
@@ -182,11 +152,11 @@
             try {
                data = $.parseJSON(data);
             } catch(e) {
-                  alert(e + "\nData: " + data.toSource());
+                  alertify.alert(e + "\nData: " + data.toSource());
                   return false;
             }
             if (! data.success && data.message) {
-               alert('Error: ' + data.message);
+               alertify.alert('Error: ' + data.message);
             }
             return data;
          }
@@ -195,7 +165,7 @@
             if (! data.success) {
                // Something went wrong, restore old value
                if (! data.fieldname) {
-                  alert('Unexpected error');
+                  alertify.alert('Unexpected error');
                   return false;
                }
                $('#eigenschaften #' + data.fieldname).val(old_val[data.fieldname]);
@@ -249,15 +219,15 @@
             try {
                data = $.parseJSON(data);
             } catch(e) {
-                  alert(e + "\nData: " + data.toSource());
+                  alertify.alert(e + "\nData: " + data.toSource());
                   return false;
             }
             if (! data.success) {
                if (data.message) {
-                  alert('Error: ' + data.message);
+                  alertify.alert('Error: ' + data.message);
                }
                // Something went wrong, restore old value
-               alert('Could not update ' + data.fieldname + ', reset to ' + old_val[data.fieldname]);
+               alertify.alert('Could not update ' + data.fieldname + ', reset to ' + old_val[data.fieldname]);
                $('#' + data.fieldname).val(old_val[data.fieldname]);
                $('#' + data.fieldname).prop('disabled', false);
                return false;
@@ -289,7 +259,7 @@
             // DOM element for the form do this:
             // var formElement = jqForm[0];
 
-            alert('About to submit: \n\n' + queryString);
+            alertify.alert('About to submit: \n\n' + queryString);
 
             // here we could return false to prevent the form from being submitted;
             // returning anything other than false will allow the form submit to continue
@@ -300,12 +270,12 @@
          }
          function do_add_character(response, status, xhr, form) {
             if (! status) {
-               alert('Error processing request, try again');
+               alertify.alert('Error processing request, try again');
                return false;
             }
             response = $.parseJSON(response);
             if (! response.success) {
-               alert('Error: ' + response.message);
+               alertify.alert('Error: ' + response.message);
                return false;
             }
             // Check if this was an update
@@ -373,12 +343,12 @@
             try {
                character = $.parseJSON(data);
             } catch(e) {
-                  alert(e + "\nData: " + character.toSource());
+                  alertify.alert(e + "\nData: " + character.toSource());
                   return false;
             }
             if (! character.success) {
                if (character.message) {
-                  alert('Error: ' + character.message);
+                  alertify.alert('Error: ' + character.message);
                }
                return false;
             }
@@ -455,5 +425,6 @@
          }
          {/literal}//-->
       </script>
+      {include file='characters_vorteile_js.tpl'}
    </body>
 </html>
