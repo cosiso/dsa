@@ -11,15 +11,15 @@
       {include file="head.tpl"}
       {include file="character_menu.tpl" selected="main"}
       <div style="float: left">
-         <div id="main" style="display: none; padding-bottom: 8px">
+         <div id="main">
             <div>
                <h2 id="main_name" style="display: inline"></h2>
                {carto_spacer width=40}
                <img id="img_edit_name" src="images/page_white_paint.png" alt="edit" border="0" style="cursor: pointer" />
             </div>
             <div id="data">
-               <h3 onclick="toggle_h3('general_data')">General data</h3>
-               <div id="general_data">
+               <h3 onclick="toggle_h3('general_data', false)">General data</h3>
+               <div id="general_data" style="display: none">
                   <div class="column" style="margin-left: 0px">
                      <label for="rasse">Rasse:</label>
                      {html_text name='rasse'}
@@ -49,28 +49,8 @@
                   {html_textarea name='aussehen' style='width: 100%; height: 60px'}
                </div>
                <hr />
-               <h3 onclick="toggle_h3('eigenschaften')">Eigenschaften &amp; Basiswerte</h3>
+               <h3 id="h3_eigenschaften">Eigenschaften &amp; Basiswerte</h3>
                <div id="eigenschaften" style="display: none">
-                  <div style="margin-left: 0px">
-                     {section name=idx loop=$eigenschaften}
-                        <label>{$eigenschaften[idx].name|capitalize|escape}</label>
-                        <b>Current</b> {html_text name=$eigenschaften[idx].name|lower class='show_disabled' style='width: 40px' disabled=true}
-                        <b>Base</b> {html_text name=$eigenschaften[idx].name|lower|cat:'_base' style='width: 25px'}
-                        <b>Bought</b> {html_text name=$eigenschaften[idx].name|lower|cat:'_zugekauft' style='width: 25px'}
-                        <b>Modifier</b> {html_text name=$eigenschaften[idx].name|lower|cat:'_modifier' style='width: 25px'}
-                        {carto_spacer width=20}
-                        <span style="cursor: pointer" onclick="roll('{$eigenschaften[idx].name|lower}')">
-                           <img src="images/dice-red-16.png" border="0" alt="roll" />
-                           <img src="images/dice-red-16.png" border="0" alt="roll" />
-                           <img src="images/dice-red-16.png" border="0" alt="roll" />
-                        </span>
-                     {/section}
-                  </div>
-                  <div>
-                     <label>Lebenspunkte</label>
-                     <b>Current</b> {html_text name='lebenspunkte'}
-                     <b>Base</b> {html_text name='lebenspunkte_base' class='show_disabled' style='width: 25px' disabled=true}
-                  </div>
                </div>
                <hr />
                {* Vor- & Nachteile *}
@@ -90,9 +70,9 @@
       <script type="text/javascript" src="scripts/jquery.simpletip-1.3.1.min.js"></script>
       <script type="text/javascript" src="scripts/jquery.tablesorter.min.js"></script>
       <script type="text/javascript">
-         <!--
-         var old_val = new Array();
-         var character_id = 0;{literal}
+         <!--{literal}
+         var old_val = {};
+         var character_id = 0;
          $(document).ready(function() {
             // Set validation on new character-form
             $('#frm_name').validate({
@@ -113,19 +93,7 @@
             });
             // Set onblur on edit-fields
             $('#data #general_data input[type=text], #data textarea').blur(blur_general_data);
-            $('#data #eigenschaften input[type=text], #data textarea').blur(blur_eigenschaften);
          });
-         function roll(eigenschaft) {
-            var value=$('#eigenschaften #' + eigenschaft).val();
-            var die = Math.floor(Math.random() * 20 + 1);
-            var result = value - die;
-            var out = $('#main_name').text() + ' rolled on ' + eigenschaft + ': ' + die + ', result: ' + (value - die);
-            if (result < 0) {
-               alertify.error(out);
-            } else {
-               alertify.success(out);
-            }
-         }
          function ask_new_character() {
             alertify.prompt('Name of new character', function(e, str) {
                if (e && str != '') {
@@ -140,38 +108,6 @@
                }
             });
          }
-         function blur_eigenschaften(e) {
-            // Verify if this field may be edited
-            fieldname = this.id;
-            if (! fieldname.match(/_(base|zugekauft|modifier)$/)) {
-               alertify.alert('This field (' + fieldname + ') cannot be edited');
-               return false;
-            }
-            // See if value actually changed
-            var v = $(this).val();
-            if (v != old_val[fieldname]) {
-               // New value must be an integer
-               var intRegEx = /^\d*$/;
-               if (! intRegEx.test(v)) {
-                  $(this).addClass('error');
-                  return false;
-               } else {
-                  $(this).removeClass('error');
-                  // Disable field and make Ajax-request
-                  this.disabled = true;
-                  $.ajax({
-                     datatype: 'json',
-                     type    : 'post',
-                     url     : 'characters.php',
-                     data    : {'stage'    : 'update_eigenschaft',
-                                'char_id'  : character_id,
-                                'fieldname': fieldname,
-                                'value'    : v},
-                     success : update_eigenschaft
-                  });
-               }
-            }
-         }
          function extract_json(data) {
             try {
                data = $.parseJSON(data);
@@ -183,23 +119,6 @@
                alertify.alert('Error: ' + data.message);
             }
             return data;
-         }
-         function update_eigenschaft(data) {
-            data = extract_json(data)
-            if (! data.success) {
-               // Something went wrong, restore old value
-               if (! data.fieldname) {
-                  alertify.alert('Unexpected error');
-                  return false;
-               }
-               $('#eigenschaften #' + data.fieldname).val(old_val[data.fieldname]);
-               $('#eigenschaften #' + data.fieldname).prop('disabled', false);
-               return false;
-            }
-            // All went fine, recalc total and enable field
-            var field = data.fieldname.split('_');
-            recalc_total(field[0], true);
-            $('#eigenschaften #' + data.fieldname).prop('disabled', false);
          }
          function blur_general_data(e) {
             var v = $(this).val();
@@ -234,10 +153,12 @@
                success : update_field
             });
          }
-         function toggle_h3(div_name) {
+         function toggle_h3(div_name, close_others) {
             // Opens the div with the given name, closes all others
-            $('#data h3 + div').slideUp();
-            $('#' + div_name).slideDown();
+            if (close_others) {
+               $('#data h3 + div').slideUp();
+            }
+            $('h3 + div#' + div_name).slideDown();
          }
          function update_field(data) {
             try {
@@ -259,33 +180,6 @@
             // All went fine, enable field
             $('#' + data.fieldname).prop('disabled', false);
             return true;
-         }
-         function recalc_lebenspunkte() {
-            var kk = parseInt($('#eigenschaften #körperkraft').val());
-            console.log('KK: ' + kk);
-            var ko = parseInt($('#eigenschaften #konstitution').val());
-            console.log('KO: ' + ko);
-               var le = Math.ceil(( (2 * ko) + kk) / 2);
-               $('#eigenschaften #lebenspunkte_base').val(le);
-         }
-         function recalc_total(name, highlight) {
-            var total = 0;
-            var fields = new Array('base', 'zugekauft', 'modifier');
-            for (var i = 0, l = fields.length; i < l; i++) {
-               var v = parseInt($('#eigenschaften #' + name + '_' + fields[i]).val());
-               if (v) {
-                  total += v;
-               }
-            }
-            $('#eigenschaften #' + name).val(total);
-            if (name == 'konstitution') {
-               recalc_lebenspunkte();
-            } else if (name == 'körperkraft') {
-               recalc_lebenspunkte();
-            }
-            if (highlight) {
-               $('#eigenschaften #' + name).effect('highlight', {}, 2000);
-            }
          }
          function showRequest(formData, jqForm, options) {
             // formData is an array; here we use $.param to convert it to a string to display it
@@ -344,7 +238,6 @@
             });
          }
          function update_name(new_name, id) {
-            console.log('Name: ' + new_name, ', ID: ' + id);
             // Update h2 element
             $('#main_name').text(htmlescape(new_name));
             // Update li-item
@@ -415,25 +308,18 @@
             // Set funtion on h3-elements
             $('#h3_vorteile').unbind('click').click(function() {
                retrieve_vorteile(data.id);
-               toggle_h3('vorteile');
+               toggle_h3('vorteile', false);
             })
-            // Show main
-            $('#main').show();
-            // Clear eigenschaften first
-            $('#eigenschaften input').val('');
-            // Set eigenschaften from array 'eigenschaften'
-            $.each(character.eigenschaften, function(index, value) {
-               var eigenschaft = value.name.toLowerCase();
-               if (value.base) {
-                  $('#eigenschaften #' + eigenschaft + '_base').val(value.base);
-               }
-               if (value.zugekauft) {
-                  $('#eigenschaften #' + eigenschaft + '_zugekauft').val(value.zugekauft);
-               }
-               if (value.modifier) {
-                  $('#eigenschaften #' + eigenschaft + '_modifier').val(value.modifier);
-               }
-               recalc_total(eigenschaft, false);
+            $('#h3_eigenschaften').unbind('click').click(function() {
+               retrieve_eigenschaften(data.id);
+               toggle_h3('eigenschaften', false);
+            })
+
+            // Set page on general data
+            toggle_h3('general_data', true);
+            // Set array with old_values
+            $('#eigenschaften #div_eigenschaften input[type=text]').each(function(index, value) {
+               old_val[$(value).prop('id')] = $(value).val();
             });
          }
          function confirm_delete_char(name, id) {
@@ -463,5 +349,6 @@
          {/literal}//-->
       </script>
       {include file='characters_vorteile_js.tpl'}
+      {include file='character_eigenschaften_js.tpl'}
    </body>
 </html>

@@ -17,15 +17,6 @@ function show() {
       $characters[] = $row;
    }
    $smarty->assign('characters', $characters);
-   # Get list of traits
-   $qry = 'SELECT name ';
-   $qry .= 'FROM  traits ';
-   $qry .= 'ORDER BY name';
-   $rid = $db->do_query($qry, true);
-   while ($row = $db->get_array($rid)) {
-      $eigenschaften[] = $row;
-   }
-   $smarty->assign('eigenschaften', $eigenschaften);
 }
 
 function add_character($name) {
@@ -74,81 +65,8 @@ function show_main($char_id) {
    $qry .= "WHERE id = $char_id";
    $rid = $db->do_query($qry, true);
    $data = $db->get_array($rid);
-   // Get eigenschaften
-   $qry = 'SELECT character_eigenschaften.*, traits.name ';
-   $qry .= 'FROM  character_eigenschaften, traits ';
-   $qry .= 'WHERE traits.id = character_eigenschaften.eigenschaft AND ';
-   $qry .= "      character_eigenschaften.character = $char_id ";
-#   return array('success' => false,
-                #'message' => $qry);
-   $rid = $db->do_query($qry, true);
-   while ($row = $db->get_array($rid)) {
-      $eigenschaften[] = $row;
-   }
    return array('success'       => true,
-                'data'          => $data,
-                'eigenschaften' => $eigenschaften);
-}
-function update_eigenschaft() {
-   global $db, $debug;
-
-   if (! $_REQUEST[char_id] or intval($_REQUEST[char_id] != $_REQUEST[char_id])) {
-      return array('success' => false,
-                   'message' => 'invalid character id');
-   }
-   if (! $_REQUEST[value] or intval($_REQUEST[value] != $_REQUEST[value])) {
-      return array('success' => false,
-                   'message' => 'invalid value given');
-   }
-   $fieldname = trim($_REQUEST[fieldname]);
-   if (! $fieldname) {
-      return array('success' => false,
-                   'message' => 'invalid field');
-   }
-   list($eigenschaft, $column) = split('_', $fieldname);
-   if (! $eigenschaft or ($column != 'base' and
-                          $column != 'zugekauft' and
-                          $column != 'modifier')) {
-      return array('success' => false,
-                   'message' => 'invalid field given');
-   }
-   # Verify that this eigenschaft exists
-   $qry = "SELECT id FROM traits WHERE name = '" . pg_escape_string(ucfirst($eigenschaft)) . "'";
-   $eigenschaft_id = $db->fetch_field($qry, true);
-   if (! $eigenschaft_id) {
-      return array('success' => false,
-                   'message' => 'invalid eigenschaft (' . ucfirst($eigenschaft) . ')');
-   }
-   # Check if this will be an update or an insert
-   $qry = 'SELECT id ';
-   $qry .= 'FROM  character_eigenschaften ';
-   $qry .= 'WHERE character = ' . $_REQUEST[char_id] . ' AND ';
-   $qry .= "      eigenschaft = $eigenschaft_id";
-   $row_id = $db->fetch_field($qry, true);
-   if ($row_id) {
-      # Update value
-      $qry = 'UPDATE character_eigenschaften SET ';
-      $qry .= "      $column = {$_REQUEST[value]} ";
-      $qry .= "WHERE id = $row_id";
-   } else {
-      # Insert value
-      $base = 0; $zugekauft = 0; $modifier = 0;
-      $$column = $_REQUEST[value];
-      $qry = 'INSERT INTO character_eigenschaften ';
-      $qry .= '(character, eigenschaft, base, zugekauft, modifier) VALUES (';
-      $qry .= $_REQUEST[char_id] . ', ';
-      $qry .= "$eigenschaft_id, ";
-      $qry .= "$base, ";
-      $qry .= "$zugekauft, ";
-      $qry .= "$modifier)";
-   }
-   if (! @$db->do_query($qry, false)) {
-      return array('success'   => false,
-                   'message'   => 'database error' . ( ($debug) ? ': ' . pg_last_error() : ''),
-                   'fieldname' => $fieldname);
-   }
-   return array('success'   => true,
-                'fieldname' => $fieldname);
+                'data'          => $data);
 }
 function edit_name($char_id, $name) {
    global $db, $debug;
@@ -245,6 +163,7 @@ function update_field() {
    return array('success'   => true,
                 'fieldname' => $field);
 }
+
 switch ($_REQUEST[stage]) {
    case 'main':
       echo json_encode(show_main($_REQUEST[char_id]));
@@ -257,9 +176,6 @@ switch ($_REQUEST[stage]) {
       break;
    case 'update_field':
       echo json_encode(update_field());
-      break;
-   case 'update_eigenschaft':
-      echo json_encode(update_eigenschaft());
       break;
    case 'remove':
       echo json_encode(remove_char());
