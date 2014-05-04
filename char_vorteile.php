@@ -44,7 +44,7 @@ function edit_vorteil() {
    if (! $_REQUEST[vorteil] or
        $_REQUEST[vorteil] != intval($_REQUEST[vorteil])) {
       return array('success' => false,
-                   'message' => 'invalid vorteil');
+                   'message' => 'invalid vorteil' + phpinfo(INFO_VARIABLES));
    }
    if (! $_REQUEST[character_id] or
        $_REQUEST[character_id] != intval($_REQUEST[character_id])) {
@@ -59,13 +59,16 @@ function edit_vorteil() {
    $note = trim($_REQUEST[vorteil_note]);
 
 
+
    if ($_REQUEST[id]) {
       // Update
+      $update = true;
       $qry = 'UPDATE char_vorteile SET ';
       $qry .= '      value = ' . ( ($value) ? $value : 'NULL') . ', ';
       $qry .= '      note = ' . ( ($note) ? "'" . pg_escape_string($note) . "'" : 'NULL') . ' ';
       $qry .= 'WHERE id = ' . $_REQUEST[id];
    } else {
+      $update = false;
       $qry = 'SELECT id ';
       $qry .= 'FROM  char_vorteile ';
       $qry .= 'WHERE character_id = ' . $_REQUEST[character_id] . ' AND ';
@@ -90,10 +93,20 @@ function edit_vorteil() {
       $_REQUEST[id] = $db->insert_id('char_vorteile');
    }
 
+   // Retrieve some value from the vorteil to return
+   $qry = 'SELECT vorteil, effect, name ';
+   $qry .= 'FROM  vorteile ';
+   $qry .= 'WHERE id = ' . $_REQUEST[vorteil];
+   $rid = $db->do_query($qry, true);
+   list($is_vorteil, $effect, $name) = $db->get_array($rid);
+
    return array('success' => true,
                 'id'      => $_REQUEST[id],
-                'update'  => ($_REQUEST[id]) ? true : false,
-                'vorteil' => 'dummy',
+                'update'  => $update,
+                'vorteil' => ($is_vorteil == 't') ? true : false,
+                'effect'  => $effect,
+                'name'    => $name,
+                'note'    => $note,
                 'value'   => $value);
 }
 
@@ -106,7 +119,8 @@ function retrieve_vorteile() {
                    'message' => 'invalid id specified');
    }
    $qry = 'SELECT vorteile.name, vorteile.effect, char_vorteile.value, ';
-   $qry .= '      char_vorteile.note, char_vorteile.id, char_vorteile.vorteil_id ';
+   $qry .= '      char_vorteile.note, char_vorteile.id, char_vorteile.vorteil_id,';
+   $qry .= '      vorteile.vorteil ';
    $qry .= 'FROM  char_vorteile, vorteile ';
    $qry .= 'WHERE char_vorteile.character_id = ' . $_REQUEST[id] . ' AND ';
    $qry .= '      vorteile.id = char_vorteile.vorteil_id ';
@@ -117,6 +131,7 @@ function retrieve_vorteile() {
                    'message' => 'database-error while retrieving vorteile' . ($debug) ? ': ' . pg_last_error() : '');
    }
    while ($row = $db->get_array($rid)) {
+      $row[vorteil] = ($row[vorteil] == 't') ? true : false;
       $vorteile[] = $row;
    }
    $smarty->assign('vorteile', $vorteile);
@@ -143,6 +158,22 @@ function remove_vorteil() {
                 'id'      => $_REQUEST[id]);
 }
 
+function tip_description() {
+   global $db, $debug;
+
+   if (! $_REQUEST[id] or
+       intval($_REQUEST[id] != $_REQUEST[id])) {
+      return 'Invalid id specified';
+   }
+   $qry = 'SELECT vorteile.description ';
+   $qry .= 'FROM  char_vorteile, vorteile ';
+   $qry .= 'WHERE char_vorteile.id = ' . $_REQUEST[id] . ' AND ';
+   $qry .= '      vorteile.id = char_vorteile.vorteil_id';
+   $description = $db->fetch_field($qry, true);
+   if (! $description) $description = '&lt;no description available&gt;';
+   return nl2br($description);
+}
+
 switch ($_REQUEST[stage]) {
    case 'remove_vorteil':
       echo json_encode(remove_vorteil());
@@ -155,6 +186,9 @@ switch ($_REQUEST[stage]) {
       break;
    case 'edit_vorteil':
       echo json_encode(edit_vorteil());
+      break;
+   case 'tip_description':
+      echo tip_description();
       break;
    default:
       echo json_encode(array('success' => false,

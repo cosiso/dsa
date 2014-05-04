@@ -5,7 +5,7 @@
       <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
       <link href="css/dsa.css" rel="stylesheet" type="text/css" />
       <link href="css/alertify.css" rel="stylesheet" type="text/css" />
-      <link href="css/select2.css" rel="stylesheet" type="text/css" />
+      <link href="css/selectize.default.css" rel="stylesheet" type="text/css" />
    </head>
    <body>
       {include file="head.tpl"}
@@ -44,20 +44,32 @@
                      <label for='augenfarbe'>Augenfarbe</label>
                      {html_text name='augenfarbe'}
                   </div><br />
+                  <div>{carto_spacer}</div>
                   <label for="aussehen">Aussehen:</label>
                   {html_textarea name='aussehen' style='width: 100%; height: 60px'}
                </div>
                <hr />
                <h3 onclick="toggle_h3('eigenschaften')">Eigenschaften &amp; Basiswerte</h3>
                <div id="eigenschaften" style="display: none">
-                  <div class="column" style="margin-left: 0px">
+                  <div style="margin-left: 0px">
                      {section name=idx loop=$eigenschaften}
-                        <label for="{$eigenschaften[idx].name|lower}">{$eigenschaften[idx].name|capitalize|escape}</label>
+                        <label>{$eigenschaften[idx].name|capitalize|escape}</label>
                         <b>Current</b> {html_text name=$eigenschaften[idx].name|lower class='show_disabled' style='width: 40px' disabled=true}
                         <b>Base</b> {html_text name=$eigenschaften[idx].name|lower|cat:'_base' style='width: 25px'}
                         <b>Bought</b> {html_text name=$eigenschaften[idx].name|lower|cat:'_zugekauft' style='width: 25px'}
                         <b>Modifier</b> {html_text name=$eigenschaften[idx].name|lower|cat:'_modifier' style='width: 25px'}
+                        {carto_spacer width=20}
+                        <span style="cursor: pointer" onclick="roll('{$eigenschaften[idx].name|lower}')">
+                           <img src="images/dice-red-16.png" border="0" alt="roll" />
+                           <img src="images/dice-red-16.png" border="0" alt="roll" />
+                           <img src="images/dice-red-16.png" border="0" alt="roll" />
+                        </span>
                      {/section}
+                  </div>
+                  <div>
+                     <label>Lebenspunkte</label>
+                     <b>Current</b> {html_text name='lebenspunkte'}
+                     <b>Base</b> {html_text name='lebenspunkte_base' class='show_disabled' style='width: 25px' disabled=true}
                   </div>
                </div>
                <hr />
@@ -74,8 +86,9 @@
       <script type="text/javascript" src="scripts/jquery.validate.min.js"></script>
       <script type="text/javascript" src="scripts/jquery.form.min.js"></script>
       <script type="text/javascript" src="scripts/alertify.min.js"></script>
-      <script type="text/javascript" src="scripts/select2.min.js"></script>
+      <script type="text/javascript" src="scripts/selectize.min.js"></script>
       <script type="text/javascript" src="scripts/jquery.simpletip-1.3.1.min.js"></script>
+      <script type="text/javascript" src="scripts/jquery.tablesorter.min.js"></script>
       <script type="text/javascript">
          <!--
          var old_val = new Array();
@@ -102,6 +115,17 @@
             $('#data #general_data input[type=text], #data textarea').blur(blur_general_data);
             $('#data #eigenschaften input[type=text], #data textarea').blur(blur_eigenschaften);
          });
+         function roll(eigenschaft) {
+            var value=$('#eigenschaften #' + eigenschaft).val();
+            var die = Math.floor(Math.random() * 20 + 1);
+            var result = value - die;
+            var out = $('#main_name').text() + ' rolled on ' + eigenschaft + ': ' + die + ', result: ' + (value - die);
+            if (result < 0) {
+               alertify.error(out);
+            } else {
+               alertify.success(out);
+            }
+         }
          function ask_new_character() {
             alertify.prompt('Name of new character', function(e, str) {
                if (e && str != '') {
@@ -236,6 +260,14 @@
             $('#' + data.fieldname).prop('disabled', false);
             return true;
          }
+         function recalc_lebenspunkte() {
+            var kk = parseInt($('#eigenschaften #körperkraft').val());
+            console.log('KK: ' + kk);
+            var ko = parseInt($('#eigenschaften #konstitution').val());
+            console.log('KO: ' + ko);
+               var le = Math.ceil(( (2 * ko) + kk) / 2);
+               $('#eigenschaften #lebenspunkte_base').val(le);
+         }
          function recalc_total(name, highlight) {
             var total = 0;
             var fields = new Array('base', 'zugekauft', 'modifier');
@@ -246,6 +278,11 @@
                }
             }
             $('#eigenschaften #' + name).val(total);
+            if (name == 'konstitution') {
+               recalc_lebenspunkte();
+            } else if (name == 'körperkraft') {
+               recalc_lebenspunkte();
+            }
             if (highlight) {
                $('#eigenschaften #' + name).effect('highlight', {}, 2000);
             }

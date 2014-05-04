@@ -4,9 +4,9 @@
    {html_hidden name='id' value=$id}
    {html_hidden name='vorteil' value=$vorteil}
    <label for="list_vorteile">Vorteile</label>
-   <select id="list_vorteile" style="width: 20em">
+   <select id="list_vorteile" style="width: 20em" placeholder="Select vor- / nachteil">
       {section name=idx loop=$vorteile}
-         <option value="{$vorteile[idx].id}"{if $id == $vorteile[idx].id} selected{/if} data-is_vorteil="{$vorteile[idx].vorteil}">{$vorteile[idx].name|escape}</option>
+         <option value="{$vorteile[idx].id}"{if $vorteil == $vorteile[idx].id} selected{/if}>{if $vorteile[idx].vorteil}Vorteil{else}Nachteil{/if} - {$vorteile[idx].name|escape}</option>
       {/section}
    </select><br />
    <label for="vorteil_value">Value</label>

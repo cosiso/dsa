@@ -8,16 +8,6 @@
          $('#table_vorteile #vorteil_' + data.id).remove();
       }
    }
-   function vorteile_description(elem, id) {
-      $(elem).simpletip({
-         persistent    : true,
-         onBeforeShow  : function() {
-            this.load('setup_vorteile.php', {'stage': 'tip_description',
-                                             'id'   : id});
-         }
-      });
-      return false;
-   }
    function remove_vorteil(id, name) {
       alertify.confirm('Remove ' + name + '?', function (e) {
          if (e) {
@@ -52,6 +42,9 @@
             add_simpletip_desc_to_link($('#vorteile_link_desc',this));
             add_simpletip_edit_to_link($('#vorteile_link_edit',this));
          });
+         // Make table sortable
+         $('#table_vorteile').tablesorter({headers : { 0: {sorter: false},
+                                                       5: {sorter: false}}})
       }
    }
    function add_simpletip_edit_to_link(link) {
@@ -70,7 +63,17 @@
          persistent    : true});
    }
    function add_simpletip_desc_to_link(link) {
-      console.log('Funtion adds to ' + $(link).attr('id'));
+      // id is in parent row
+      var tr_id = $(link).closest('tr').attr('id');
+      var dummy = tr_id.split('_');
+      var id = dummy[1];
+      $(link).simpletip({
+         onBeforeShow : function() {
+            this.load('char_vorteile.php', {'stage': 'tip_description',
+                                            'id'   : id});
+         },
+         persistent   : true
+      });
    }
    function retrieve_vorteile(id) {
       var name = $('#main_name').text();
@@ -88,43 +91,82 @@
       // See where we are attached
       var id = $('#frm_vorteil #id').val();
       if (id) {
-         console.log('Connected from link with ID: ' + id);
+         $('tr#vorteil_' + id + ' #vorteile_link_edit').eq(0).simpletip().hide();
       } else {
          $('#btn_add_vorteil').eq(0).simpletip().hide();
       }
    }
    function destroy_form_vorteile() {
-      // Remove select2 from list
-      $('#list_vorteile').select2("destroy");
+      // Remove selectize from list
+      $('#list_vorteile')[0].selectize.destroy();
       $('#frm_vorteile').remove();
    }
    function do_update_vorteil(data) {
       data = extract_json(data);
-   }
-   function list_vorteile_format(state) {
-      var is_vorteil = $(state.element).data('is_vorteil');
-      var src = (is_vorteil) ? 'plus-16.png' : 'minus-16.png';
-      return '<img src="images/' + src + '" border="0" />' + state.text;
+      if (data.success) {
+         var row = '#vorteil_' + data.id;
+         var img_src = (data.vorteil) ? 'plus-16.png' : 'minus-16.png';
+         if (data.update) {
+            // Update the row
+            $(row + ' #cell_value').text(data.value);
+            $(row + ' #cell_note').text(data.note);
+            $(row).effect('highlight', {}, 2000);
+         } else {
+            var elem = '<tr id="vorteil_' + data.id + '">' +
+                   '<td id="cell_img"><img src="images/' + img_src + '" border="0" /></td>' +
+                   '<td id="cell_name">' + htmlescape(data.name) + '</td>' +
+                   '<td id="cell_value">' + htmlescape(data.value) + '</td>' +
+                   '<td id="cell_effect">' + htmlescape(data.effect) + '</td>' +
+                   '<td id="cell_note">' + htmlescape(data.note) + '</td>' +
+                   '<td>' +
+                      '<a id="vorteile_link_desc" href="#" class="link-info">description</a>' +
+                      ' | <a id="vorteile_link_edit" href="#" class="link-edit">edit</a>' +
+                      ' | <a id="cell_remove" href="#" class="link-cancel" onclick="remove_vorteil(' + data.id + ', \'' + htmlescape(data.name) + '\')">remove</a>' +
+                   '</td></tr>';
+            $('#table_vorteile tbody').append(elem);
+            $(row).effect('highlight', {}, 2000);
+            add_simpletip_desc_to_link(row + ' #vorteile_link_desc');
+            add_simpletip_edit_to_link(row + ' #vorteile_link_edit');
+         }
+      }
    }
    function add_select_to_vorteile() {
-      $('#list_vorteile').select2({
-         formatResult    : list_vorteile_format,
-         formatSelection : list_vorteile_format,
-         escapeMarkup    : function(m) {return m;}
+      $('#list_vorteile').selectize({
+         valueField  : 'fId',
+         labelField  : 'fVorteil',
+         searchField : 'fVorteil',
+         create      : false,
+         render      : {
+            option : function (item, escape) {
+               var dummy = item.fVorteil.split(' - ');
+               var src = (dummy[0] == 'Vorteil') ? 'plus-16.png' : 'minus-16.png';
+               var out = '<div><img src="images/' + src + '" border="0" />' + dummy[1] + '</div>';
+               return out;
+            },
+            item  : function (item, escape) {
+               var dummy = item.fVorteil.split(' - ');
+               var src = (dummy[0] == 'Vorteil') ? 'plus-16.png' : 'minus-16.png';
+               var out = '<div><img src="images/' + src + '" border="0" />' + dummy[1] + '</div>';
+               return out;
+            }
+         }
       });
-      // Select correct line if field id is set
-      console.log('Selected: ' + $('#list_vorteile').select2('val'));
-      $('#list_vorteile').select2('val', $('#frm_vorteil #vorteil').val());
+      // Clear if vorteil not set
+      if (! $('#frm_vorteil #vorteil').val()) {
+         $('#list_vorteile')[0].selectize.clear();
+         $('#list_vorteile').focus();
+      } else {
+         // Make list readonly if vorteil is set
+         $('#list_vorteile')[0].selectize.disable();
+         $('#frm_vorteil #vorteil_value').focus().select();
+      }
       // Set character id
       $('#frm_vorteil #character_id').val(character_id);
-      // Set focus
-      $('#list_vorteile').focus();
       // Also add validation
       $('#frm_vorteil').validate({
          submitHandler: function(form) {
-            // First get value of list
-            var vorteil = $('#list_vorteile').select2('val');
-            $('#frm_vorteil #vorteil').val(vorteil);
+            // Set vorteil with selected value
+            $('#frm_vorteil #vorteil').val($('#list_vorteile')[0].selectize.getValue());
             $(form).ajaxSubmit({
                success : do_update_vorteil,
                // beforeSubmit: showRequest,
