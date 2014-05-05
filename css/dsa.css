@@ -186,6 +186,24 @@ div.column {
 	float: left;
 	margin-left: 8px;
 }
+/* Used to make a button like look */
+.round-button {
+	border-radius: 12px;
+	padding: 8px;
+	border: 1px solid #AAA;
+	cursor: pointer;
+}
+.round-button:hover {
+	background-color: #F5F5B5;
+}
+/* Used for notes in superscript */
+.smallnote {
+	vertical-align: super;
+	font-size: 9px;
+}
+.smallnote:before {
+	content: url(../images/information-balloon.png);
+}
 
 /* image */
 img {

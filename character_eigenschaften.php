@@ -113,13 +113,109 @@ function retrieve_eigenschaften() {
    $row = $db->get_array($rid);
    $smarty->assign($row);
 
+   /* Vorteile / nachteil influencing basevalues */
+   # Gefäß der Sterne -> AE
+   $qry = 'SELECT vorteile.id FROM ';
+   $qry .= '      char_vorteile, vorteile ';
+   $qry .= 'WHERE char_vorteile.character_id = ' . $_REQUEST[id] . ' AND ';
+   $qry .= '      char_vorteile.vorteil_id = vorteile.id AND ';
+   $qry .= "      vorteile.name = 'Gefäß der Sterne'";
+   $smarty->assign('gefass', $db->fetch_field($qry, true));
+   # Kampfreflexe -> INI
+   $qry = 'SELECT vorteile.id ';
+   $qry .= 'FROM  char_vorteile, vorteile ';
+   $qry .= 'WHERE char_vorteile.vorteil_id = vorteile.id AND ';
+   $qry .= "      vorteile.name = 'Kampfreflexe' AND ";
+   $qry .= '      char_vorteile.character_id = ' . $_REQUEST[id];
+   $smarty->assign('kampfreflexe', $db->fetch_field($qry, true));
+   # Kampfgespür -> INI
+   $qry = 'SELECT vorteile.id ';
+   $qry .= 'FROM  char_vorteile, vorteile ';
+   $qry .= 'WHERE char_vorteile.vorteil_id = vorteile.id AND ';
+   $qry .= "      vorteile.name = 'Kampfgespür' AND ";
+   $qry .= '      char_vorteile.character_id = ' . $_REQUEST[id];
+   $smarty->assign('kampfgespur', $db->fetch_field($qry, true));
+
    $out = $smarty->fetch('character_eigenschaften.tpl');
 
    return array('success' => true,
                 'html'    => $out);
 }
+function update_basevalue() {
+   global $db, $debug;
+
+   // Verify field is valid
+   $field = trim($_REQUEST[field]);
+   if (! $field) {
+      return array('success' => false,
+                   'message' => 'No field specified');
+   }
+   preg_match('/^(le|au|ae|mr|ini|at)_(used|mod|bought)$/', $field, $match);
+   if (! $match) {
+      return array('success' => false,
+                   'field'   => $field,
+                   'message' => "invalid field ($field) specified");
+   }
+   # Initiativ, attack has only mod
+   if (preg_match('/^(ini|at)_(used|bought)$/', $field)) {
+      return array('success' => false,
+                   'field'   => $field,
+                   'message' => "invalid field ($field) specified");
+   }
+   switch ($match[1]) {
+      case 'le' : $total = 'lebenspunkte';   break;
+      case 'au' : $total = 'ausdauer';       break;
+      case 'ae' : $total = 'astralenergie';  break;
+      case 'mr' : $total = 'magieresistenz'; break;
+      case 'ini': $total = 'initiativ';      break;
+      case 'at' : $total = 'attack';         break;
+   }
+
+   if (! $_REQUEST[id] or
+       $_REQUEST[id] != intval($_REQUEST[id])) {
+      return array('success' => false,
+                   'field'   => $field,
+                   'total'   => $total,
+                   'message' => 'invalid id specified');
+   }
+
+   $value = trim($_REQUEST[value]);
+   if (! $value) $value = 0;
+   if ($value != intval($value)) {
+      return array('success' => false,
+                   'field'   => $field,
+                   'total'   => $total,
+                   'message' => 'invalid value specified');
+   }
+
+   $qry = 'SELECT id FROM basevalues WHERE character_id = ' . $_REQUEST[id];
+   if (! $db->fetch_field($qry, true)) {
+      // basevalues does not yet exit, create it
+      $qry = 'INSERT INTO basevalues (character_id) VALUES (' . $_REQUEST[id] . ')';
+      $db->do_query($qry, true);
+   }
+
+   $qry = 'UPDATE basevalues SET ';
+   $qry .= $field . ' = ' . $_REQUEST[value] . ' ';
+   $qry .= 'WHERE character_id = ' . $_REQUEST[id];
+   if (! $db->do_query($qry, false)) {
+      return array('success' => false,
+                   'field'   => $field,
+                   'total'   => $total,
+                   'message' => 'database-error while updating' . ( ($debug) ? ':' . pg_last_error() : ''));
+   }
+
+   return array('success' => true,
+                'field'   => $field,
+                'value'   => $_REQUEST[value],
+                'total'   => $total,
+                'message' => 'dummy');
+}
 
 switch ($_REQUEST[stage]) {
+   case 'update_basevalue' :
+      echo json_encode(update_basevalue());
+      break;
    case 'retrieve_eigenschaften':
       echo json_encode(retrieve_eigenschaften());
       break;

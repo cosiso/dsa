@@ -154,6 +154,8 @@
             });
          }
          function toggle_h3(div_name, close_others) {
+            // set close_others to true, TODO change later
+            close_others = true;
             // Opens the div with the given name, closes all others
             if (close_others) {
                $('#data h3 + div').slideUp();

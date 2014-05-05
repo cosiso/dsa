@@ -30,6 +30,81 @@ SET default_tablespace = '';
 SET default_with_oids = false;
 
 --
+-- Name: basevalues; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE basevalues (
+    id integer NOT NULL,
+    character_id integer NOT NULL,
+    le_used integer,
+    le_mod integer,
+    le_bought integer,
+    au_used integer,
+    au_mod integer,
+    au_bought integer,
+    ae_used integer,
+    ae_mod integer,
+    ae_bought integer,
+    mr_used integer,
+    mr_mod integer,
+    mr_bought integer,
+    ini_mod integer,
+    at_mod integer
+);
+
+
+--
+-- Name: basevalues_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE basevalues_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: basevalues_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE basevalues_id_seq OWNED BY basevalues.id;
+
+
+--
+-- Name: char_vorteile; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE char_vorteile (
+    id integer NOT NULL,
+    character_id integer NOT NULL,
+    vorteil_id integer NOT NULL,
+    note character varying(1024),
+    value integer
+);
+
+
+--
+-- Name: char_vorteile_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE char_vorteile_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: char_vorteile_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE char_vorteile_id_seq OWNED BY char_vorteile.id;
+
+
+--
 -- Name: character_eigenschaften; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -236,6 +311,20 @@ ALTER SEQUENCE vorteile_id_seq OWNED BY vorteile.id;
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
+ALTER TABLE ONLY basevalues ALTER COLUMN id SET DEFAULT nextval('basevalues_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY char_vorteile ALTER COLUMN id SET DEFAULT nextval('char_vorteile_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
 ALTER TABLE ONLY character_eigenschaften ALTER COLUMN id SET DEFAULT nextval('character_eigenschaften_id_seq'::regclass);
 
 
@@ -275,18 +364,63 @@ ALTER TABLE ONLY vorteile ALTER COLUMN id SET DEFAULT nextval('vorteile_id_seq':
 
 
 --
+-- Data for Name: basevalues; Type: TABLE DATA; Schema: public; Owner: -
+--
+
+COPY basevalues (id, character_id, le_used, le_mod, le_bought, au_used, au_mod, au_bought, ae_used, ae_mod, ae_bought, mr_used, mr_mod, mr_bought, ini_mod, at_mod) FROM stdin;
+1	1	\N	15	3	\N	10	\N	\N	97	10	\N	5	4	0	0
+\.
+
+
+--
+-- Name: basevalues_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+--
+
+SELECT pg_catalog.setval('basevalues_id_seq', 1, true);
+
+
+--
+-- Data for Name: char_vorteile; Type: TABLE DATA; Schema: public; Owner: -
+--
+
+COPY char_vorteile (id, character_id, vorteil_id, note, value) FROM stdin;
+4	1	1	\N	\N
+1	1	2	\N	\N
+16	1	3	2	1
+17	3	1	\N	\N
+18	3	9	\N	\N
+19	1	10	\N	\N
+\.
+
+
+--
+-- Name: char_vorteile_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+--
+
+SELECT pg_catalog.setval('char_vorteile_id_seq', 21, true);
+
+
+--
 -- Data for Name: character_eigenschaften; Type: TABLE DATA; Schema: public; Owner: -
 --
 
 COPY character_eigenschaften (id, "character", eigenschaft, base, modifier, zugekauft, note) FROM stdin;
 1	1	1	16	\N	8	\N
 3	1	2	16	0	8	\N
+7	1	7	11	0	6	\N
+9	3	3	16	1	8	\N
+8	1	8	12	0	3	\N
+10	3	4	16	1	8	\N
+11	3	5	16	0	8	\N
+12	3	2	13	0	7	\N
+13	3	7	14	0	7	\N
+14	3	8	16	0	8	\N
+15	3	1	15	0	8	\N
+16	3	6	9	0	5	\N
+6	1	4	14	0	2	\N
+5	1	6	13	0	2	\N
 4	1	5	15	0	4	\N
 2	1	3	16	0	8	\N
-5	1	6	13	0	2	\N
-6	1	4	14	0	2	\N
-7	1	7	11	0	6	\N
-8	1	8	12	0	3	\N
 \.
 
 
@@ -294,7 +428,7 @@ COPY character_eigenschaften (id, "character", eigenschaft, base, modifier, zuge
 -- Name: character_eigenschaften_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
-SELECT pg_catalog.setval('character_eigenschaften_id_seq', 8, true);
+SELECT pg_catalog.setval('character_eigenschaften_id_seq', 16, true);
 
 
 --
@@ -312,7 +446,7 @@ COPY characters (id, name, rasse, kultur, profession, geschlecht, grosse, gewich
 -- Name: characters_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
-SELECT pg_catalog.setval('characters_id_seq', 3, true);
+SELECT pg_catalog.setval('characters_id_seq', 8, true);
 
 
 --
@@ -380,6 +514,13 @@ SELECT pg_catalog.setval('traits_id_seq', 25, true);
 --
 
 COPY vorteile (id, name, vorteil, gp, ap, effect, description) FROM stdin;
+3	Verpflichtungen	f	12	\N	Variable	Myranische Helden haben oftmals Verpflichtungen gegenüber ihrem Cirkel oder einem bestimmten Optimatenhaus. Ebenso haben Sklaven selbstredend Verpflichtungen gegenüber ihren Herren.\n\nAnsonsten siehe AH 117.
+11	Kampfgespür	t	\N	300	INI + 2	Ein Kämpfer mit Kampfgespür bewegt sich mit schier traumwandlerischer Sicherheit über das Kampffeld: Sein Initiative-Basiswert steigt um 2 Punkte (zusätzlich zu den 4 Punkten aus der Sonderfertigkeit Kampfreflexe), und ein Passierschlag gegen ihn ist um 2 Punkte erschwert (zusätzlich zu den 4 Punkten aus Aufmerksamkeit und den normalen 4 Punkten; Seite 83).\n\nEr kann jederzeit Aktionen in Reaktionen umwandeln und umgekehrt, ohne dies vorher ankündigen zu müssen - die Probenerschwernis von 4 Punkten gilt jedoch auch für ihn. Außerdem ist seine IN-Probe, um zu verhindern, dass er überrascht wird (WdS, Seite 78), um 4 Punkte erleichtert (ebenfalls zusätzlich zu den 4 Punkten aus Aufmerksamkeit).\n\nEin Kämpfer, der diese Fähigkeit mit den Sonderfertigkeiten Klingensturm (WdS, Seite 75) oder Klingenwand (ebenfalls WdS, Seite 75) kombiniert, ist zudem in der Lage, seinen AT- oder PA-Wert nach Belieben aufzuspalten, anstatt ihn jeweils zu halbieren.\n\nVoraussetzungen: IN 15; SF Aufmerksamkeit und Kampfreflexe\nVerbreitung: 3, bei erfahren en Einzelkämpfern
+2	Optimat	t	10	\N	Besonderer Besitz: 3GP, SO +2	Der Held entstammt einer alten Familie des Imperiums und ist für eine höhere Karriere vorgesehen; er hat Anspruch auf den Titel Exzellenz und unterliegt in vielen Bereichen nicht mehr der gewöhnlichen Gerichtsbarkeit.\n\nUm Optimat zu sein, muss man einen Sozialstatus von mindestens 8 aufweisen. Magier müssen einem Optimatenhaus entstammen bzw. sie werden im Zuge ihrer Ausbildung zu Optimaten gemacht.\n\nDieser Vorteil verbilligt den Vorteil Besonderer Besitz auf 3 GP und bringt gleichzeitig einen SO-Bonus von 2 Punkten.
+9	RiUa	t	\N	\N	IMBA	You are the char of the GM, you have unlimited luck and the eternal support of fate^^
+1	Vollzauberer	t	15	\N	Gives (MU + IN + CH)/2 + 18 AsP and all (dis-) advantages coming with it.	Der Held besitzt in vollem Umfang magische Kräfte und hat im Rahmen seiner Kultur oder Profession (meist Magier eines Optimatenhauses) eine längerfristige magische Ausbildung hinter sich gebracht, die ihm ermöglicht, bestimmte Instruktionen und Matrizen (nach Profession beziehungsweise zugehörigem Haus) zu erlernen und anzuwenden.\nEr verfügt über (MU + IN + CH)/2 (aufgerundet) AsP + 18AsP sowie eventuell weitere Vor- und Nachteile. Darüber hinaus beherrscht er die für seine Ausbildung typischen Instruktionen und Quellen, seine traditions-abhängige Ritualkenntnis sowie einige magische Sonderfertigkeiten (vornehmlich Stabzauber).\nDie jeweiligen Boni auf bestimmte Talente, Instruktionen, Domänen und Matrizen sowie Grundwerte wie etwa Magieresistenz finden Sie in der Beschreibung des gewählten Optimatenhauses (Seite 22ff.) beziehungsweise in den Beschreibungen der sonstigen Vollzauberer-Traditionen (die wir für Folgepublikation planen).\nEin Held, der Vollzauberer gewählt hat, kann nicht gleichzeitig Halb- oder Viertelzauberer sein.\n\nExpertenanmerkung für Selbstgestalter: Dieser Vorteil beinhaltet 120 VP; siehe auch Seite 197.
+10	Gefäß der Sterne	t	\N	250	AE = (MU + IN + CH + CH) / 5	Der Zauberer ist in der Lage, das 'Gefäß', das die Astralkraft aufnimmt, zu vergrößern, d.h., er ist in der Lage, mehr permanente AE speichern, er wird 'strahlender'.\n\nIn die Berechnung der AE-Basis geht der Charisma-Wert doppelt ein d.h. (MU + IN + CH + CH)/5. Wenn er in der Lage ist, die Große Meditation zu vollführen, kann er hierbei auf Wunsch auch Charisma als Leiteigenschaft wählen (anstatt KL oder IN) und so CH/3 plus RkP*/10 aus einer (MU/CH/CH)-Probe auf die Ritualkenntnis als AsP hinzugewinnen. Zudem ist er nicht mehr gezwungen, für die Große Meditation mehr gezwungen, für die Große Meditation das Ritual durchführen, wo es ihm beliebt.\n\nDruiden, Geoden und Hexen sehen die Zauberkraft als 'Erdkraft', weswegen diese SF bei ihnen als 'Sumus Fülle' bekannt ist.\n\nVoraussetzungen: CH 15, IN 13\nVerbreitung: 3
+12	Kampfreflexe	t	\N	300	INI + 4	Ein Kämpfer mit dieser Fähigkeit hat einen um 4 Punkte erhöhten Initiative-Wert und ist daher im Kampf häufig als erster an der Reihe.\nDiese Fähigkeit kommt nur dann zum Tragen, wenn der Kämpfer eine Rüstung mit einer BE von maximal 4 trägt (Rüstungsgewöhnung gilt).\n\nVoraussetzungen: INI-Basiswert 10\nVerbreitung: 4, professionelle Kämpfer
 \.
 
 
@@ -387,7 +528,23 @@ COPY vorteile (id, name, vorteil, gp, ap, effect, description) FROM stdin;
 -- Name: vorteile_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
-SELECT pg_catalog.setval('vorteile_id_seq', 1, false);
+SELECT pg_catalog.setval('vorteile_id_seq', 12, true);
+
+
+--
+-- Name: basevalues_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY basevalues
+    ADD CONSTRAINT basevalues_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: char_vorteile_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY char_vorteile
+    ADD CONSTRAINT char_vorteile_pkey PRIMARY KEY (id);
 
 
 --
@@ -471,6 +628,37 @@ ALTER TABLE ONLY vorteile
 
 
 --
+-- Name: char_vorteile_character_id_vorteil_id_idx; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE UNIQUE INDEX char_vorteile_character_id_vorteil_id_idx ON char_vorteile USING btree (character_id, vorteil_id);
+
+
+--
+-- Name: basevalues_character_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY basevalues
+    ADD CONSTRAINT basevalues_character_id_fkey FOREIGN KEY (character_id) REFERENCES characters(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: char_vorteile_character_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY char_vorteile
+    ADD CONSTRAINT char_vorteile_character_id_fkey FOREIGN KEY (character_id) REFERENCES characters(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: char_vorteile_vorteil_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY char_vorteile
+    ADD CONSTRAINT char_vorteile_vorteil_id_fkey FOREIGN KEY (vorteil_id) REFERENCES vorteile(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
 -- Name: character_eigenschaften_character_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -526,6 +714,46 @@ REVOKE ALL ON SCHEMA public FROM PUBLIC;
 REVOKE ALL ON SCHEMA public FROM postgres;
 GRANT ALL ON SCHEMA public TO postgres;
 GRANT ALL ON SCHEMA public TO PUBLIC;
+
+
+--
+-- Name: basevalues; Type: ACL; Schema: public; Owner: -
+--
+
+REVOKE ALL ON TABLE basevalues FROM PUBLIC;
+REVOKE ALL ON TABLE basevalues FROM andre;
+GRANT ALL ON TABLE basevalues TO andre;
+GRANT ALL ON TABLE basevalues TO nginx;
+
+
+--
+-- Name: basevalues_id_seq; Type: ACL; Schema: public; Owner: -
+--
+
+REVOKE ALL ON SEQUENCE basevalues_id_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE basevalues_id_seq FROM andre;
+GRANT ALL ON SEQUENCE basevalues_id_seq TO andre;
+GRANT ALL ON SEQUENCE basevalues_id_seq TO nginx;
+
+
+--
+-- Name: char_vorteile; Type: ACL; Schema: public; Owner: -
+--
+
+REVOKE ALL ON TABLE char_vorteile FROM PUBLIC;
+REVOKE ALL ON TABLE char_vorteile FROM andre;
+GRANT ALL ON TABLE char_vorteile TO andre;
+GRANT ALL ON TABLE char_vorteile TO nginx;
+
+
+--
+-- Name: char_vorteile_id_seq; Type: ACL; Schema: public; Owner: -
+--
+
+REVOKE ALL ON SEQUENCE char_vorteile_id_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE char_vorteile_id_seq FROM andre;
+GRANT ALL ON SEQUENCE char_vorteile_id_seq TO andre;
+GRANT ALL ON SEQUENCE char_vorteile_id_seq TO nginx;
 
 
 --
