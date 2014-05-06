@@ -23,6 +23,11 @@
       }
    }
    function recalc_total(name, highlight) {
+      var base = parseInt($('#div_eigenschaften #' + name + '_base').val()) || 0;
+      var bought = parseInt($('#div_eigenschaften #' + name +'_zugekauft').val()) || 0
+      var mod = parseInt($('#div_eigenschaften #' + name + '_modifier').val()) || 0;
+      var total = base + bought + mod;
+      $('#div_eigenschaften #' + name).val(total);
       if (name == 'konstitution') {
          recalc_lebenspunkte();
          recalc_ausdauer();
@@ -30,6 +35,8 @@
       } else if (name == 'körperkraft') {
          recalc_lebenspunkte();
          recalc_attack();
+         recalc_parry();
+         recalc_fernkampf();
       } else if (name == 'mut') {
          recalc_ausdauer();
          recalc_astralenergie();
@@ -40,16 +47,21 @@
          recalc_ausdauer();
          recalc_initiativ();
          recalc_attack();
+         recalc_parry();
       } else if (name == 'intuition') {
          recalc_astralenergie();
          recalc_initiativ();
+         recalc_parry();
+         recalc_fernkampf();
       } else if (name == 'charisma') {
          recalc_astralenergie();
       } else if (name == 'klugheit') {
          recalc_magieresistenz();
+      } else if (name =='fingerfertigkeit') {
+         recalc_fernkampf();
       }
       if (highlight) {
-         $('#div_basevalues #' + name).effect('highlight', {}, 2000);
+         $('#div_eigenschaften #' + name).effect('highlight', {}, 2000);
       }
    }
    function blur_eigenschaften(e) {
@@ -107,6 +119,7 @@
       }
       // All went fine, recalc total and enable field
       var field = data.fieldname.split('_');
+      console.log('FIELD: ' + field.toSource());
       recalc_total(field[0], true);
       $('#eigenschaften #' + data.fieldname).prop('disabled', false);
    }
@@ -138,6 +151,8 @@
          recalc_magieresistenz();
          recalc_initiativ();
          recalc_attack();
+         recalc_parry();
+         recalc_fernkampf();
          // Set array with old_values
          $('#eigenschaften #div_basevalues input[type=text]').each(function(index, value) {
             old_basevalues[$(value).prop('id')] = $(value).val();
@@ -185,6 +200,26 @@
       if (highlight) {
          $('#div_basevalues #' + name).effect('highlight', {}, 2000);
       }
+   }
+   function recalc_fernkampf() {
+      var int = parseInt($('#div_eigenschaften #intuition').val()) || 0;
+      var ff = parseInt($('#div_eigenschaften #fingerfertigkeit').val()) || 0;
+      var kk = parseInt($('#div_eigenschaften #körperkraft').val()) || 0;
+      var fk = Math.round((int + ff + kk) / 5);
+      $('#div_basevalues #fk_base').val(fk);
+      var mod = parseInt($('#div_basevalues #fk_mod').val()) || 0;
+      var total = fk + mod;
+      $('#div_basevalues #fernkampf').val(total);
+   }
+   function recalc_parry() {
+      var int = parseInt($('#div_eigenschaften #intuition').val()) || 0;
+      var ge = parseInt($('#div_eigenschaften #gewandtheit').val()) || 0;
+      var kk = parseInt($('#div_eigenschaften #körperkraft').val()) || 0;
+      var pa = Math.round((int + ge + kk) / 5);
+      $('#div_basevalues #pa_base').val(pa);
+      var mod = parseInt($('#div_basevalues #pa_mod').val()) || 0;
+      var total = pa + mod;
+      $('#div_basevalues #parry').val(total);
    }
    function recalc_attack() {
       var mu = parseInt($('#div_eigenschaften #mut').val()) || 0;

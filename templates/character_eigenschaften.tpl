@@ -66,4 +66,14 @@
    <b>Current</b> {html_text name='attack' style='width: 45px' class='show_disabled' disabled=true}
    <b>Base</b> {html_text name='at_base' style='width: 25px' class='show_disabled' disabled=true}
    <b>Modifier</b> {html_text name='at_mod' value=$at_mod style='width: 25px'}
+
+   <label>Parry</label>
+   <b>Current</b> {html_text name='parry' style='width: 45px' class='show_disabled' disabled=true}
+   <b>Base</b> {html_text name='pa_base' style='width: 25px' class='show_disabled' disabled=true}
+   <b>Modifier</b> {html_text name='pa_mod' value=$pa_mod style='width: 25px'}
+
+   <label>Fernkampf</label>
+   <b>Current</b> {html_text name='fernkampf' style='width: 45px' class='show_disabled' disabled=true}
+   <b>Base</b> {html_text name='fk_base' style='width: 25px' class='show_disabled' disabled=true}
+   <b>Modifier</b> {html_text name='fk_mod' value=$fk_mod style='width: 25px'}
 </div>

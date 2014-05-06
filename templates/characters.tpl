@@ -47,6 +47,11 @@
                   <div>{carto_spacer}</div>
                   <label for="aussehen">Aussehen:</label>
                   {html_textarea name='aussehen' style='width: 100%; height: 60px'}
+                  <hr />
+                  <label>Abenteurpunkte</label>
+                  Available: {html_text name='ap' value=$ap style="width: 6em"}
+                  Add {html_text name="add_ap" style="width: 4em" onblur='add_ap(1)'}
+                  Subtract {html_text name="sub_ap" style="width: 4em" onblur='add_ap(-1)'}
                </div>
                <hr />
                <h3 id="h3_eigenschaften">Eigenschaften &amp; Basiswerte</h3>
@@ -94,6 +99,24 @@
             // Set onblur on edit-fields
             $('#data #general_data input[type=text], #data textarea').blur(blur_general_data);
          });
+         function add_ap(multiply) {
+            if (multiply > 0) {
+               // Add
+               field = '#general_data #add_ap';
+               var value = parseInt($('#general_data #add_ap').val()) || 0;
+            } else {
+               // Subtract
+               var value = parseInt($('#general_data #sub_ap').val()) || 0;
+               value = 0 - value
+               field = '#general_data #sub_ap';
+            }
+            if (! character_id or value == 0) {
+               // No character selected or no value, simply clear field and return
+               $(field).val('');
+               return;
+            }
+            // TODO
+         }
          function ask_new_character() {
             alertify.prompt('Name of new character', function(e, str) {
                if (e && str != '') {
@@ -299,6 +322,8 @@
             $('#rasse').val(htmlescape(data.rasse));
             $('#kultur').val(htmlescape(data.kultur));
             $('#profession').val(htmlescape(data.profession));
+            // Set ap
+            $('#general_data #ap').val(data.ap);
             // Set or replace function for name editing
             $('#img_edit_name').unbind('click').click(function() {
                edit_name(data.id);

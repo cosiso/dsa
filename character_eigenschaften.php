@@ -150,14 +150,14 @@ function update_basevalue() {
       return array('success' => false,
                    'message' => 'No field specified');
    }
-   preg_match('/^(le|au|ae|mr|ini|at)_(used|mod|bought)$/', $field, $match);
+   preg_match('/^(le|au|ae|mr|ini|at|pa|fk)_(used|mod|bought)$/', $field, $match);
    if (! $match) {
       return array('success' => false,
                    'field'   => $field,
                    'message' => "invalid field ($field) specified");
    }
-   # Initiativ, attack has only mod
-   if (preg_match('/^(ini|at)_(used|bought)$/', $field)) {
+   # Initiativ, attack, parry, fernkampf has only mod
+   if (preg_match('/^(ini|at|pa|fk)_(used|bought)$/', $field)) {
       return array('success' => false,
                    'field'   => $field,
                    'message' => "invalid field ($field) specified");
@@ -169,6 +169,8 @@ function update_basevalue() {
       case 'mr' : $total = 'magieresistenz'; break;
       case 'ini': $total = 'initiativ';      break;
       case 'at' : $total = 'attack';         break;
+      case 'pa' : $total = 'parry';          break;
+      case 'fk' : $total = 'fernkampf';      break;
    }
 
    if (! $_REQUEST[id] or
