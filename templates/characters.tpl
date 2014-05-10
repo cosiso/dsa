@@ -50,8 +50,8 @@
                   <hr />
                   <label>Abenteurpunkte</label>
                   Available: {html_text name='ap' value=$ap style="width: 6em"}
-                  Add {html_text name="add_ap" style="width: 4em" onblur='add_ap(1)'}
-                  Subtract {html_text name="sub_ap" style="width: 4em" onblur='add_ap(-1)'}
+                  Add {html_text name="add_ap" style="width: 4em"}
+                  Subtract {html_text name="sub_ap" style="width: 4em"}
                </div>
                <hr />
                <h3 id="h3_eigenschaften">Eigenschaften &amp; Basiswerte</h3>
@@ -91,31 +91,61 @@
                   return false;
                }
             });
-            // Set onfocus on edit-fields
-            $('#data input[type=text], #data textarea').focus(function(e) {
-               // Save original value
-               old_val[this.id] = $(this).val();
+            $('#data input[type=text], #data textarea').each(function(index, value) {
+               // Set onfocus
+               $(value).unbind('focus').focus(function(e) {
+                  old_val[$(this).prop('id')] = parseInt($(this).val()) || 0;
+               });
+               // Set blur
+               var field_id = $(this).prop('id');
+               if (field_id != 'add_ap' &&
+                   field_id != 'sub_ap' &&
+                   field_id != 'ap') {
+                  $(this).unbind('blur').blur(blur_general_data);
+               } else {
+                  $(this).unbind('blur').blur(blur_ap);
+               }
             });
-            // Set onblur on edit-fields
-            $('#data #general_data input[type=text], #data textarea').blur(blur_general_data);
          });
-         function add_ap(multiply) {
-            if (multiply > 0) {
-               // Add
-               field = '#general_data #add_ap';
-               var value = parseInt($('#general_data #add_ap').val()) || 0;
-            } else {
-               // Subtract
-               var value = parseInt($('#general_data #sub_ap').val()) || 0;
-               value = 0 - value
-               field = '#general_data #sub_ap';
-            }
-            if (! character_id or value == 0) {
+         function blur_ap(e) {
+            var field_id = $(this).prop('id');
+            var value = parseInt($(this).val()) || 0;
+
+
+            if (! character_id || value == 0) {
                // No character selected or no value, simply clear field and return
-               $(field).val('');
+               $(this).val('');
                return;
             }
-            // TODO
+
+            if (old_val[field_id] == value) {
+               return;
+            }
+
+            $.ajax({
+               datatype : 'json',
+               url      : 'characters.php',
+               type     : 'post',
+               data     : {stage   : 'change_ap',
+                           char_id : character_id,
+                           field   : field_id,
+                           value   : value},
+               success  : do_change_ap
+            });
+         }
+         function do_change_ap(data) {
+            data = extract_json(data);
+            if (data.success) {
+               // Update fields
+               var old_ap = parseInt($('#data #general_data #ap').val()) || 0;
+               $('#data #general_data #' + data.field).val(data.value);
+               if (old_ap != data.ap) {
+                  $('#data #general_data #ap').val(data.ap);
+                  $('#data #general_data #ap').effect('highlight', {}, 2000);
+               }
+            }
+            $('#data #general_data #add_ap').val('');
+            $('#data #general_data #sub_ap').val('');
          }
          function ask_new_character() {
             alertify.prompt('Name of new character', function(e, str) {
@@ -181,7 +211,11 @@
             close_others = true;
             // Opens the div with the given name, closes all others
             if (close_others) {
-               $('#data h3 + div').slideUp();
+               $('#data h3 + div').each(function(index, value) {
+                  if (div_name != $(value).prop('id')) {
+                     $(value).slideUp();
+                  }
+               });
             }
             $('h3 + div#' + div_name).slideDown();
          }

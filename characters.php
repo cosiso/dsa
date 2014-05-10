@@ -164,6 +164,49 @@ function update_field() {
                 'fieldname' => $field);
 }
 
+function change_ap() {
+   global $db, $debug;
+
+   if (! $_REQUEST[char_id] or
+       $_REQUEST[char_id] != intval($_REQUEST[char_id])) {
+      return array('message' => 'invalid character id');
+   }
+   if (! $_REQUEST[value] or
+       $_REQUEST[value] != intval($_REQUEST[value])) {
+      $_REQUEST[value] = 0;
+   }
+
+   $field = trim($_REQUEST[field]);
+   $qry = 'UPDATE characters SET ap = ';
+   switch ($field) {
+      case 'ap':
+         # Simply set the field to the specified value
+         $qry .= $_REQUEST[value];
+         break;
+      case 'add_ap':
+         # Add value to ap
+         $qry .= 'COALESCE(ap, 0) + ' . $_REQUEST[value];
+         break;
+      case 'sub_ap':
+         # Subtract value from ap
+         $qry .= 'COALESCE(ap, 0) - ' . $_REQUEST[value];
+         break;
+      default:
+         # Invalid field
+         return array('message' => 'invalid field');
+   }
+   $qry .= ' WHERE id = ' . $_REQUEST[char_id];
+   if (! @$db->do_query($qry, false)) {
+      return array('message' => 'database-error while updating AP' . ( ($debug) ? ': ' . pg_last_error() : ''));
+   }
+   $qry = 'SELECT ap FROM characters WHERE id = ' . $_REQUEST[char_id];
+   $ap = $db->fetch_field($qry, true);
+   return array('success' => true,
+                'field'   => $field,
+                'value'   => $_REQUEST[value],
+                'ap'      => $ap);
+}
+
 switch ($_REQUEST[stage]) {
    case 'main':
       echo json_encode(show_main($_REQUEST[char_id]));
@@ -179,6 +222,9 @@ switch ($_REQUEST[stage]) {
       break;
    case 'remove':
       echo json_encode(remove_char());
+      break;
+   case 'change_ap':
+      echo json_encode(change_ap());
       break;
    default:
       show();

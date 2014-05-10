@@ -12,8 +12,8 @@ body {
 a {
 	text-decoration: none;
 }
-/* remove colors for visited links */
-a:visited {
+/* remove colors for links */
+a:visited, a:link {
 	color: #215452;
 }
 

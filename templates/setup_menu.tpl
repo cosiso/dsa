@@ -22,4 +22,9 @@
    {else}
       <div><a href="setup_vorteile.php">Vor- &amp; Nachteile</a></div>
    {/if}
+   {if $selected_category == 'Kampftechniken'}
+      <div class="selected_menu">Kampftechniken</div>
+   {else}
+      <div><a href="setup_kampftechniken.php">Kampftechniken</a></div>
+   {/if}
 </div>
