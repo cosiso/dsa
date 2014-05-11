@@ -66,6 +66,12 @@ function update_kampftechnik() {
       $qry .= "'" . pg_escape_string($name) . "', ";
       $qry .= ( ($skt) ? "'" . pg_escape_string($skt) . "'" : 'NULL') . ', ';
       $qry .= $be . ')';
+   } else {
+      $qry = 'UPDATE kampftechniken SET ';
+      $qry .= "      name = '" . pg_escape_string($name) . "', ";
+      $qry .= '      skt = ' . ( ($skt) ? "'" . pg_escape_string($skt) . "'" : 'NULL') . ', ';
+      $qry .= "      be = $be ";
+      $qry .= 'WHERE id = ' . $_REQUEST[id];
    }
    if (! @$db->do_query($qry, false)) {
       return array('message' => 'database-error while updating' . ($debug) ? ': ' . pg_last_error() : '');
@@ -78,7 +84,27 @@ function update_kampftechnik() {
                 'be'      => $be);
 }
 
+function remove_kampftechnik() {
+   global $db, $debug;
+
+   if (! $_REQUEST[id] or
+       $_REQUEST[id] != intval($_REQUEST[id])) {
+      return array('message' => 'invalid id specified');
+   }
+
+   $qry = 'DELETE FROM kampftechniken WHERE id = ' . $_REQUEST[id];
+   if (! @$db->do_query($qry, false)) {
+      return array('message' => 'database-error while removing' . ( ($debug) ? ': ' . pg_last_error() : ''));
+   }
+
+   return array('success' => true,
+                'id'      => $_REQUEST[id]);
+}
+
 switch ($_REQUEST[stage]) {
+   case 'remove':
+      echo json_encode(remove_kampftechnik());
+      break;
    case 'update':
       echo json_encode(update_kampftechnik());
       break;

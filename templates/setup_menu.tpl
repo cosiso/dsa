@@ -27,4 +27,9 @@
    {else}
       <div><a href="setup_kampftechniken.php">Kampftechniken</a></div>
    {/if}
+   {if $selected_category == 'Weapons'}
+      <div class="selected_menu">Weapons</div>
+   {else}
+      <div><a href="setup_weapons.php">Weapons</a></div>
+   {/if}
 </div>

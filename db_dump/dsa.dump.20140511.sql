@@ -49,7 +49,9 @@ CREATE TABLE basevalues (
     mr_mod integer,
     mr_bought integer,
     ini_mod integer,
-    at_mod integer
+    at_mod integer,
+    pa_mod integer,
+    fk_mod integer
 );
 
 
@@ -154,7 +156,8 @@ CREATE TABLE characters (
     haarfarbe character varying(16),
     augenfarbe character varying(16),
     aussehen character varying(1024),
-    alter integer
+    alter integer,
+    ap integer
 );
 
 
@@ -175,6 +178,37 @@ CREATE SEQUENCE characters_id_seq
 --
 
 ALTER SEQUENCE characters_id_seq OWNED BY characters.id;
+
+
+--
+-- Name: kampftechniken; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE kampftechniken (
+    id integer NOT NULL,
+    name character varying(32) NOT NULL,
+    be integer,
+    skt character(1)
+);
+
+
+--
+-- Name: kampftechniken_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE kampftechniken_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: kampftechniken_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE kampftechniken_id_seq OWNED BY kampftechniken.id;
 
 
 --
@@ -308,6 +342,46 @@ ALTER SEQUENCE vorteile_id_seq OWNED BY vorteile.id;
 
 
 --
+-- Name: weapons; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE weapons (
+    id integer NOT NULL,
+    tp character varying(8) NOT NULL,
+    tpkk character varying(8) NOT NULL,
+    gewicht integer,
+    lange integer,
+    bf integer DEFAULT 0 NOT NULL,
+    ini integer DEFAULT 0 NOT NULL,
+    preis integer,
+    wm character varying(8) DEFAULT '0/0'::character varying NOT NULL,
+    dk character varying(8),
+    note character varying(1024),
+    kampftechnik_id integer NOT NULL,
+    name character varying(32) NOT NULL
+);
+
+
+--
+-- Name: weapons_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE weapons_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: weapons_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE weapons_id_seq OWNED BY weapons.id;
+
+
+--
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -339,6 +413,13 @@ ALTER TABLE ONLY characters ALTER COLUMN id SET DEFAULT nextval('characters_id_s
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
+ALTER TABLE ONLY kampftechniken ALTER COLUMN id SET DEFAULT nextval('kampftechniken_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
 ALTER TABLE ONLY talente ALTER COLUMN id SET DEFAULT nextval('talente_id_seq'::regclass);
 
 
@@ -364,11 +445,18 @@ ALTER TABLE ONLY vorteile ALTER COLUMN id SET DEFAULT nextval('vorteile_id_seq':
 
 
 --
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY weapons ALTER COLUMN id SET DEFAULT nextval('weapons_id_seq'::regclass);
+
+
+--
 -- Data for Name: basevalues; Type: TABLE DATA; Schema: public; Owner: -
 --
 
-COPY basevalues (id, character_id, le_used, le_mod, le_bought, au_used, au_mod, au_bought, ae_used, ae_mod, ae_bought, mr_used, mr_mod, mr_bought, ini_mod, at_mod) FROM stdin;
-1	1	\N	15	3	\N	10	\N	\N	97	10	\N	5	4	0	0
+COPY basevalues (id, character_id, le_used, le_mod, le_bought, au_used, au_mod, au_bought, ae_used, ae_mod, ae_bought, mr_used, mr_mod, mr_bought, ini_mod, at_mod, pa_mod, fk_mod) FROM stdin;
+1	1	\N	15	3	\N	10	\N	\N	97	10	\N	5	4	0	0	0	0
 \.
 
 
@@ -417,10 +505,10 @@ COPY character_eigenschaften (id, "character", eigenschaft, base, modifier, zuge
 14	3	8	16	0	8	\N
 15	3	1	15	0	8	\N
 16	3	6	9	0	5	\N
-6	1	4	14	0	2	\N
+2	1	3	16	0	8	\N
 5	1	6	13	0	2	\N
 4	1	5	15	0	4	\N
-2	1	3	16	0	8	\N
+6	1	4	14	0	2	\N
 \.
 
 
@@ -435,10 +523,10 @@ SELECT pg_catalog.setval('character_eigenschaften_id_seq', 16, true);
 -- Data for Name: characters; Type: TABLE DATA; Schema: public; Owner: -
 --
 
-COPY characters (id, name, rasse, kultur, profession, geschlecht, grosse, gewicht, haarfarbe, augenfarbe, aussehen, alter) FROM stdin;
-1	Cyrotherias	Imperialer Mensch	Cantaresen	Optimat (Wesenbeschwörer)	Male	166	61	Black	Grau	\N	22
-2	Phronna	Imperialer Mensch	Cantaresen	Dancer	Weiblich	\N	\N	Black	\N	Test	22
-3	RiUa	Amaunir	Stadt- Amaunir	BaLoa	Female	178	66	Black	Green	Golden fur with black tiger stripes at the sides and over bottom length tail	18
+COPY characters (id, name, rasse, kultur, profession, geschlecht, grosse, gewicht, haarfarbe, augenfarbe, aussehen, alter, ap) FROM stdin;
+2	Phronna	Imperialer Mensch	Cantaresen	Dancer	Weiblich	\N	\N	Black	\N	Test	22	\N
+3	RiUa	Amaunir	Stadt- Amaunir	BaLoa	Female	178	66	Black	Green	Golden fur with black tiger stripes at the sides and over bottom length tail	18	\N
+1	Cyrotherias	Imperialer Mensch	Cantaresen	Optimat (Wesenbeschwörer)	Male	166	61	Black	Grau	\N	22	77
 \.
 
 
@@ -447,6 +535,29 @@ COPY characters (id, name, rasse, kultur, profession, geschlecht, grosse, gewich
 --
 
 SELECT pg_catalog.setval('characters_id_seq', 8, true);
+
+
+--
+-- Data for Name: kampftechniken; Type: TABLE DATA; Schema: public; Owner: -
+--
+
+COPY kampftechniken (id, name, be, skt) FROM stdin;
+4	Dolche	-1	D
+9	Hiebwaffen	-4	D
+10	Raufen	0	C
+11	Ringen	0	D
+12	Säbel	-2	D
+13	Wurfmesser	-3	C
+14	Speere	-2	D
+15	Stäbe	-2	D
+\.
+
+
+--
+-- Name: kampftechniken_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+--
+
+SELECT pg_catalog.setval('kampftechniken_id_seq', 15, true);
 
 
 --
@@ -532,6 +643,21 @@ SELECT pg_catalog.setval('vorteile_id_seq', 12, true);
 
 
 --
+-- Data for Name: weapons; Type: TABLE DATA; Schema: public; Owner: -
+--
+
+COPY weapons (id, tp, tpkk, gewicht, lange, bf, ini, preis, wm, dk, note, kampftechnik_id, name) FROM stdin;
+\.
+
+
+--
+-- Name: weapons_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+--
+
+SELECT pg_catalog.setval('weapons_id_seq', 1, false);
+
+
+--
 -- Name: basevalues_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -569,6 +695,22 @@ ALTER TABLE ONLY characters
 
 ALTER TABLE ONLY characters
     ADD CONSTRAINT characters_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: kampftechniken_name_key; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY kampftechniken
+    ADD CONSTRAINT kampftechniken_name_key UNIQUE (name);
+
+
+--
+-- Name: kampftechniken_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY kampftechniken
+    ADD CONSTRAINT kampftechniken_pkey PRIMARY KEY (id);
 
 
 --
@@ -628,10 +770,25 @@ ALTER TABLE ONLY vorteile
 
 
 --
+-- Name: weapons_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY weapons
+    ADD CONSTRAINT weapons_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: char_vorteile_character_id_vorteil_id_idx; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
 CREATE UNIQUE INDEX char_vorteile_character_id_vorteil_id_idx ON char_vorteile USING btree (character_id, vorteil_id);
+
+
+--
+-- Name: weapons_name_idx; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE UNIQUE INDEX weapons_name_idx ON weapons USING btree (name);
 
 
 --
@@ -704,6 +861,14 @@ ALTER TABLE ONLY talente
 
 ALTER TABLE ONLY talente
     ADD CONSTRAINT talente_eigenschaft3_fkey FOREIGN KEY (eigenschaft3) REFERENCES traits(id) ON UPDATE CASCADE ON DELETE RESTRICT;
+
+
+--
+-- Name: weapons_kampftechnik_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY weapons
+    ADD CONSTRAINT weapons_kampftechnik_id_fkey FOREIGN KEY (kampftechnik_id) REFERENCES kampftechniken(id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --
@@ -797,6 +962,26 @@ GRANT ALL ON SEQUENCE characters_id_seq TO nginx;
 
 
 --
+-- Name: kampftechniken; Type: ACL; Schema: public; Owner: -
+--
+
+REVOKE ALL ON TABLE kampftechniken FROM PUBLIC;
+REVOKE ALL ON TABLE kampftechniken FROM andre;
+GRANT ALL ON TABLE kampftechniken TO andre;
+GRANT ALL ON TABLE kampftechniken TO nginx;
+
+
+--
+-- Name: kampftechniken_id_seq; Type: ACL; Schema: public; Owner: -
+--
+
+REVOKE ALL ON SEQUENCE kampftechniken_id_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE kampftechniken_id_seq FROM andre;
+GRANT ALL ON SEQUENCE kampftechniken_id_seq TO andre;
+GRANT ALL ON SEQUENCE kampftechniken_id_seq TO nginx;
+
+
+--
 -- Name: talente; Type: ACL; Schema: public; Owner: -
 --
 
@@ -874,6 +1059,26 @@ REVOKE ALL ON SEQUENCE vorteile_id_seq FROM PUBLIC;
 REVOKE ALL ON SEQUENCE vorteile_id_seq FROM andre;
 GRANT ALL ON SEQUENCE vorteile_id_seq TO andre;
 GRANT ALL ON SEQUENCE vorteile_id_seq TO nginx;
+
+
+--
+-- Name: weapons; Type: ACL; Schema: public; Owner: -
+--
+
+REVOKE ALL ON TABLE weapons FROM PUBLIC;
+REVOKE ALL ON TABLE weapons FROM andre;
+GRANT ALL ON TABLE weapons TO andre;
+GRANT ALL ON TABLE weapons TO nginx;
+
+
+--
+-- Name: weapons_id_seq; Type: ACL; Schema: public; Owner: -
+--
+
+REVOKE ALL ON SEQUENCE weapons_id_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE weapons_id_seq FROM andre;
+GRANT ALL ON SEQUENCE weapons_id_seq TO andre;
+GRANT ALL ON SEQUENCE weapons_id_seq TO nginx;
 
 
 --

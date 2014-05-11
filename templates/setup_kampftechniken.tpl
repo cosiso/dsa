@@ -56,6 +56,50 @@
             }
             return data;
          }
+         function attach_simpletip_frm(elem, id) {
+            // places the simpletip on the specified element
+            $(elem).simpletip({
+               onBeforeShow : function() {
+                  this.load('setup_kampftechniken.php', {stage : 'frm_kampftechnik',
+                                                         id    : id});
+               },
+               onContentLoad : function() {
+                  // Set focus
+                  $('#frm_kampftechniken #name').focus().select();
+                  // Add validation to form
+                  $('#frm_kampftechniken').validate({
+                     rules        : {
+                        name : {
+                           required : true
+                        },
+                        skt  : {
+
+                           required : true,
+                           minlength: 1,
+                           maxlength: 1
+                        },
+                        be   : {
+                           number   : true
+                        }
+                     },
+                     submitHandler: function(form) {
+                        $(form).ajaxSubmit({
+                           success : do_update_kampftechnik,
+                           // beforeSubmit: showRequest,
+                           type    : 'post',
+                           url     : 'setup_kampftechniken.php',
+                           datatype: 'json'
+                        });
+                        close_kt_box();
+                        return false;
+                     }
+                  });
+               },
+               persistent   : true,
+               focus        : true
+            });
+            return false;
+         }
          function do_show_talente(data) {
             data = extract_json(data);
             if (data.success) {
@@ -64,45 +108,20 @@
                $('div#talente #table_kampftechniken').tablesorter({headers : { 2: {sorter: false},
                                                                                3: {sorter: false}}});
                // Add simpletip to button
-               $('#btn_add_kampftechnik').simpletip({
-                  onBeforeShow : function() {
-                     this.load('setup_kampftechniken.php', {stage : 'frm_kampftechnik',
-                                                            id    : 0});
-                  },
-                  onContentLoad : function() {
-                     // Set focus
-                     $('#frm_kampftechniken #name').focus().select();
-                     // Add validation to form
-                     $('#frm_kampftechniken').validate({
-                        rules        : {
-                           name : {
-                              required : true
-                           },
-                           skt  : {
-                              required : true,
-                              minlength: 1,
-                              maxlength: 1
-                           },
-                           be   : {
-                              number   : true
-                           }
-                        },
-                        submitHandler: function(form) {
-                           $(form).ajaxSubmit({
-                              success : do_update_kampftechnik,
-                              // beforeSubmit: showRequest,
-                              type    : 'post',
-                              url     : 'setup_kampftechniken.php',
-                              datatype: 'json'
-                           });
-                           close_kt_box();
-                           return false;
-                        }
-                     });
-                  },
-                  persistent   : true,
-                  focus        : true
+               attach_simpletip_frm('#btn_add_kampftechnik', 0);
+               // Add simpletip to links
+               $('#table_kampftechniken a[id^=link_edit]').each(function() {
+                  var id = $(this).prop('id');
+                  var dummy = id.split('_');
+                  attach_simpletip_frm('#' + id, dummy[2]);
                });
+               // Add remove function to links
+               $('tr[id^=row_] a[id^=link_remove_]').each(function(index) {
+                  // Fetch id from name
+                  var id = $(this).prop('id');
+                  var dummy = id.split('_');
+                  $(this).unbind('click').click(function() {remove_kampftechnik(dummy[2])});
+               })
                toggle_h3('talente');
             }
          }
@@ -111,6 +130,36 @@
             if (id == 0) {
                // Pop-up attached to btn
                $('#btn_add_kampftechnik').eq(0).simpletip().hide();
+            } else {
+               // Pop-up attached to row
+               $('#table_kampftechniken #link_edit_' + id).eq(0).simpletip().hide();
+            }
+         }
+         function remove_kampftechnik(id) {
+            // Fetch name to display in alert
+            var name = $('#table_kampftechniken #row_' + id + ' #cell_name').text();
+            alertify.confirm('Remove ' + name + '?', function(e) {
+               if (e) {
+                  $.ajax({
+                     datatype : 'json',
+                     type     : 'post',
+                     url      : 'setup_kampftechniken.php',
+                     data     : {stage : 'remove',
+                                 id    : id},
+                     success  : do_remove_kampftechnik
+                  });
+                  alertify.log('Removing kampftechnik ' + name);
+               }
+            });
+         }
+         function do_remove_kampftechnik(data) {
+            data = extract_json(data);
+            if (data.success) {
+               var row = '#table_kampftechniken #row_' + data.id;
+               $(row).effect('highlight', {}, 2000);
+               setTimeout(function() {
+                  $(row).remove();
+               }, 500);
             }
          }
          function do_update_kampftechnik(data) {
@@ -122,28 +171,21 @@
                      '<td id="cell_name">' + htmlescape(data.name) + '</td>' +
                      '<td id="cell_skt">' + htmlescape(data.skt) + '</td>' +
                      '<td id="cell_be">' + htmlescape(data.be) + '</td>' +
-                     '<td>&nbsp;</td>';
+                     '<td>' +
+                     '<a id="link_edit_' + data.id + '" href="#" class="link-edit">edit</a>' +
+                     ' | <a id="link_remove_' + data.id + '" href="#" class="link-cancel">remove</a>' +
+                     '</td>' +
+                     '</tr>';
                   $('#talente #table_kampftechniken tbody').append(elem);
                   $('#table_kampftechniken #row_' + data.id).effect('highlight', {}, 2000);
-            /*
-            var elem = '<tr id="vorteil_' + data.id + '">' +
-                   '<td id="cell_img"><img src="images/' + img_src + '" border="0" /></td>' +
-                   '<td id="cell_name">' + htmlescape(data.name) + '</td>' +
-                   '<td id="cell_value">' + htmlescape(data.value) + '</td>' +
-                   '<td id="cell_effect">' + htmlescape(data.effect) + '</td>' +
-                   '<td id="cell_note">' + htmlescape(data.note) + '</td>' +
-                   '<td>' +
-                      '<a id="vorteile_link_desc" href="#" class="link-info">description</a>' +
-                      ' | <a id="vorteile_link_edit" href="#" class="link-edit">edit</a>' +
-                      ' | <a id="cell_remove" href="#" class="link-cancel" onclick="remove_vorteil(' + data.id + ', \'' + htmlescape(data.name) + '\')">remove</a>' +
-                   '</td></tr>';
-            $('#table_vorteile tbody').append(elem);
-            $(row).effect('highlight', {}, 2000);
-            add_simpletip_desc_to_link(row + ' #vorteile_link_desc');
-            add_simpletip_edit_to_link(row + ' #vorteile_link_edit');
-            */
+                  attach_simpletip_frm('#table_kampftechniken #link_edit_' + data.id);
+                  $('#link_remove_' + data.id).unbind('click').click(function() {remove_kampftechnik(data.id)});
                } else {
-                  // Modify table
+                  var row = '#table_kampftechniken #row_' + data.id;
+                  $(row + ' #cell_name').text(data.name);
+                  $(row + ' #cell_skt').text(data.skt);
+                  $(row + ' #cell_be').text(data.be);
+                  $(row).effect('highlight', {}, 2000);
                }
             }
          }

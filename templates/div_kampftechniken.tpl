@@ -14,12 +14,11 @@
             <td id="cell_skt">{$kampftechniken[idx].skt|escape}</td>
             <td id="cell_be">{$kampftechniken[idx].be|escape}</td>
             <td>
-               <a href="#" onclick="edit_kampftechniken({$kampftechniken[idx].id})" class="link-edit">edit</a>
-               | <a href="#" onclick="remove_kampftechniken({$kampftechniken[idx].id})" class="link-cancel">remove</a>
+               <a id="link_edit_{$kampftechniken[idx].id}" href="#" class="link-edit">edit</a>
+               | <a id="link_remove_{$kampftechniken[idx].id}" href="#" class="link-cancel">remove</a>
             </td>
          </tr>
       {/section}
    </tbody>
 </table><br />
 <a id="btn_add_kampftechnik" class="link-add" href="#">Add kampftechnik</a>
-
