@@ -1,0 +1,95 @@
+-- Calculate MUT
+CREATE OR REPLACE FUNCTION calc_mu(cid INT) RETURNS INTEGER AS $$
+   DECLARE
+      mu INT;
+   BEGIN
+      SELECT COALESCE(base, 0) + COALESCE(modifier, 0) + COALESCE(zugekauft, 0) INTO mu
+      FROM   character_eigenschaften, traits
+      WHERE  character = cid AND
+             traits.id = character_eigenschaften.eigenschaft AND
+             traits.abbr = 'MU';
+      RETURN mu;
+   END;
+$$ LANGUAGE plpgsql;
+
+-- Calculate Gewandheit
+CREATE OR REPLACE FUNCTION calc_ge(cid INT) RETURNS INTEGER AS $$
+   DECLARE
+      mu INT;
+   BEGIN
+      SELECT COALESCE(base, 0) + COALESCE(modifier, 0) + COALESCE(zugekauft, 0) INTO mu
+      FROM   character_eigenschaften, traits
+      WHERE  character = cid AND
+             traits.id = character_eigenschaften.eigenschaft AND
+             traits.abbr = 'GE';
+      RETURN mu;
+   END;
+$$ LANGUAGE plpgsql;
+
+-- Calculate Gewandheit
+CREATE OR REPLACE FUNCTION calc_kk(cid INT) RETURNS INTEGER AS $$
+   DECLARE
+      mu INT;
+   BEGIN
+      SELECT COALESCE(base, 0) + COALESCE(modifier, 0) + COALESCE(zugekauft, 0) INTO mu
+      FROM   character_eigenschaften, traits
+      WHERE  character = cid AND
+             traits.id = character_eigenschaften.eigenschaft AND
+             traits.abbr = 'KK';
+      RETURN mu;
+   END;
+$$ LANGUAGE plpgsql;
+
+-- Calculate Intuition
+CREATE OR REPLACE FUNCTION calc_in(cid INT) RETURNS INTEGER AS $$
+   DECLARE
+      mu INT;
+   BEGIN
+      SELECT COALESCE(base, 0) + COALESCE(modifier, 0) + COALESCE(zugekauft, 0) INTO mu
+      FROM   character_eigenschaften, traits
+      WHERE  character = cid AND
+             traits.id = character_eigenschaften.eigenschaft AND
+             traits.abbr = 'IN';
+      RETURN mu;
+   END;
+$$ LANGUAGE plpgsql;
+
+-- Stored procedure to calculate AT
+CREATE OR REPLACE FUNCTION calc_at(cid INT) RETURNS INTEGER AS $$
+   DECLARE
+      my_at INT;
+   BEGIN
+      SELECT ROUND((calc_mu(cid) + calc_ge(cid) + calc_kk(cid)) / 5.0) INTO my_at;
+      RETURN my_at;
+   END;
+$$ LANGUAGE plpgsql;
+
+-- Stored procedure to calculate PA
+CREATE OR REPLACE FUNCTION calc_pa(cid INT) RETURNS INTEGER AS $$
+   DECLARE
+      my_pa INT;
+   BEGIN
+      SELECT ROUND((calc_in(cid) + calc_ge(cid) + calc_kk(cid)) / 5.0) INTO my_pa;
+      RETURN my_pa;
+   END;
+$$ LANGUAGE plpgsql;
+
+-- Calculate kk-bonus
+CREATE OR REPLACE FUNCTION kk_bonus(cid INT, tpkk VARCHAR) RETURNS INTEGER AS $$
+   DECLARE
+      my_kk INT;
+      start INT;
+      step  INT;
+      bonus INT;
+   BEGIN
+      start = split_part(tpkk, '/', 1);
+      step  = split_part(tpkk, '/', 2);
+      bonus = 0;
+      SELECT calc_kk(cid) - start INTO my_kk;
+      WHILE my_kk >= step LOOP
+         bonus = bonus + 1;
+         my_kk = my_kk - step;
+      END LOOP;
+      RETURN bonus;
+   END;
+$$ LANGUAGE plpgsql;
