@@ -62,6 +62,9 @@
                <h3 id="h3_vorteile">Vor- &amp; Nachteile</h3>
                <div id="vorteile"></div>
                <hr />
+               {* Kampftechniken *}
+               <h3 id="h3_kampftechniken">Kampftechniken</h3>
+               <div id="kampftechniken" style="display: none"></div>
             </div>
             {carto_spacer height=16}<br /><a id="btn_remove_char" class="link-del">Remove character</a>
          </div>
@@ -375,7 +378,10 @@
                retrieve_eigenschaften(data.id);
                toggle_h3('eigenschaften', false);
             })
-
+            $('#h3_kampftechniken').unbind('click').click(function() {
+               retrieve_kampftechniken(data.id);
+               toggle_h3('kampftechniken', false);
+            })
             // Set page on general data
             toggle_h3('general_data', true);
             // Set array with old_values
@@ -406,6 +412,128 @@
                // Remove from list
                $('#li-char-' + data.id).remove();
             }
+         }
+         /* Functions for kampftechniken */
+         function retrieve_kampftechniken(id) {
+            var name = $('#main_name').text();
+            alertify.log('Retrieving kampftechniken for ' + name);
+            $.ajax({
+               datatype : 'json',
+               type     : 'post',
+               url      : 'character_kampftechniken.php',
+               data     : {stage: 'get',
+                           id   : id},
+               success  : do_show_kampftechniken
+            });
+         }
+         function do_show_kampftechniken(data) {
+            data = extract_json(data);
+            if (data.success) {
+               var div = '#data #kampftechniken';
+               $(div).html(data.out);
+               $(div).slideDown();
+            }
+         }
+         function learn_kampftechnik(technik_id) {
+            $.ajax({
+               datatype : 'json',
+               type     : 'post',
+               url      : 'character_kampftechniken.php',
+               data     : {stage      : 'learn',
+                           char_id    : character_id,
+                           technik_id : technik_id},
+               success  : do_learn_kampftechnik,
+            });
+         }
+         function do_learn_kampftechnik(data) {
+            data = extract_json(data);
+            if (data.success) {
+               var row = 'table#kampftechniken tr#' + data.technik_id;
+               // Update fields
+               $(row + ' > #star >img').attr('src', 'images/star-16.png');
+               $(row + ' #at_' + data.technik_id).text('0');
+               $(row + ' #pa_' + data.technik_id).text('0');
+               $(row + ' #taw_' + data.technik_id).text('0');
+               var html='<img src="images/person-minus-16.png" border="0" width="16" height="16" />unlearn';
+               $(row + ' #lnk_' + data.technik_id + ' a').html(html);
+               $(row + ' #lnk_' + data.technik_id + ' a').unbind('click').click(function() {
+                  unlearn_kampftechnik(data.char_id, data.technik_id);
+               });
+               $(row + ' span').show();
+               $(row).effect('highlight', {}, 2000);
+            }
+         }
+         function unlearn_kampftechnik(char_id, technik_id) {
+            $.ajax({
+               datatype : 'json',
+               type     : 'post',
+               url      : 'character_kampftechniken.php',
+               data     : {stage      : 'unlearn',
+                           char_id    : char_id,
+                           technik_id : technik_id},
+               success  : do_unlearn_kampftechnik,
+            });
+         }
+         function do_unlearn_kampftechnik(data) {
+            data = extract_json(data);
+            if (data.success) {
+               var row = 'table#kampftechniken tr#' + data.technik_id;
+               // Update fields
+               $(row + ' > #star >img').attr('src', 'images/star-inactive-16.png');
+               $(row + ' #at_' + data.technik_id).text('');
+               $(row + ' #pa_' + data.technik_id).text('');
+               $(row + ' #taw_' + data.technik_id).text('');
+               var html='<img src="images/person-plus-16.png" border="0" width="16" height="16" />learn';
+               $(row + ' #lnk_' + data.technik_id + ' a').html(html);
+               $(row + ' #lnk_' + data.technik_id + ' a').unbind('click').click(function() {
+                  learn_kampftechnik(data.technik_id);
+               });
+               $(row + ' span').hide();
+               $(row).effect('highlight', {}, 2000);
+            }
+         }
+         function do_change_kt(data) {
+            data = extract_json(data);
+            if (data.success) {
+               var row = 'table#kampftechniken tr#' + data.technik_id;
+               if (data.kind == 'at') {
+                  fld = row + ' #at_' + data.technik_id;
+               } else {
+                  fld = row + ' #pa_' + data.technik_id;
+               }
+               $(fld).text(data.value);
+               $(row + ' #taw_' + data.technik_id).text(data.taw);
+               $(row).effect('highlight', {}, 2000);
+            }
+         }
+         function change_kt(technik_id, kind, value) {
+            if (kind != 'at' &&
+                kind != 'pa') {
+               alertify.alert('Invalid kind of kampftechnik to alter');
+            }
+            $.ajax({
+               datatype : 'json',
+               type     : 'post',
+               url      : 'character_kampftechniken.php',
+               data     : {technik_id : technik_id,
+                           char_id    : character_id,
+                           kind       : kind,
+                           stage      : 'update_kt_value',
+                           value      : value},
+               success  : do_change_kt,
+            });
+         }
+         function raise_at(kt_id) {
+            change_kt(kt_id, 'at', 1);
+         }
+         function raise_pa(kt_id) {
+            change_kt(kt_id, 'pa', 1);
+         }
+         function lower_at(kt_id) {
+            change_kt(kt_id, 'at', -1);
+         }
+         function lower_pa(kt_id) {
+            change_kt(kt_id, 'pa', -1);
          }
          {/literal}//-->
       </script>

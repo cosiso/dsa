@@ -1,6 +1,7 @@
 <form name="frm_weapons" id="frm_weapons">
    {html_hidden name='stage' value='update'}
    {html_hidden name='id' value=$id}
+   {html_hidden name='kampftechnik_id' value=$kampftechnik_id}
    <label for="name">Name</label>
    {html_text name='name' value=$name|escape style='width: 35em'}
    <label for='kampftechnik'>Kamftechnik</label>
@@ -9,7 +10,7 @@
       <tr>
          <td>
             <label for="tp">TP</label>
-            {html_text name='tp' value=$tp|escape style='width: 5em'}
+            {html_text name='tp' value=$tp|escape style='width: 5em'} (f.e. 1d6+2)
          </td>
          <td>
             <label for="tpkk">TP/KK</label>
@@ -45,6 +46,13 @@
             <label for="dk">DK</label>
             {html_text name='dk' value=$dk|escape style='width: 5em'}
          </td>
+      </tr>
+      <tr>
+         <td>
+            <label for="bf">BF</label>
+            {html_text name='bf' value=$bf|escape style='width: 5em'}
+         </td>
+         <td>&nbsp;</td>
       </tr>
    </table>
    <label for="note">Note</label>

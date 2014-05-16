@@ -165,12 +165,17 @@
          function do_update_kampftechnik(data) {
             data = extract_json(data);
             if (data.success) {
+               var cell_ua = '&nbsp;';
+               if (data.unarmed) {
+                  cell_ua = '<img src="images/bullet_orange.png" border="0" width="16" height="16" />';
+               }
                if (data.is_new) {
                   // Add to table
                   var elem = '<tr id="row_' + data.id + '">' +
                      '<td id="cell_name">' + htmlescape(data.name) + '</td>' +
                      '<td id="cell_skt">' + htmlescape(data.skt) + '</td>' +
                      '<td id="cell_be">' + htmlescape(data.be) + '</td>' +
+                     '<yd id="cell_ua">' + cell_ua + '</td>';
                      '<td>' +
                      '<a id="link_edit_' + data.id + '" href="#" class="link-edit">edit</a>' +
                      ' | <a id="link_remove_' + data.id + '" href="#" class="link-cancel">remove</a>' +
@@ -185,6 +190,7 @@
                   $(row + ' #cell_name').text(data.name);
                   $(row + ' #cell_skt').text(data.skt);
                   $(row + ' #cell_be').text(data.be);
+                  $(row + ' #cell_ua').html(cell_ua);
                   $(row).effect('highlight', {}, 2000);
                }
             }

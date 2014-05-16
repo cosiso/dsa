@@ -80,6 +80,9 @@ h3 {
 	padding-left: 18px;
 	cursor: pointer;
 }
+h4 {
+	color: #a64646;
+}
 
 /* input fields */
 input {

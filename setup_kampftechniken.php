@@ -38,6 +38,7 @@ function frm_kampftechnik() {
       $qry .= 'WHERE id = ' . $_REQUEST[id];
       $rid = $db->do_query($qry, true);
       $row = $db->get_array($rid);
+      $row[unarmed] = ($row[unarmed] == 't') ? true : false;
       $smarty->assign($row);
    } else {
       $smarty->assign('id', 0);
@@ -60,17 +61,20 @@ function update_kampftechnik() {
    if ($be != intval($be)) {
       return array('message' => 'invalid value for Behinderung specified');
    }
+   $unarmed = isset($_REQUEST[unarmed]) ? true : false;
    if (! $_REQUEST[id]) {
       $qry = 'INSERT INTO kampftechniken ';
-      $qry .= '(name, skt, be) VALUES (';
+      $qry .= '(name, skt, be, unarmed) VALUES (';
       $qry .= "'" . pg_escape_string($name) . "', ";
       $qry .= ( ($skt) ? "'" . pg_escape_string($skt) . "'" : 'NULL') . ', ';
-      $qry .= $be . ')';
+      $qry .= $be . ', ';
+      $qry .= ( ($unarmed) ? "'t'" : "'f'") . ')';
    } else {
       $qry = 'UPDATE kampftechniken SET ';
       $qry .= "      name = '" . pg_escape_string($name) . "', ";
       $qry .= '      skt = ' . ( ($skt) ? "'" . pg_escape_string($skt) . "'" : 'NULL') . ', ';
-      $qry .= "      be = $be ";
+      $qry .= "      be = $be, ";
+      $qry .= "      unarmed = '" . ( ($unarmed) ? 't' : 'f') . "' ";
       $qry .= 'WHERE id = ' . $_REQUEST[id];
    }
    if (! @$db->do_query($qry, false)) {
@@ -81,6 +85,7 @@ function update_kampftechnik() {
                 'id'      => ($_REQUEST[id]) ? $_REQUEST[id] : $db->insert_id('kampftechniken'),
                 'name'    => $name,
                 'skt'     => $skt,
+                'unarmed' => $unarmed,
                 'be'      => $be);
 }
 
