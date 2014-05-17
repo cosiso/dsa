@@ -12,31 +12,17 @@ CREATE OR REPLACE FUNCTION calc_mu(cid INT) RETURNS INTEGER AS $$
    END;
 $$ LANGUAGE plpgsql;
 
--- Calculate Gewandheit
-CREATE OR REPLACE FUNCTION calc_ge(cid INT) RETURNS INTEGER AS $$
+-- Calculate Klugheit
+CREATE OR REPLACE FUNCTION calc_kl(cid INT) RETURNS INTEGER AS $$
    DECLARE
-      mu INT;
+      kl INT;
    BEGIN
-      SELECT COALESCE(base, 0) + COALESCE(modifier, 0) + COALESCE(zugekauft, 0) INTO mu
+      SELECT COALESCE(base, 0) + COALESCE(modifier, 0) + COALESCE(zugekauft, 0) INTO kl
       FROM   character_eigenschaften, traits
       WHERE  character = cid AND
              traits.id = character_eigenschaften.eigenschaft AND
-             traits.abbr = 'GE';
-      RETURN mu;
-   END;
-$$ LANGUAGE plpgsql;
-
--- Calculate Gewandheit
-CREATE OR REPLACE FUNCTION calc_kk(cid INT) RETURNS INTEGER AS $$
-   DECLARE
-      mu INT;
-   BEGIN
-      SELECT COALESCE(base, 0) + COALESCE(modifier, 0) + COALESCE(zugekauft, 0) INTO mu
-      FROM   character_eigenschaften, traits
-      WHERE  character = cid AND
-             traits.id = character_eigenschaften.eigenschaft AND
-             traits.abbr = 'KK';
-      RETURN mu;
+             traits.abbr = 'KL';
+      RETURN kl;
    END;
 $$ LANGUAGE plpgsql;
 
@@ -51,6 +37,86 @@ CREATE OR REPLACE FUNCTION calc_in(cid INT) RETURNS INTEGER AS $$
              traits.id = character_eigenschaften.eigenschaft AND
              traits.abbr = 'IN';
       RETURN mu;
+   END;
+$$ LANGUAGE plpgsql;
+
+-- Calculate Charisma
+CREATE OR REPLACE FUNCTION calc_ch(cid INT) RETURNS INTEGER AS $$
+   DECLARE
+      ch INT;
+   BEGIN
+      SELECT COALESCE(base, 0) + COALESCE(modifier, 0) + COALESCE(zugekauft, 0) INTO ch
+      FROM   character_eigenschaften, traits
+      WHERE  character = cid AND
+             traits.id = character_eigenschaften.eigenschaft AND
+             traits.abbr = 'CH';
+      RETURN ch;
+   END;
+$$ LANGUAGE plpgsql;
+
+-- Calculate Fingerfertigkeit
+CREATE OR REPLACE FUNCTION calc_ff(cid INT) RETURNS INTEGER AS $$
+   DECLARE
+      ff INT;
+   BEGIN
+      SELECT COALESCE(base, 0) + COALESCE(modifier, 0) + COALESCE(zugekauft, 0) INTO ff
+      FROM   character_eigenschaften, traits
+      WHERE  character = cid AND
+             traits.id = character_eigenschaften.eigenschaft AND
+             traits.abbr = 'FF';
+      RETURN ff;
+   END;
+$$ LANGUAGE plpgsql;
+
+-- Calculate Gewandheit
+CREATE OR REPLACE FUNCTION calc_ge(cid INT) RETURNS INTEGER AS $$
+   DECLARE
+      ge INT;
+   BEGIN
+      SELECT COALESCE(base, 0) + COALESCE(modifier, 0) + COALESCE(zugekauft, 0) INTO ge
+      FROM   character_eigenschaften, traits
+      WHERE  character = cid AND
+             traits.id = character_eigenschaften.eigenschaft AND
+             traits.abbr = 'GE';
+      RETURN ge;
+   END;
+$$ LANGUAGE plpgsql;
+
+-- Calculate Konstitution
+CREATE OR REPLACE FUNCTION calc_ko(cid INT) RETURNS INTEGER AS $$
+   DECLARE
+      ko INT;
+   BEGIN
+      SELECT COALESCE(base, 0) + COALESCE(modifier, 0) + COALESCE(zugekauft, 0) INTO ko
+      FROM   character_eigenschaften, traits
+      WHERE  character = cid AND
+             traits.id = character_eigenschaften.eigenschaft AND
+             traits.abbr = 'KO';
+      RETURN ko;
+   END;
+$$ LANGUAGE plpgsql;
+
+-- Calculate Korperkraft
+CREATE OR REPLACE FUNCTION calc_kk(cid INT) RETURNS INTEGER AS $$
+   DECLARE
+      kk INT;
+   BEGIN
+      SELECT COALESCE(base, 0) + COALESCE(modifier, 0) + COALESCE(zugekauft, 0) INTO kk
+      FROM   character_eigenschaften, traits
+      WHERE  character = cid AND
+             traits.id = character_eigenschaften.eigenschaft AND
+             traits.abbr = 'KK';
+      RETURN kk;
+   END;
+$$ LANGUAGE plpgsql;
+
+-- calculate INI
+CREATE OR REPLACE FUNCTION calc_ini(cid INT) RETURNS INTEGER AS $$
+   DECLARE
+      my_ini INT;
+   BEGIN
+      SELECT ROUND( (calc_mu(cid) * 2 + calc_in(cid) + calc_ge(cid)) / 5.0 ) INTO my_ini;
+      RETURN my_ini;
    END;
 $$ LANGUAGE plpgsql;
 

@@ -24,10 +24,21 @@
       </div>
    </div>
    {include file=part_script_include.tpl}
-   {include file=part_script_functions.tpl}
    <script type="text/javascript">
       <!--{literal}
       var hasData = {};
+      function extract_json(data) {
+         try {
+            data = $.parseJSON(data);
+         } catch(e) {
+            alertify.alert(e + "\nData: " + data.toSource());
+            return false;
+         }
+         if (! data.success && data.message) {
+            alertify.alert('Error: ' + data.message);
+         }
+         return data;
+      }
       function close_all_divs() {
          $('#main h3 + div[id^=char_]').slideUp();
       }
@@ -57,6 +68,40 @@
             $(div).slideDown();
             hasData[data.id] = true;
          }
+      }
+      function rollIni(td_elem) {
+         var ini = parseInt($(td_elem).text().trim()) || 0;
+         ini += Math.floor(Math.random() * 6 + 1);
+         var name = $(td_elem).closest('div').prev().text();
+         var log = name + ' rolled initiative <b>' + ini + '</b> on ' +
+                   $(td_elem).parent().children('td').eq(0).text();
+         alertify.log(log);
+      }
+      function rollATorPA(td_elem, at) {
+         var typ = (at) ? 'attack' : 'parry';
+         var sk = parseInt($(td_elem).text().trim()) || 0;
+         var roll = Math.floor(Math.random() * 20 + 1);
+         var name = $(td_elem).closest('div').prev().text();
+         var skill = $(td_elem).parent().children('td').eq(0).text();
+         if (roll > sk) {
+            alertify.error(name + ' rolled <b> ' + roll + '</b> and failed a ' + skill + ' ' + typ);
+         } else {
+            alertify.success(name + ' rolled ' + roll + '(<b>+' + (sk - roll) + '</b>) on ' + skill + ' ' + typ);
+         }
+      }
+      function rollTP(td_elem) {
+         var description = $(td_elem).text().trim();
+         var split = description.split('+');
+         var dice = split[0];
+         var addition = parseInt(split[1]) || 0;
+         split = dice.split('D');
+         var multiplier = parseInt(split[0]) || 1;
+         dice = parseInt(split[1]) || 0;
+         var roll = Math.floor(Math.random() * dice + 1);
+         var total = roll * multiplier + addition;
+         var name = $(td_elem).closest('div').prev().text();
+         var skill = $(td_elem).parent().children('td').eq(0).text();
+         alertify.log(name + ' rolled <b>' + total + '</b> damage on ' + skill);
       }
       //-->{/literal}
    </script>

@@ -16,7 +16,8 @@ function get_kampftechniken() {
    $qry = 'SELECT kt.id, kt.name, kt.be, kt.skt, ';
    $qry .= '      ck.at, ck.pa, ck.at + ck.pa AS taw, ck.character_id ';
    $qry .= 'FROM  kampftechniken kt ';
-   $qry .= '      LEFT JOIN char_kampftechniken ck ON ck.kampftechnik_id = kt.id ';
+   $qry .= '      LEFT JOIN char_kampftechniken ck ON ck.kampftechnik_id = kt.id AND ';
+   $qry .= '                                          ck.character_id = ' . $_REQUEST[id] . ' ';
    $qry .= 'ORDER BY name';
    $rid = $db->do_query($qry, true);
    while ($row = $db->get_array($rid)) {

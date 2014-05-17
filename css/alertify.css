@@ -44,7 +44,8 @@
 .alertify-logs {
    position: fixed;
    z-index: 5000;
-   bottom: 10px;
+   /* bottom: 10px; */
+   top: 10px;
    right: 10px;
    width: 300px;
 }

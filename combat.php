@@ -25,13 +25,15 @@ function get_char() {
        $_REQUEST[id] != intval($_REQUEST[id])) {
       return array('message' => 'invalid id specified');
    }
+   $char_id = $_REQUEST[id];
 
    $qry = "SELECT kampftechniken.name AS kampftechnik, '10/3' AS tpkk, ";
-   $qry .= '      0 AS ini, calc_at(' . $_REQUEST[id] . ') + char_kampftechniken.at AS at, ';
-   $qry .= '      calc_pa(' . $_REQUEST[id] . ') + char_kampftechniken.pa AS pa, ';
-   $qry .= "      '1D6+0' AS roll, kk_bonus(" . $_REQUEST[id] . ", '10/3')  AS tp_bonus ";
+   $qry .= "      calc_at($char_id) + char_kampftechniken.at AS at, ";
+   $qry .= "      calc_pa($char_id) + char_kampftechniken.pa AS pa, ";
+   $qry .= "      '1D6+0' AS roll, kk_bonus($char_id, '10/3')  AS tp_bonus, ";
+   $qry .= "      calc_ini($char_id) AS ini ";
    $qry .= 'FROM  characters, char_kampftechniken, kampftechniken ';
-   $qry .= 'WHERE characters.id = ' . $_REQUEST[id] . ' AND ';
+   $qry .= "WHERE characters.id = $char_id AND ";
    $qry .= '      char_kampftechniken.character_id = characters.id AND ';
    $qry .= '      kampftechniken.id = char_kampftechniken.kampftechnik_id  AND ';
    $qry .= '      kampftechniken.unarmed = true ';
