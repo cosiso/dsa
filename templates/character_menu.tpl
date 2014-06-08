@@ -17,4 +17,9 @@
    {else}
       <div><a href="combat.php">Combat</a></div>
    {/if}
+   {if $selected == 'inventory'}
+      <div class="selected_menu">Inventory</div>
+   {else}
+      <div><a href="inventory.php">Inventory</a></div>
+   {/if}
 </div>

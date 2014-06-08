@@ -129,7 +129,6 @@
             return data;
          }
          function add_note_simpletip(elem) {
-            console.log('tip for ' + elem);
             var dummy = elem.split('_');
             $('#' + elem).unbind('click');
             $('#' + elem).simpletip({
@@ -164,14 +163,14 @@
                   // Add validation to form
                   $('#frm_weapons').validate({
                      rules        : {
-                        name         : { required : true },
-                        tp           : { required : true },
-                        tpkk         : { required : true },
-                        gewicht      : { number   : true },
-                        lange        : { number   : true },
-                        bf           : { number   : true },
-                        ini          : { number   : true },
-                        wm           : { required : true },
+                        name    : 'required',
+                        tp      : 'required',
+                        tpkk    : 'required',
+                        gewicht : 'number',
+                        lange   : 'number',
+                        bf      : 'number',
+                        ini     : 'number',
+                        wm      : 'required',
                      },
                      submitHandler: function(form) {
                         $(form).ajaxSubmit({

@@ -65,7 +65,7 @@ function update_weapon() {
    }
    $tp = $matches[1] . 'D' . $matches[3] . $matches[4];
    $tpkk = trim($_REQUEST[tpkk]);
-   if (! preg_match('/^\d+\/\d+$/', $tpkk)) {
+   if (! preg_match('#^\d+/\d+$#', $tpkk)) {
       return array('message' => 'invalid TP/KK specified');
    }
    $gewicht = trim($_REQUEST[gewicht]) ?: 0;
@@ -113,6 +113,12 @@ function update_weapon() {
       $qry .= "note = '" . pg_escape_string($note) . "' ";
       $qry .= 'WHERE id = ' . $_REQUEST[id];
    } else {
+      $qry = 'SELECT id ';
+      $qry .= 'FROM  weapons ';
+      $qry .= "WHERE name = '" . pg_escape_string($name) . "'";
+      if ($db->fetch_field($qry, false)) {
+         return array('message' => 'A weapon with this name already exists');
+      }
       $is_new = true;
       $qry = 'INSERT INTO weapons ';
       $qry .= '(name, kampftechnik_id, tp, tpkk, gewicht, lange, ';
