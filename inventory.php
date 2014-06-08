@@ -79,12 +79,13 @@ function show_weapon_form() {
    } else {
       # New weapon
       $smarty->assign('char_id', $_REQUEST[char_id]);
+      $weapons[0] = '-- select a weapon';
       $qry = 'SELECT id, name ';
       $qry .= 'FROM  weapons ';
       $qry .= 'ORDER BY name';
       $rid = $db->do_query($qry, true);
       while ($row = $db->get_array($rid)) {
-         $weapons[] = $row;
+         $weapons[$row[id]] = $row[name];
       }
       $smarty->assign('weapons', $weapons);
    }
@@ -197,3 +198,4 @@ switch ($_REQUEST[stage]) {
       show();
       $smarty->display('inventory.tpl');
 }
+?>

@@ -4,10 +4,12 @@
 <form name="frm_weapons" id="frm_weapons">
    {html_hidden name='stage' value='update_weapon'}
    {html_hidden name='id' value=$id}
+   {html_hidden name='char_id' value=$char_id}
    <label for="name">Name</label>
    {if $id}
       {html_text name='name' value=$name|escape style='width: 20em' disabled=true}
    {else}
+      {html_options name='name' style='width: 20em' options=$weapons}
    {/if}
    <table cellpadding="0" cellspacing="5" border="0">
       <tr>
