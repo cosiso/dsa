@@ -83,7 +83,7 @@
          var roll = Math.floor(Math.random() * 20 + 1);
          var name = $(td_elem).closest('div').prev().text();
          var skill = $(td_elem).parent().children('td').eq(0).text();
-         if (roll > sk) {
+         if (roll > sk || roll == 20) {
             alertify.error(name + ' rolled <b> ' + roll + '</b> and failed a ' + skill + ' ' + typ);
          } else {
             alertify.success(name + ' rolled ' + roll + '(<b>+' + (sk - roll) + '</b>) on ' + skill + ' ' + typ);

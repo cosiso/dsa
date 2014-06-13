@@ -4,27 +4,39 @@
       <tr>
          <th>Weapon</th>
          <th>Kampftechnik</th>
+         <th>TP/KK</th>
          <th>DK</th>
          <th>INI</th>
          <th>AT</th>
          <th>PA</th>
          <th>TP</th>
          <th>BF</th>
-         <th>&nbsp;</th>
       </tr>
    </thead>
    <tbody class="hover">
       {section name=idx loop=$armed}
          <tr>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
+            <td>{$armed[idx].name|escape}</td>
+            <td>{$armed[idx].technik|escape}</td>
+            <td>{$armed[idx].tpkk|escape}</td>
+            <td>{$armed[idx].dk|escape}</td>
+            <td onclick="rollIni(this)">
+               {$armed[idx].ini}
+               <img src="images/dice-red-16.png" border="0" />
+            </td>
+            <td onclick="rollATorPA(this, true)">
+               {$armed[idx].at}
+               <img src="images/dice-red-16.png" border="0" />
+            </td>
+            <td onclick="rollATorPA(this, false)">
+               {$armed[idx].pa}
+               <img src="images/dice-red-16.png" border="0" />
+            </td>
+            <td onclick="rollTP(this)">
+               {$armed[idx].tp|escape}
+               <img src="images/dice-red-16.png" border="0" />
+            </td>
+            <td>{$armed[idx].bf}</td>
          </tr>
       {sectionelse}
          <tr><td colspan="9">Character has no usable weapons</td></tr>
