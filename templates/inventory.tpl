@@ -27,6 +27,7 @@
    <script type="text/javascript">
       <!--{literal}
       var hasData = {};
+      var is_retrieving = false;
       $(document).ready(function() {
          $.validator.addMethod('tp', function(value, element) {
             return this.optional(element) || value.match(/\d+[dwDW]\d+(\+\d+)/);
@@ -34,12 +35,11 @@
          $.validator.addMethod('tpkk', function(value, element) {
             return this.optional(element) || value.match(/\d+\/\d+/);
          }, 'Please format like f.e. 2/3');
-         $.validator.addMethod('non-zero-option', function(value, element) {
-            return this.optional(element) || $(element).val() !== 0;
-         }, 'Select an option')
       })
       function add_simpletip(elem, id, char_id) {
          $(elem).unbind('click');
+         var row_id = $(elem).closest('tr').prop('id');
+         console.log('Add simpletip to row ' + row_id + ', having id ' + id + ' and char id: ' + char_id);
          $(elem).simpletip({
             persistent    : true,
             focus         : true,
@@ -50,21 +50,18 @@
             },
             onContentLoad : function() {
                var dummy = $('#frm_weapons #id').val();
-               if (dummy) {
+               if (dummy > 0) {
                   // an edit, name is disabled, so focus on tp
                   $('#frm_weapons #tp').focus().select();
                } else {
-                  // ToDo: selectize and focus name field
                   $('#frm_weapons #name').selectize({
                      sortField   : 'text',
                      selectOnTab : true,
                   });
-                  // var sel = $('#frm_weapons #kampftechnik_id').val() || 0;
                   $('#frm_weapons #name')[0].selectize.addItem(0);
                }
                $('#frm_weapons').validate({
                   rules         : {
-                     name : 'required, non-zero-option',
                      ini  : 'number',
                      at   : 'number',
                      pa   : 'number',
@@ -74,6 +71,12 @@
                      wm   : 'tpkk',
                   },
                   submitHandler : function(form) {
+                     // Verify a weapon has been selected if adding
+                     if ($('#frm_weapons #id').val() == 0 &&
+                         $('#frm_weapons #name').val() == 0) {
+                        alertify.alert('No weapon selected');
+                        return false;
+                     }
                      $(form).ajaxSubmit({
                         success  : do_update_weapon,
                         type     : 'post',
@@ -87,23 +90,46 @@
             },
          });
       }
+      function htmlescape(s) {
+         return $('<div />').text(s).html();
+      }
       function do_update_weapon(data) {
          data = extract_json(data);
          if (data.success) {
+            var id = data.id;
+            var table_id = 'table#weapons_' + data.char_id;
             if (data.is_new) {
                // Add row
+               var elem = '<tr id="' + id + '">' +
+                     '<td id="name">' + htmlescape(data.name) + '</td>' +
+                     '<td id="tp">' + htmlescape(data.tp) + '</td>' +
+                     '<td id="tpkk">' + htmlescape(data.tpkk) + '</td>' +
+                     '<td id="ini">' + htmlescape(data.ini) + '</td>' +
+                     '<td id="wm">' + htmlescape(data.wm) + '</td>' +
+                     '<td id="at">' + htmlescape(data.at) + '</td>' +
+                     '<td id="pa">' + htmlescape(data.pa) + '</td>' +
+                     '<td id="bf">' + htmlescape(data.bf) + '</td>' +
+                     '<td>' +
+                        '<a id="note" href="#" class="link-info">note</a> ' +
+                        '| <a id="edit" href="#" class="link-edit">edit</a> ' +
+                        '| <a id="remove" href="#" class="link-cancel" onclick="remove_weapon(' + id + ')">remove</a>' +
+                     '</td></tr>';
+               $(table_id + ' tbody').append(elem);
+               add_simpletip($(table_id + ' tr#' + id), id, 0);
+               add_note_tip($(table_id + ' tr#' + id + ' #note'), id);
+
             } else {
+               var row_id = table_id + ' #' + id;
                // Update values
-               var id = data.id;
-               $('table#weapons #' + id + ' #tp').text(data.tp);
-               $('table#weapons #' + id + ' #tpkk').text(data.tpkk);
-               $('table#weapons #' + id + ' #ini').text(data.ini);
-               $('table#weapons #' + id + ' #wm').text(data.wm);
-               $('table#weapons #' + id + ' #at').text(data.at);
-               $('table#weapons #' + id + ' #pa').text(data.pa);
-               $('table#weapons #' + id + ' #bf').text(data.bf);
+               $(row_id + ' #tp').text(data.tp);
+               $(row_id + ' #tpkk').text(data.tpkk);
+               $(row_id + ' #ini').text(data.ini);
+               $(row_id + ' #wm').text(data.wm);
+               $(row_id + ' #at').text(data.at);
+               $(row_id + ' #pa').text(data.pa);
+               $(row_id + ' #bf').text(data.bf);
             }
-            $('table#weapons #' +id).effect('highlight', {}, 2000);
+            $(table_id + ' #' + id).effect('highlight', {}, 2000);
          }
       }
       function extract_json(data) {
@@ -149,30 +175,76 @@
             // Add simpletip to button
             add_simpletip('#btn_add_weapon_' + data.id, 0, data.id);
             // Add simpletip to links
-            $('table#weapons #edit').each(function() {
+            $('table#weapons_' + data.id + ' #edit').each(function() {
                var id = $(this).closest('tr').prop('id');
+               console.log('Add id ' + id + ' to edit field of char: ' + data.id);
                add_simpletip($(this), id, 0);
             });
+            $('table#weapons_' + data.id + ' #note').each(function() {
+               var id=$(this).closest('tr').prop('id');
+               add_note_tip($(this), id);
+            })
          }
       }
+      function add_note_tip(href, id) {
+         $(href).unbind('click');
+         $(href).simpletip({
+            persistent    : true,
+            focus         : true,
+            onBeforeShow  : function() {
+               this.load('inventory.php', {stage   : 'show_weapon_note',
+                                           id      : id,
+                                          });
+            },
+         });
+      }
       function note_weapon(href, id) {
+         console.log('Check to see if a simpletip is attached');
+         var tip = $(href).eq(0).simpletip();
+         console.log('Tooltip is: ' + tip.getParent().toSource());
+         console.log('Attaching simpletip');
+         console.log('Displaying simpletip');
          alertify.alert('ToDo: note_weapon, ID: ' + id);
          return false;
       }
       function remove_weapon(id) {
-         alertify.alert('ToDo: remove_weapon, ID: ' + id);
+         var name = $('tr#' + id + ' #name').text();
+         alertify.confirm('Remove weapon ' + name + '?', function(e) {
+            if (e) {
+               $.ajax({
+                  datatype : 'json',
+                  type     : 'post',
+                  url      : 'inventory.php',
+                  data     : { stage : 'remove_weapon',
+                               id    : id},
+                  success  : do_remove_weapon,
+               });
+            }
+         });
          return false;
+      }
+      function do_remove_weapon(data) {
+         data = extract_json(data);
+         if (data.success) {
+            // Weapon removed from invwentory, remove row from list
+            var row = 'tr#' + data.id;
+            $(row).effect('highlight', {}, 2000);
+            setTimeout(function() {
+               $(row).remove();
+            }, 500);
+         }
       }
       function close_box() {
          var id = $('#frm_weapons #id').val();
-         if (id) {
+         if (id > 0) {
             // attached to link
-            $('table#weapons tr#' + id + ' #edit').eq(0).simpletip().hide();
+            $('tr#' + id + ' #edit').eq(0).simpletip().hide();
          } else {
             $('a[id^="btn_add_weapon_"]').each(function() {
                $(this).eq(0).simpletip().hide();
             })
          }
+         $('#frm_weapons').remove();
       }
       //-->{/literal}
    </script>

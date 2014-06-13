@@ -71,7 +71,8 @@ function show_weapon_form() {
       // An edit, so retrieve values
       $qry = 'SELECT char_weapons.*, weapons.name ';
       $qry .= 'FROM  char_weapons, weapons ';
-      $qry .= 'WHERE char_weapons.weapon_id = weapons.id';
+      $qry .= 'WHERE char_weapons.weapon_id = weapons.id AND ';
+      $qry .= '      char_weapons.id = ' . $_REQUEST[id];
       $rid = $db->do_query($qry, true);
       $row = $db->get_array($rid);
       $smarty->assign($row);
@@ -79,6 +80,7 @@ function show_weapon_form() {
    } else {
       # New weapon
       $smarty->assign('char_id', $_REQUEST[char_id]);
+      $smarty->assign('id', 0);
       $weapons[0] = '-- select a weapon';
       $qry = 'SELECT id, name ';
       $qry .= 'FROM  weapons ';
@@ -146,6 +148,7 @@ function update_weapon() {
    if ($_REQUEST[id]) {
       # Update weapon
       $qry = 'UPDATE char_weapons SET ';
+      $qry .= '      note = ' . ( ($note) ? "'" . pg_escape_string($note) . "'" : 'NULL') . ', ';
       $qry .= '      tp = ' . ( ($tp) ? "'$tp'" : 'NULL') . ', ';
       $qry .= '      tpkk = ' . ( ($tpkk) ? "'$tpkk'" : 'NULL') . ', ';
       $qry .= '      ini = ' . ( ($ini) ? $ini : 0) . ', ';
@@ -156,6 +159,19 @@ function update_weapon() {
       $qry .= 'WHERE id = ' . $_REQUEST[id];
    } else {
       # Add new weapon
+      $is_new = true;
+      $qry = 'INSERT INTO char_weapons (';
+      $qry .= 'weapon_id, character_id, note, tp, tpkk, ini, wm, at, pa, bf) VALUES (';
+      $qry .= $_REQUEST[name] . ', ';
+      $qry .= $_REQUEST[char_id] . ', ';
+      $qry .= ( ($note) ? "'" . pg_escape_string($note) . "'" : 'NULL') . ', ';
+      $qry .= ( ($tp) ? "'$tp'" : 'NULL') . ', ';
+      $qry .= ( ($tpkk) ? "'$tpkk'" : 'NULL') . ', ';
+      $qry .= ( ($ini) ? $ini : 0) . ', ';
+      $qry .= ( ($wm) ? "'$wm'" : 'NULL') . ', ';
+      $qry .= ( ($at) ? $at : 0) . ', ';
+      $qry .= ( ($pa) ? $pa : 0) . ', ';
+      $qry .= ( ($bf) ? $bf : 0) . ')';
    }
 
    #return array('message' => $qry);
@@ -163,17 +179,26 @@ function update_weapon() {
       return array('message' => 'database-error' . ($debug) ? ': ' . pg_last_error() : '');
    }
 
+   # If new, get id
+   if ($is_new) {
+      $_REQUEST[id] = $db->insert_id('char_weapons');
+   }
+
    # Get correct values for tpkk, wm and tp to return
    $qry = 'SELECT COALESCE(char_weapons.tpkk, weapons.tpkk) AS tpkk, ';
    $qry .= '      COALESCE(char_weapons.wm, weapons.wm) AS wm, ';
-   $qry .= '      COALESCE(char_weapons.tp, weapons.tp) AS tp ';
+   $qry .= '      COALESCE(char_weapons.tp, weapons.tp) AS tp, ';
+   $qry .= '      character_id, weapons.name ';
    $qry .= 'FROM  char_weapons, weapons ';
    $qry .= 'WHERE char_weapons.weapon_id = weapons.id AND ';
    $qry .= '      char_weapons.id = ' . $_REQUEST[id];
-   list($tpkk, $wm, $tp) = $db->get_list($qry, true);
+   list($tpkk, $wm, $tp, $char_id, $name) = $db->get_list($qry, true);
 
    return array('success' => true,
                 'id'      => $_REQUEST[id],
+                'char_id' => $char_id,
+                'is_new'  => $is_new,
+                'name'    => $name,
                 'tp'      => $tp,
                 'tpkk'    => $tpkk,
                 'ini'     => $ini,
@@ -181,6 +206,41 @@ function update_weapon() {
                 'at'      => $at,
                 'pa'      => $pa,
                 'bf'      => $bf);
+}
+
+function remove_weapon() {
+   global $db, $debug;
+
+   if (! $_REQUEST[id] or
+       $_REQUEST[id] != intval($_REQUEST[id])) {
+      return array('message' => 'invalid id specified');
+   }
+
+   $qry = 'DELETE FROM char_weapons WHERE id = ' . $_REQUEST[id];
+   if (! @$db->do_query($qry, false)) {
+      return array('message' => 'database-error while deleting' . (($debug) ? ': ' . pg_last_error() : ''));
+   }
+
+   return array('success' => true,
+                'id'      => $_REQUEST[id]);
+}
+
+function show_weapon_note() {
+   global $db, $debug;
+
+   if (! $_REQUEST[id] or $_REQUEST[id] != intval($_REQUEST[id])) {
+      return '<b>Invalid id specified</b>';
+   }
+
+   $qry = 'SELECT char_weapons.note AS personal, weapons.note ';
+   $qry .= 'FROM  char_weapons, weapons ';
+   $qry .= 'WHERE char_weapons.weapon_id = weapons.id AND ';
+   $qry .= '      char_weapons.id = ' . $_REQUEST[id];
+   list($personal, $note) = $db->get_list($qry, true);
+
+   if ($personal) $note = $personal . '<br /><hr /><br />' . $note;
+   if (! $note) $note = 'No note defined';
+   return nl2br($note);
 }
 
 switch ($_REQUEST[stage]) {
@@ -191,8 +251,14 @@ switch ($_REQUEST[stage]) {
       show_weapon_form();
       $smarty->display('frm_char_weapons.tpl');
       break;
+   case 'remove_weapon':
+      echo json_encode(remove_weapon());
+      break;
    case 'get_char':
       echo json_encode(get_char());
+      break;
+   case 'show_weapon_note':
+      echo show_weapon_note();
       break;
    default:
       show();

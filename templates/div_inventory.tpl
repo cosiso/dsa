@@ -1,5 +1,5 @@
 <h4>Weapons</h4>
-<table id="weapons">
+<table id="weapons_{$char_id}">
    <thead>
       <tr>
          <th>Weapon</th>
@@ -25,7 +25,7 @@
             <td id="pa">{$weapons[idx].pa}</td>
             <td id="bf">{$weapons[idx].bf}</td>
             <td>
-               <a id="note" href="#" class="link-info" onclick="note_weapon(this, {$weapons[idx].id})">note</a>
+               <a id="note" href="#" class="link-info">note</a>
                | <a id="edit" href="#" class="link-edit">edit</a>
                | <a id="remove" href="#" class="link-cancel" onclick="remove_weapon({$weapons[idx].id})">remove</a>
             </td>
