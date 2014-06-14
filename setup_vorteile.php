@@ -144,7 +144,7 @@ function show_edit() {
       $qry .= 'WHERE id = ' . $_REQUEST[id];
       $rid = $db->do_query($qry, true);
       $row = $db->get_array($rid);
-      $row[is_vorteil] = ($row[vorteil]) ? 1 : 0;
+      $row[is_vorteil] = ($row[vorteil] == 't') ? 1 : 0;
       $smarty->assign($row);
    } else {
       $smarty->assign('is_vorteil', ($_REQUEST[vorteil]) ? 1 : 0);

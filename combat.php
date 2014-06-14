@@ -41,7 +41,8 @@ function get_char() {
    $qry .= "WHERE char_weapons.character_id = $char_id AND ";
    $qry .= '      char_weapons.weapon_id = weapons.id AND ';
    $qry .= '      weapons.kampftechnik_id = kampftechniken.id AND ';
-   $qry .= '      char_kampftechniken.kampftechnik_id = weapons.kampftechnik_id ';
+   $qry .= '      char_kampftechniken.kampftechnik_id = weapons.kampftechnik_id AND  ';
+   $qry .= "      char_kampftechniken.character_id = $char_id ";
    $qry .= 'ORDER BY weapons.name';
    $rid = $db->do_query($qry, true);
    while ($row = $db->get_array($rid)) {

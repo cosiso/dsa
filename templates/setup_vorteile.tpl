@@ -186,6 +186,7 @@
                   var table_id = $('#edit_desc_' + id).closest('table').attr('id');
                   // table_id = table_vorteile or table_nachteile
                   var dummy = table_id.split('_');
+                  console.log('Dummy: ' + dummy[0] + ', ' + dummy[1]);
                   this.load('setup_vorteile.php', {'stage'  : 'popup_edit',
                                                    'vorteil': (dummy[1] == 'vorteile') ? 1 : 0,
                                                    'id'     : id});

@@ -16,4 +16,5 @@
       {carto_button type='submit'}
       {carto_button type='close' onclick="close_edit_box()"}
    </div>
+   VORTEIL: {$tst}
 </form>
