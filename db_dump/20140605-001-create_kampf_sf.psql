@@ -1,0 +1,3 @@
+create table kampf_sf (id serial primary key, name varchar(64) not null, gp integer, ap integer, effect varchar(256), description varchar(2048));
+grant ALL on kampf_sf to nginx ;
+grant ALL on kampf_sf_id_seq to nginx ;

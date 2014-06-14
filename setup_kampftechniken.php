@@ -105,6 +105,22 @@ function remove_kampftechnik() {
    return array('success' => true,
                 'id'      => $_REQUEST[id]);
 }
+function fetch_sonderfertigkeiten() {
+   global $db, $debug, $smarty;
+
+   $qry = 'SELECT id, name, gp, ap, effect ';
+   $qry .= 'FROM  kampf_sf ';
+   $qry .= 'ORDER BY name';
+   $rid = $db->do_query($qry, true);
+   while ($row = $db->get_array($rid)) {
+      $sf[] = $row;
+   }
+   $smarty->assign('sf', $sf);
+
+   $out = $smarty->fetch('div_kampf_sf.tpl');
+   return array('success' => true,
+                'out'     => $out);
+}
 
 switch ($_REQUEST[stage]) {
    case 'remove':
@@ -119,6 +135,12 @@ switch ($_REQUEST[stage]) {
       break;
    case 'show_talente':
       echo json_encode(show_talente());
+      break;
+   case 'fetch_sf':
+      echo json_encode(fetch_sonderfertigkeiten());
+      break;
+   case 'frm_sonderfertigkeit':
+      echo '<b>BOO!</b>';
       break;
    default:
       show();

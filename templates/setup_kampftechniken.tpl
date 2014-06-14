@@ -28,6 +28,7 @@
       <script type="text/javascript" src="scripts/jquery.tablesorter.min.js"></script>
       <script type="text/javascript">
          <!--{literal}
+         hasData = {};
          $(document).ready(function() {
             // Activate talente
             show_talente();
@@ -106,7 +107,8 @@
                $('#main div#talente').html(data.div);
                // Make table sortable
                $('div#talente #table_kampftechniken').tablesorter({headers : { 2: {sorter: false},
-                                                                               3: {sorter: false}}});
+                                                                               3: {sorter: false},
+                                                                               4: {sorter: false}}});
                // Add simpletip to button
                attach_simpletip_frm('#btn_add_kampftechnik', 0);
                // Add simpletip to links
@@ -122,6 +124,7 @@
                   var dummy = id.split('_');
                   $(this).unbind('click').click(function() {remove_kampftechnik(dummy[2])});
                })
+               hasData['talente'] = true;
                toggle_h3('talente');
             }
          }
@@ -201,7 +204,85 @@
                   $(value).slideUp();
                }
             });
-            $('h3 + div#' + div_name).slideDown();
+            if (! hasData[div_name]) {
+               if (div_name == 'sonderfertigkeiten') {
+                  fetch_sonderfertigkeiten();
+               }
+            } else {
+               $('h3 + div#' + div_name).slideDown();
+            }
+         }
+         function fetch_sonderfertigkeiten() {
+            // make ajax-call to get the sonderfertigkeiten
+            $.ajax({
+               datatype : 'json',
+               type     : 'post',
+               url      : 'setup_kampftechniken.php',
+               data     : { stage : 'fetch_sf' },
+               success  : show_sonderfertigkeiten,
+            });
+         }
+         function show_sonderfertigkeiten(data) {
+            data = extract_json(data);
+            if (data.success) {
+               var div = 'div#main div#sonderfertigkeiten';
+               $(div).html(data.out);
+               $(div).slideDown();
+               // Make table sortable
+               $('div#sonderfertigkeiten #kampf_sf').tablesorter({headers : { 3: {sorter: false},
+                                                                              4: {sorter: false}}});
+               hasData['sonderfertigkeiten'] = true;
+               // Add simpletip to button
+               add_simpletip_sf($('#btn_add_sf'));
+
+            }
+         }
+         function add_simpletip_sf(elem, id) {
+            // places the simpletip for sonderfertigkeiten on the specified element
+            $(elem).unbind('click');
+            $(elem).simpletip({
+               onBeforeShow : function() {
+                  this.load('setup_kampftechniken.php', {stage : 'frm_sonderfertigkeit',
+                                                         id    : id});
+               },
+               /*
+               onContentLoad : function() {
+                  // Set focus
+                  $('#frm_kampftechniken #name').focus().select();
+                  // Add validation to form
+                  $('#frm_kampftechniken').validate({
+                     rules        : {
+                        name : {
+                           required : true
+                        },
+                        skt  : {
+
+                           required : true,
+                           minlength: 1,
+                           maxlength: 1
+                        },
+                        be   : {
+                           number   : true
+                        }
+                     },
+                     submitHandler: function(form) {
+                        $(form).ajaxSubmit({
+                           success : do_update_kampftechnik,
+                           // beforeSubmit: showRequest,
+                           type    : 'post',
+                           url     : 'setup_kampftechniken.php',
+                           datatype: 'json'
+                        });
+                        close_kt_box();
+                        return false;
+                     }
+                  });
+               },
+               */
+               persistent   : true,
+               focus        : true
+            });
+            return false;
          }
          //-->{/literal}
       </script>
