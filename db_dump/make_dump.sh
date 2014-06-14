@@ -4,7 +4,7 @@ PATH='/var/www/nginx/dsa/db_dump'
 FILENAME="dsa.dump.$(/usr/bin/date '+%Y%m%d').sql"
 
 cd "$PATH"
-/usr/bin/pg_dump --no-owner --oids -d dsa > "$FILENAME"
+/usr/bin/pg_dump --no-owner --format c --oids -d dsa > "$FILENAME"
 
 count=$(/usr/bin/ls -1 *.dump.*.sql | /usr/bin/wc -l)
 if [[ $count > 2 ]]; then
