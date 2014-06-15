@@ -1,0 +1,22 @@
+{
+  "keyboard_shortcut": "", 
+  "name": "php-check_int", 
+  "value": [
+    "function check_int($value, $zero=true) {", 
+    "   if ($value and $value != intval($value)) {", 
+    "\t   return false;", 
+    "\t}", 
+    "\tif (! $value and ! $zero) {", 
+    "\t   return false;", 
+    "\t}", 
+    "\treturn true;", 
+    "}!@#_currentPos!@#_anchor"
+  ], 
+  "set_selection": "false", 
+  "version": "1.0.12", 
+  "auto_abbreviation": "false", 
+  "treat_as_ejs": "false", 
+  "type": "snippet", 
+  "indent_relative": "false", 
+  "icon": "chrome://icomoon/skin/icons/bubble-check.png"
+}
