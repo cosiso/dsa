@@ -1,0 +1,12 @@
+CREATE OR REPLACE FUNCTION calc_fk(cid INT) RETURNS INTEGER AS $$
+   DECLARE
+      fk  INT;
+      tmp INT;
+   BEGIN
+      SELECT ROUND((calc_in(cid) + calc_ff(cid) + calc_kk(cid)) / 5.0) + basevalues.fk_mod
+      INTO   fk
+      FROM   basevalues
+      WHERE  basevalues.character_id = cid;
+      RETURN fk;
+   END;
+$$ LANGUAGE plpgsql;

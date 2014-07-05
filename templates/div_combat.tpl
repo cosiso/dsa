@@ -1,3 +1,5 @@
+<div id="value-bar" class="value-bar">
+</div>
 <h4>Armed</h4>
 <table id="armed">
    <thead>

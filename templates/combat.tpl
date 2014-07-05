@@ -15,7 +15,7 @@
          </div>
          {section name=idx loop=$chars}
             <h3 id="h3_{$chars[idx].id}" class="toggle" onclick="toggle({$chars[idx].id})">{$chars[idx].name|escape}</h3>
-            <div id="char_{$chars[idx].id}" style="display: none;">Iets</div>
+            <div id="char_{$chars[idx].id}" style="display: none; padding-left: 20px"></div>
          {sectionelse}
             <script type="text/javascript">
                alert('No characters defined yet');
@@ -67,6 +67,7 @@
             $(div).html(data.out);
             $(div).slideDown();
             hasData[data.id] = true;
+            $(div + ' #value-bar').load('value-bar.php', { id: data.id });
          }
       }
       function rollIni(td_elem) {

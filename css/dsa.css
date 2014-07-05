@@ -163,6 +163,11 @@ label {
 	display: block;
 }
 /* divs */
+.value-bar {
+	background-color: #fff2d8;
+	border: 1px dotted #215452;
+	padding: 3px;
+}
 #head {
    margin-bottom: 10px;
 }
