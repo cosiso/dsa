@@ -32,7 +32,6 @@ function get_char() {
    $qry .= '      COALESCE(char_weapons.tp, weapons.tp) AS tp, ';
    $qry .= '      COALESCE(char_weapons.tpkk, weapons.tpkk) AS tpkk, ';
    $qry .= '      char_weapons.ini, ';
-   $qry .= '      COALESCE(char_weapons.wm, weapons.wm) AS wm, ';
    $qry .= '      char_weapons.at, char_weapons.pa, char_weapons.bf ';
    $qry .= 'FROM  char_weapons, weapons ';
    $qry .= "WHERE char_weapons.character_id = $id AND ";
@@ -121,12 +120,6 @@ function update_weapon() {
                             intval($_REQUEST[name] != $_REQUEST[name]))) {
       return array('message' => 'No weapon selected');
    }
-   $wm = trim($_REQUEST[wm]);
-   if ($wm) {
-      if (! preg_match('#^\d+/\d+$#', $wm)) {
-         return array('message' => 'invalid wm specified');
-      }
-   }
    $ini = trim($_REQUEST[ini]);
    if ($ini and intval($ini) != $ini) {
       return array('message' => 'invalid ini specified');
@@ -152,7 +145,6 @@ function update_weapon() {
       $qry .= '      tp = ' . ( ($tp) ? "'$tp'" : 'NULL') . ', ';
       $qry .= '      tpkk = ' . ( ($tpkk) ? "'$tpkk'" : 'NULL') . ', ';
       $qry .= '      ini = ' . ( ($ini) ? $ini : 0) . ', ';
-      $qry .= '      wm = ' . ( ($wm) ? "'$wm'" : 'NULL') . ', ';
       $qry .= '      at = ' . ( ($at) ? $at : 0) . ', ';
       $qry .= '      pa = ' . ( ($pa) ? $pa : 0) . ', ';
       $qry .= '      bf = ' . ( ($bf) ? $bf : 0) . ' ';
@@ -161,14 +153,13 @@ function update_weapon() {
       # Add new weapon
       $is_new = true;
       $qry = 'INSERT INTO char_weapons (';
-      $qry .= 'weapon_id, character_id, note, tp, tpkk, ini, wm, at, pa, bf) VALUES (';
+      $qry .= 'weapon_id, character_id, note, tp, tpkk, ini, at, pa, bf) VALUES (';
       $qry .= $_REQUEST[name] . ', ';
       $qry .= $_REQUEST[char_id] . ', ';
       $qry .= ( ($note) ? "'" . pg_escape_string($note) . "'" : 'NULL') . ', ';
       $qry .= ( ($tp) ? "'$tp'" : 'NULL') . ', ';
       $qry .= ( ($tpkk) ? "'$tpkk'" : 'NULL') . ', ';
       $qry .= ( ($ini) ? $ini : 0) . ', ';
-      $qry .= ( ($wm) ? "'$wm'" : 'NULL') . ', ';
       $qry .= ( ($at) ? $at : 0) . ', ';
       $qry .= ( ($pa) ? $pa : 0) . ', ';
       $qry .= ( ($bf) ? $bf : 0) . ')';
@@ -184,15 +175,14 @@ function update_weapon() {
       $_REQUEST[id] = $db->insert_id('char_weapons');
    }
 
-   # Get correct values for tpkk, wm and tp to return
+   # Get correct values for tpkk, tp to return
    $qry = 'SELECT COALESCE(char_weapons.tpkk, weapons.tpkk) AS tpkk, ';
-   $qry .= '      COALESCE(char_weapons.wm, weapons.wm) AS wm, ';
    $qry .= '      COALESCE(char_weapons.tp, weapons.tp) AS tp, ';
    $qry .= '      character_id, weapons.name ';
    $qry .= 'FROM  char_weapons, weapons ';
    $qry .= 'WHERE char_weapons.weapon_id = weapons.id AND ';
    $qry .= '      char_weapons.id = ' . $_REQUEST[id];
-   list($tpkk, $wm, $tp, $char_id, $name) = $db->get_list($qry, true);
+   list($tpkk, $tp, $char_id, $name) = $db->get_list($qry, true);
 
    return array('success' => true,
                 'id'      => $_REQUEST[id],
@@ -202,7 +192,6 @@ function update_weapon() {
                 'tp'      => $tp,
                 'tpkk'    => $tpkk,
                 'ini'     => $ini,
-                'wm'      => $wm,
                 'at'      => $at,
                 'pa'      => $pa,
                 'bf'      => $bf);

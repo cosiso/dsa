@@ -7,8 +7,6 @@
          <th>TP/KK</th>
          <th>INI</th>
          <th>WM</th>
-         <th>AT</th>
-         <th>PA</th>
          <th>BF</th>
          <th>&nbsp;</th>
       </tr>
@@ -20,9 +18,7 @@
             <td id="tp">{$weapons[idx].tp}</td>
             <td id="tpkk">{$weapons[idx].tpkk|escape}</td>
             <td id="ini">{$weapons[idx].ini}</td>
-            <td id="wm">{$weapons[idx].wm|escape}</td>
-            <td id="at">{$weapons[idx].at}</td>
-            <td id="pa">{$weapons[idx].pa}</td>
+            <td id="wm">{$weapons[idx].at|default:'0'}/{$weapons[idx].pa|default:'0'}</td>
             <td id="bf">{$weapons[idx].bf}</td>
             <td>
                <a id="note" href="#" class="link-info">note</a>

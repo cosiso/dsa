@@ -5,6 +5,15 @@ require_once('config.inc.php');
 require_once('db.inc.php');
 require_once('smarty.inc.php');
 
+function check_int($value, $zero=true) {
+   if ($value and $value != intval($value)) {
+	   return false;
+	}
+	if (! $value and ! $zero) {
+	   return false;
+	}
+	return true;
+}
 function show() {
    global $db, $debug, $smarty;
 
@@ -21,16 +30,15 @@ function show() {
 function get_char() {
    global $db, $debug, $smarty;
 
-   if (! $_REQUEST[id] or
-       $_REQUEST[id] != intval($_REQUEST[id])) {
+   if (! check_int($_REQUEST[id], false)) {
       return array('message' => 'invalid id specified');
    }
    $char_id = $_REQUEST[id];
 
    $qry = 'SELECT weapons.name, kampftechniken.name as technik, ';
-   $qry .= '      char_kampftechniken.at, char_weapons.at AS w_at, ';
+	$qry .= '      combat_at(char_weapons.id) AS combat_at, combat_pa(char_weapons.pa) AS combat_pa, ';
+   $qry .= '      char_kampftechniken.at, char_kampftechniken.pa, ';
    $qry .= "      calc_at($char_id) AS c_at, calc_pa($char_id)  AS c_ap, ";
-   $qry .= '      char_kampftechniken.pa, char_weapons.pa AS w_pa, ';
    $qry .= '      COALESCE(char_weapons.tp, weapons.tp) AS tp, ';
    $qry .= '      weapons.dk, weapons.ini, char_weapons.ini AS w_ini, ';
    $qry .= "      calc_ini($char_id) AS c_ini, ";
@@ -46,8 +54,8 @@ function get_char() {
    $qry .= 'ORDER BY weapons.name';
    $rid = $db->do_query($qry, true);
    while ($row = $db->get_array($rid)) {
-      $row[at] = $row[at] + $row[w_at] + $row[c_at];
-      $row[pa] = $row[pa] + $row[w_pa] + $row[c_pa];
+      $row[at] = $row[at] + $row[combat_at];
+      $row[pa] = $row[pa] + $row[combat_pa];
       $row[ini] = $row[ini] + $row[w_ini] + $row[c_ini];
       list($die, $add) = split('\+', $row[tp]);
       $row[tp] = $die . '+' . ((int)$add + $row[tp_bonus]);
@@ -73,6 +81,25 @@ function get_char() {
       $unarmed[] = $row;
    }
    $smarty->assign('unarmed', $unarmed);
+
+   $qry = 'SELECT id, name ';
+   $qry .= 'FROM  kampf_sf ';
+   $qry .= 'ORDER BY name';
+   $rid = $db->do_query($qry, true);
+   while ($row = $db->get_array($rid)) {
+      $kampf_sf[] = $row;
+   }
+   $smarty->assign('kampf_sf', $kampf_sf);
+   $qry = 'SELECT char_kampf_sf.id, kampf_sf.name ';
+   $qry .= 'FROM  char_kampf_sf, kampf_sf ';
+   $qry .= "WHERE char_kampf_sf.character_id = $char_id AND ";
+   $qry .= '      char_kampf_sf.kampf_sf_id = kampf_sf.id ';
+   $qry .= 'ORDER BY name';
+   $rid = $db->do_query($qry, true);
+   while ($row = $db->get_array($rid)) {
+      $sf[] = $row;
+   }
+   $smarty->assign('sf', $sf);
    $out = $smarty->fetch('div_combat.tpl');
 
    return array('success' => true,

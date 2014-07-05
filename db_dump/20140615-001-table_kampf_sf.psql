@@ -1,0 +1,4 @@
+create table char_kampf_sf (id serial primary key, character_id int references characters (id) on delete cascade on update cascade not null, kampf_sf_id int references kampf_sf (id) on delete cascade on update cascade not null);
+grant all on char_kampf_sf to nginx ;
+grant all on char_kampf_sf_id_seq to nginx ;
+create index on char_kampf_sf (character_id);

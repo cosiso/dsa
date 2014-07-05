@@ -28,8 +28,7 @@
             {html_text name='ini' value=$ini style='width: 5em'}
          </td>
          <td>
-            <label for="wm">WM</label>
-            {html_text name='wm' value=$wm|escape style='width: 5em'}
+            &nbsp;
          </td>
       </tr>
       <tr>
@@ -38,7 +37,7 @@
             {html_text name='at' value=$at style='width: 5em'}
          </td>
          <td>
-            <label for="wm">PA</label>
+            <label for="pa">PA</label>
             {html_text name='pa' value=$pa style='width: 5em'}
          </td>
       </tr>

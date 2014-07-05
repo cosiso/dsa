@@ -1,0 +1,41 @@
+CREATE OR REPLACE FUNCTION combat_at(cw_id INT) RETURNS INTEGER AS $$
+   DECLARE
+      at  INT;
+      tmp INT;
+   BEGIN
+      -- Start with retrieving the modificator and the character_value
+      SELECT COALESCE(char_weapons.at, 0) + calc_at(char_weapons.character_id)
+      INTO   at
+      FROM   char_weapons
+      WHERE  char_weapons.id = cw_id;
+      -- Retrieve the at value from the wm of the weapon
+      SELECT split_part(COALESCE(weapons.wm, '0/0'), '/', 1)
+      INTO   tmp
+      FROM   weapons, char_weapons
+      WHERE  char_weapons.id = cw_id AND
+             weapons.id = char_weapons.weapon_id;
+      at := at + tmp;
+      RETURN at;
+   END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION combat_pa(cw_id INT) RETURNS INTEGER AS $$
+   DECLARE
+      pa  INT;
+      tmp INT;
+   BEGIN
+      -- Start with retrieving the modificator and the character_value
+      SELECT COALESCE(char_weapons.pa, 0) + calc_pa(char_weapons.character_id)
+      INTO   pa
+      FROM   char_weapons
+      WHERE  char_weapons.id = cw_id;
+      -- Retrieve the at value from the wm of the weapon
+      SELECT split_part(COALESCE(weapons.wm, '0/0'), '/', 2)
+      INTO   tmp
+      FROM   weapons, char_weapons
+      WHERE  char_weapons.id = cw_id AND
+             weapons.id = char_weapons.weapon_id;
+      pa := pa + tmp;
+      RETURN pa;
+   END;
+$$ LANGUAGE plpgsql;

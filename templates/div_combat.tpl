@@ -80,3 +80,4 @@
       </tbody>
    </thead>
 </table>
+<h4>Sonderfertigkeiten</h4>

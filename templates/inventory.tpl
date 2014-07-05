@@ -39,7 +39,6 @@
       function add_simpletip(elem, id, char_id) {
          $(elem).unbind('click');
          var row_id = $(elem).closest('tr').prop('id');
-         console.log('Add simpletip to row ' + row_id + ', having id ' + id + ' and char id: ' + char_id);
          $(elem).simpletip({
             persistent    : true,
             focus         : true,
@@ -68,7 +67,6 @@
                      bf   : 'number',
                      tp   : 'tp',
                      tpkk : 'tpkk',
-                     wm   : 'tpkk',
                   },
                   submitHandler : function(form) {
                      // Verify a weapon has been selected if adding
@@ -105,9 +103,7 @@
                      '<td id="tp">' + htmlescape(data.tp) + '</td>' +
                      '<td id="tpkk">' + htmlescape(data.tpkk) + '</td>' +
                      '<td id="ini">' + htmlescape(data.ini) + '</td>' +
-                     '<td id="wm">' + htmlescape(data.wm) + '</td>' +
-                     '<td id="at">' + htmlescape(data.at) + '</td>' +
-                     '<td id="pa">' + htmlescape(data.pa) + '</td>' +
+                     '<td id="wm">' + htmlescape(data.at) + '/' + htmlescape(data.pa) + '</td>' +
                      '<td id="bf">' + htmlescape(data.bf) + '</td>' +
                      '<td>' +
                         '<a id="note" href="#" class="link-info">note</a> ' +
@@ -119,14 +115,14 @@
                add_note_tip($(table_id + ' tr#' + id + ' #note'), id);
 
             } else {
+               console.log('Data: ' + data.toSource());
                var row_id = table_id + ' #' + id;
                // Update values
+               console.log('Row_id = ' + row_id);
                $(row_id + ' #tp').text(data.tp);
                $(row_id + ' #tpkk').text(data.tpkk);
                $(row_id + ' #ini').text(data.ini);
-               $(row_id + ' #wm').text(data.wm);
-               $(row_id + ' #at').text(data.at);
-               $(row_id + ' #pa').text(data.pa);
+               $(row_id + ' #wm').text(data.at + '/' + data.pa);
                $(row_id + ' #bf').text(data.bf);
             }
             $(table_id + ' #' + id).effect('highlight', {}, 2000);
@@ -177,7 +173,6 @@
             // Add simpletip to links
             $('table#weapons_' + data.id + ' #edit').each(function() {
                var id = $(this).closest('tr').prop('id');
-               console.log('Add id ' + id + ' to edit field of char: ' + data.id);
                add_simpletip($(this), id, 0);
             });
             $('table#weapons_' + data.id + ' #note').each(function() {
@@ -199,11 +194,7 @@
          });
       }
       function note_weapon(href, id) {
-         console.log('Check to see if a simpletip is attached');
          var tip = $(href).eq(0).simpletip();
-         console.log('Tooltip is: ' + tip.getParent().toSource());
-         console.log('Attaching simpletip');
-         console.log('Displaying simpletip');
          alertify.alert('ToDo: note_weapon, ID: ' + id);
          return false;
       }
