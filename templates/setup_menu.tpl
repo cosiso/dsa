@@ -32,9 +32,4 @@
    {else}
       <div><a href="setup_weapons.php">Weapons</a></div>
    {/if}
-   {if $selected_category == 'Snderfertigkeiten'}
-      <div class="selected_menu">Sonderfertigkeiten</div>
-   {else}
-      <div><a href="sonderfertigkeiten.php">Sonderfertigkeiten</a></div>
-   {/if}
 </div>

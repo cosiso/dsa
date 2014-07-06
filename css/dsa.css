@@ -163,10 +163,34 @@ label {
 	display: block;
 }
 /* divs */
+
+#popup {
+	z-index: 5;
+	background-color: #f5f5b5;
+	border: 1px dotted #a68646;
+	padding: 5px 8px;
+	overflow: auto;
+}
+/* div with icon to close a popup */
+#popup #close {
+	text-align: right;
+}
+#popup #text {
+	padding-top: 3px;
+	padding-bottom: 3px;
+}
+#popup #close span {
+	cursor: pointer;
+	color: #ff3939;
+	font-style: italic;
+}
+
+/* Small yellow bar below character name */
 .value-bar {
 	background-color: #fff2d8;
 	border: 1px dotted #215452;
 	padding: 3px;
+	font-size: 11px;
 }
 #head {
    margin-bottom: 10px;

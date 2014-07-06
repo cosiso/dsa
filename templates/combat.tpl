@@ -23,10 +23,19 @@
          {/section}
       </div>
    </div>
+   <div id="popup" style="display: none"></div>
    {include file=part_script_include.tpl}
    <script type="text/javascript">
       <!--{literal}
       var hasData = {};
+      jQuery.fn.center = function () {
+          this.css("position","absolute");
+          this.css("top", Math.max(0, (($(window).height() - $(this).outerHeight()) / 2) +
+                                                      $(window).scrollTop()) + "px");
+          this.css("left", Math.max(0, (($(window).width() - $(this).outerWidth()) / 2) +
+                                                      $(window).scrollLeft()) + "px");
+          return this;
+      }
       function extract_json(data) {
          try {
             data = $.parseJSON(data);
@@ -38,6 +47,9 @@
             alertify.alert('Error: ' + data.message);
          }
          return data;
+      }
+      function htmlescape(s) {
+         return $('<div />').text(s).html();
       }
       function close_all_divs() {
          $('#main h3 + div[id^=char_]').slideUp();
@@ -103,6 +115,98 @@
          var name = $(td_elem).closest('div').prev().text();
          var skill = $(td_elem).parent().children('td').eq(0).text();
          alertify.log(name + ' rolled <b>' + total + '</b> damage on ' + skill);
+      }
+      function sf_info(sf_id) {
+         $('#popup').width(400).height(200).html('Please wait, loading content').center();
+         $('#popup').load('combat.php',
+                          { stage : 'sf_note', sf_id : sf_id },
+                          function(response, status, xhr) {
+            if (status == 'error') {
+               alertify.alert('Error loading note for kampfsonderfertigkeit');
+            } else {
+               $('#popup').slideDown();
+            }
+         });
+      }
+      function sf_remove(sf_id) {
+         // Fetch name
+         var row=$('table#sf tr#' + sf_id);
+         // First td is name
+         var name=$(row).children().first().text();
+         alertify.confirm('Remove kampfsonderfertigfkeit ' + name + '?', function (e) {
+            if (e) {
+               $.ajax({
+                  datatype : 'json',
+                  url      : 'combat.php',
+                  type     : 'post',
+                  success  : do_remove_sf,
+                  data     : { stage : 'remove_sf',
+                               id    : sf_id },
+               });
+            }
+         });
+         return false;
+      }
+      function do_remove_sf(data) {
+         data = extract_json(data);
+         if (data.success) {
+            console.log('Remove sf with id ' + data.id);
+            var row = $('table#sf tr#' + data.id);
+            $(row).effect('highlight', {}, 2000);
+            setTimeout(function() {
+               $(row).remove();
+            }, 500);
+         }
+      }
+      function add_sf(char_id) {
+         $('#popup').width(400).height(175);
+         $('#popup').html('Please wait, loading content');
+         $('#popup').center();
+         $('#popup').load('combat.php',
+                          { stage : 'load_sf', char_id : char_id },
+                          function(response, status, xhr) {
+            if (status == 'error') {
+               alertify.alert('Error loading kampfsonderfertigkeiten');
+               $('#popup').toggle();
+            } else {
+               $('#p_sf').selectize({
+                  sortField   : 'text',
+                  selectOnTab : true,
+               });
+               $('form#p_add_sf').validate({
+                  submitHandler : function(form) {
+                     $('#popup').slideUp();
+                     if ($('#popup #p_sf').val() == 0) {
+                        alertify.error('No kampfsonderfertigkeit selected');
+                     } else {
+                        $(form).ajaxSubmit({
+                           url      : 'combat.php',
+                           type     : 'post',
+                           datatype : 'json',
+                           success  : do_add_sf,
+                        });
+                     }
+                     return false;
+                  }
+               });
+            }
+         });
+         $('#popup').slideDown();
+         return false;
+      }
+      function do_add_sf(data) {
+         data = extract_json(data);
+         if (data.success) {
+            var elem = '<tr id="' + data.id + '">' +
+                       '<td>' + htmlescape(data.name) + '</td>' +
+                       '<td>' + htmlescape(data.effect) + '</td>' +
+                       '<td><a href="#" onclick="sf_info(' + data.sf_id + ')" class="link-info">note</a>' +
+                       ' | <a href="#" onclick="sf_remove(' + data.id + ')" class="link-cancel">remove</a>' +
+                       '</td></tr>';
+            $('div#char_' + data.char_id + ' table#sf tbody').append(elem);
+            $('table#sf tr#' + data.id).effect('highlight', {}, 2000);
+            console.log('DO something with data');
+         }
       }
       //-->{/literal}
    </script>

@@ -34,6 +34,7 @@ function get_char() {
       return array('message' => 'invalid id specified');
    }
    $char_id = $_REQUEST[id];
+   $smarty->assign('char_id', $char_id);
 
    $qry = 'SELECT weapons.name, kampftechniken.name as technik, ';
 	$qry .= '      combat_at(char_weapons.id) AS combat_at, combat_pa(char_weapons.pa) AS combat_pa, ';
@@ -82,15 +83,8 @@ function get_char() {
    }
    $smarty->assign('unarmed', $unarmed);
 
-   $qry = 'SELECT id, name ';
-   $qry .= 'FROM  kampf_sf ';
-   $qry .= 'ORDER BY name';
-   $rid = $db->do_query($qry, true);
-   while ($row = $db->get_array($rid)) {
-      $kampf_sf[] = $row;
-   }
-   $smarty->assign('kampf_sf', $kampf_sf);
-   $qry = 'SELECT char_kampf_sf.id, kampf_sf.name ';
+   $qry = 'SELECT char_kampf_sf.id, kampf_sf.name, kampf_sf.effect, ';
+   $qry .= '      char_kampf_sf.kampf_sf_id ';
    $qry .= 'FROM  char_kampf_sf, kampf_sf ';
    $qry .= "WHERE char_kampf_sf.character_id = $char_id AND ";
    $qry .= '      char_kampf_sf.kampf_sf_id = kampf_sf.id ';
@@ -106,9 +100,109 @@ function get_char() {
                 'out'     => $out,
                 'id'      => $_REQUEST[id]);
 }
+
+function sf_note() {
+   global $db, $debug, $smarty;
+
+   if (! check_int($_REQUEST[sf_id], false)) {
+      $smarty->assign("text", 'Error: invalid id specified');
+   } else {
+      $qry = 'SELECT description FROM kampf_sf WHERE id = %d';
+      $qry = sprintf($qry, $_REQUEST[sf_id]);
+      $smarty->assign('text', $db->fetch_field($qry, true));
+   }
+}
+
+function load_sf() {
+   global $db, $debug, $smarty;
+
+   if (! check_int($_REQUEST[char_id], false)) {
+      $smarty->assign('error', 'Invalid character id specified');
+   } else {
+      $smarty->assign('char_id', $_REQUEST[char_id]);
+
+      $qry = 'SELECT name ';
+      $qry .= 'FROM  characters ';
+      $qry .= 'WHERE id = ' . $_REQUEST[char_id];
+      $smarty->assign('name', $db->fetch_field($qry));
+
+      $qry = 'SELECT id, name ';
+      $qry .= 'FROM  kampf_sf ';
+      $qry .= 'WHERE id NOT IN (SELECT kampf_sf_id ';
+      $qry .= '                 FROM   char_kampf_sf ';
+      $qry .= '                 WHERE  character_id = ' . $_REQUEST[char_id] . ') ';
+      $qry .= 'ORDER BY name';
+      $rid = $db->do_query($qry, true);
+      $sf[0] = '-- select a kampfsonderfertigkeit';
+      while ($row = $db->get_array($rid)) {
+         $sf[$row[id]] = $row[name];
+      }
+      $smarty->assign('sf', $sf);
+   }
+}
+
+function add_sf() {
+   global $db, $debug;
+
+   if (! check_int($_REQUEST[char_id], false)) {
+      return array('message' => 'invalid character id specified');
+   }
+   if (! check_int($_REQUEST[p_sf], false)) {
+      return array('message' => 'invalid kampfsonderfertigkeit');
+   }
+
+   $qry = 'INSERT INTO char_kampf_sf (character_id, kampf_sf_id) VALUES (%d, %d)';
+   $qry = sprintf($qry, $_REQUEST[char_id], $_REQUEST[p_sf]);
+   if (! @$db->do_query($qry, false)) {
+      return array('message' => 'database-error while inserting' . ($debug) ? ': ' . pg_last_error() : '');
+   }
+   $id = $db->insert_id('char_kampf_sf');
+   $qry = 'SELECT name, effect FROM kampf_sf WHERE id = %d';
+   $qry = sprintf($qry, $_REQUEST[p_sf]);
+   list($name, $effect) = $db->get_list($qry, true);
+
+   return array('success' => true,
+                'id'      => $id,
+                'name'    => $name,
+                'effect'  => $effect,
+                'sf_id'   => $_REQUEST[p_sf],
+                'char_id' => $_REQUEST[char_id]);
+}
+
+function remove_sf() {
+   global $db, $debug;
+
+   if (! check_int($_REQUEST[id], false)) {
+      return array('message' => 'invalid id specified');
+   }
+
+   $qry = 'DELETE FROM char_kampf_sf WHERE id = %d';
+   $qry = sprintf($qry, $_REQUEST[id]);
+   if (! @$db->do_query($qry, false)) {
+      return array('message' => 'database-error while deleting' . ($debug) ? ': ' . pg_last_error() : '');
+   }
+
+   return array('success' => true,
+                'id'      => $_REQUEST[id]);
+}
+
 switch ($_REQUEST[stage]) {
    case 'get_char':
       echo json_encode(get_char());
+      break;
+   case 'load_sf':
+      load_sf();
+      $smarty->display('divs/load_sf.tpl');
+      break;
+   case 'add_sf':
+      echo json_encode(add_sf());
+      break;
+   case 'sf_note':
+      sf_note();
+      $smarty->display('divs/large_note.tpl');
+      break;
+   case 'remove_sf':
+      echo json_encode(remove_sf());
       break;
    default:
       show();

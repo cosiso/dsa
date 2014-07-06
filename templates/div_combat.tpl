@@ -83,3 +83,26 @@
    </thead>
 </table>
 <h4>Sonderfertigkeiten</h4>
+<table id="sf">
+   <thead>
+      <tr>
+         <th>Name</th>
+         <th>Effect</th>
+         <th>&nbsp;</th>
+      </tr>
+   </thead>
+   <tbody>
+      {section name=idx loop=$sf}
+         <tr id="{$sf[idx].id}">
+            <td>{$sf[idx].name|escape}</td>
+            <td>{$sf[idx].effect|escape}</td>
+            <td>
+               <a href="#" onclick="sf_info({$sf[idx].kampf_sf_id})" class="link-info">note</a>
+               | <a href="#" onclick="sf_remove({$sf[idx].id})" class="link-cancel">remove</a>
+            </td>
+         </tr>
+      {/section}
+   </tbody>
+</table>
+<br />
+<a id="btn_add_sf" href="#" class="link-add" onclick="add_sf({$char_id})">Add kampfsonderfertigkeit</a>

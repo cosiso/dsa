@@ -115,7 +115,6 @@
                add_note_tip($(table_id + ' tr#' + id + ' #note'), id);
 
             } else {
-               console.log('Data: ' + data.toSource());
                var row_id = table_id + ' #' + id;
                // Update values
                console.log('Row_id = ' + row_id);
