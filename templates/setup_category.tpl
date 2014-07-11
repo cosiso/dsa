@@ -4,47 +4,10 @@
       <title>DSA - setup</title>
       <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
       <link href="css/dsa.css" rel="stylesheet" type="text/css" />
+      <link href="css/alertify.css" rel="stylesheet" type="text/css" />
+      <link href="css/selectize.default.css" rel="stylesheet" type="text/css" />
    </head>
    <body>
-      <script src="scripts/jquery.js"></script>
-      <script src="tools/jquery-ui-1.10.4/ui/minified/jquery-ui.min.js"></script>
-      <script type="text/javascript">
-         <!--
-         var traits = [
-         {section name=idx loop=$traits}
-               {ldelim}
-                  id   : {$traits[idx].id},
-                  name: "{$traits[idx].name}",
-                  abbr: "{$traits[idx].abbr}"
-               {rdelim}
-               {if ! $smarty.section.idx.last},{/if}
-         {/section}
-         ]{literal}
-         $().ready(function() {
-            // Set classes on default tab
-            $('#default-tab a').addClass('tab-inactive').addClass('tab-active');
-            // Fill in selects on form
-            $('#frm_talente select[id^="eigenschaft"]').append('<option value="0">-- Not selected</option>');
-            traits = traits.sort(function(a, b) {
-               name_a = a.name;
-               name_b = b.name;
-               return name_a.localeCompare(name_b);
-               var w = name_a.localeCompare(name_b);
-               if (w < 0) {
-                  alert(a + ' comes before ' + b);
-               } else if (w == 0) {
-                  alert(a + ' is actually equal to ' + b);
-               } else {
-                  alert(a + ' should be after ' + b);
-               }
-               return w;
-            });
-            for (var key in traits) {
-               $('#frm_talente select[id^="eigenschaft"]').append('<option value="' + traits[key].id + '">' + traits[key].name + '</option>');
-            }
-         });
-         //-->{/literal}
-      </script>
       {include file="head.tpl"}
       {include file="setup_menu.tpl" selected_category="Talenten"}
       <div style="float: left" id="tab-container">
@@ -66,87 +29,131 @@
                </thead>
                <tbody>
                   {section name=idx loop=$talente}
-                     <tr>
+                     <tr id="{$talente[idx].id}">
                         <td>{$talente[idx].name|escape}</td>
                         <td>{$talente[idx].eigenschaft1|escape} - {$talente[idx].eigenschaft2|escape} - {$talente[idx].eigenschaft3|escape}</td>
                         <td>{$talente[idx].skt|escape}</td>
                         <td>{$talente[idx].be|escape}</td>
                         <td>{$talente[idx].komp|escape}</td>
                         <td>
-                           <a href="javascript:edit_talent({$talente[idx].id})" class="link-edit">edit</a>
-                           | <a href="javascript:remove_talent({$talente[idx].id})" class="link-cancel">remove</a>
+                           <a href="#" onclick="edit_talent({$talente[idx].id})" class="link-edit">edit</a>
+                           | <a href="#" onclick="remove_talent({$talente[idx].id})" class="link-cancel">remove</a>
                         </td>
                      </tr>
                   {/section}
                </tbody>
             </table>
             <br />
-            {carto_spacer width='200px'}
-            {carto_button name='btn_add_talent' value='Add talent' onclick='add_talent()'}
+            <a id="add_talent" class="link-add" href="#" onclick="edit_talent(0)">Add talent</a>
          </div>
       </div>
-      <div id="add_talent" class="popup" style="display: none; height: 380px">
-         <form name="frm_talente" id="frm_talente" onsubmit="submit_talente()">
-            {html_hidden name='talent_id' value=0}
-            <label>Name:</label>
-            {html_text name='name' style='width: 10em'}<br />
-            <label>Eigenschaft 1</label>
-            <select name="eigenschaft1" id="eigenschaft1"></select>
-            <label>Eigenschaft 2</label>
-            <select name="eigenschaft2" id="eigenschaft2"></select>
-            <label>Eigenschaft 3</label>
-            <select name="eigenschaft3" id="eigenschaft3"></select>
-            <label>SKT</label>
-            {html_text name='skt' style='width: 2em'}
-            <label>BE</label>
-            {html_text name='be' style='width 5em'}
-            <label>Komp.</label>
-            {html_text name='komp' style='width: 5em'}
-            <div class="button_bar">
-               {carto_button type='submit'}
-               {carto_button type='close' onclick="$('#add_talent').slideUp()"}
-            </div>
-         </form>
-      </div>
+      <div id="popup" style="display: none"></div>
+      {include file=part_script_include.tpl}
       <script type="text/javascript">
-         <!--{literal}
-         function fill_talente_form(id, name, eig1, eig2, eig3, skt, be, komp ) {
-            $('#talente_id').text(id);
-            $('#name').text(name);
-            $('#skt').text(skt);
-            $('#be').text(be);
-            $('#komp').text(komp);
-            $('#eigenschaft1').val(eig1);
-            $('#eigenschaft2').val(eig2);
-            $('#eigenschaft3').val(eig3);
+         <!--
+         var category_id = {$cat_id|default:'0'};{literal}
+         $().ready(function() {
+            // Set classes on default tab
+            $('#default-tab a').addClass('tab-inactive').addClass('tab-active');
+         });
+         jQuery.fn.center = function () {
+             this.css("position","absolute");
+             this.css("top", Math.max(0, (($(window).height() - $(this).outerHeight()) / 2) +
+                                                         $(window).scrollTop()) + "px");
+             this.css("left", Math.max(0, (($(window).width() - $(this).outerWidth()) / 2) +
+                                                         $(window).scrollLeft()) + "px");
+             return this;
          }
-         function show_add_talente(aligned) {
-            // Position add_talent div
-            var div = $('#add_talent');
-            var pos = aligned.position();
-            div.css({top:  pos.top + 30,
-                     left: pos.left + aligned.width() - div.width() + 15});
-            // Show div and focus on first input
-            $('#add_talent').slideDown();
-            $('#name').focus();
+         function extract_json(data) {
+            try {
+               data = $.parseJSON(data);
+            } catch(e) {
+               alertify.alert(e + "\nData: " + data.toSource());
+               return false;
+            }
+            if (! data.success && data.message) {
+               alertify.alert('Error: ' + data.message);
+            }
+            return data;
          }
-         function submit_talente() {
-            // TODO
-            alert('Submit talente');
-            return false;
-         }
-         function add_talent() {
-            fill_talente_form(0, '', 0, 0, 0, '', '', '');
-            show_add_talente($('#btn_add_talent'));
+         function htmlescape(s) {
+            return $('<div />').text(s).html();
          }
          function edit_talent(talent_id) {
-            // TODO
-            alert('Edit talent');
-            return false;
+            // Get form
+            $('#popup').width(400).height(380);
+            $('#popup').html('Please wait, loading content');
+            $('#popup').center();
+            $('#popup').slideDown();
+            $('#popup').load('talente.php',
+                             { stage : 'show', talent_id : talent_id, category_id : category_id },
+                             function(response, status, xhr) {
+               if (status == 'error') {
+                  alertify.alert('Error loading talent');
+                  $('#popup').toggle();
+               } else {
+                  $('div#popup form#talente').validate({
+                     rules         : {
+                        name         : { required : true },
+                        eigenschaft1 : { required: true },
+                        eigenschaft2 : { required: true },
+                        eigenschaft3 : { required: true },
+                     },
+                     submitHandler : function(form) {
+                        $('#popup').slideUp();
+                        $(form).ajaxSubmit({
+                           url      : 'talente.php',
+                           type     : 'post',
+                           datatype : 'json',
+                           success  : do_edit_talent,
+                        });
+                        return false;
+                     }
+                  });
+               }
+            });
+         }
+         function do_edit_talent(data) {
+            data = extract_json(data);
+            if (data.success) {
+               if (data.is_new) {
+                  // Add row
+                  var row = '<tr id="' + data.id + '">' +
+                     '<td>' + htmlescape(data.name) + '</td>' +
+                     '<td>' + htmlescape(data.eig1) + ' - ' + htmlescape(data.eig2) + ' - ' + htmlescape(data.eig3) + '</td>' +
+                     '<td>' + htmlescape(data.skt) + '</td>' +
+                     '<td>' + htmlescape(data.be) + '</td>' +
+                     '<td>' + htmlescape(data.komp) + '</td>' +
+                     '<td><a href="#" class="link-edit" onclick="edit_talent(' + data.id + ')">edit</a>' +
+                     ' | <a href="#" class="link-cancel" onclick="remove_talent(' + data.id + ')">remove</a></td>' +
+                     '</tr>';
+                  $('table#talente tbody').append(row);
+               } else {
+                  // Edit row
+                  var row = 'table#talente tr#' + data.id;
+                  $(row + ' td:nth-child(1)').text(data.name);
+                  $(row + ' td:nth-child(2)').text(data.eig1 + ' - ' + data.eig2 + ' - ' + data.eig3);
+                  $(row + ' td:nth-child(3)').text(data.skt);
+                  $(row + ' td:nth-child(4)').text(data.be);
+                  $(row + ' td:nth-child(5)').text(data.komp);
+               }
+               $('table#talente tr#' + data.id).effect('highlight', {}, 2000);
+            }
          }
          function remove_talent(talent_id) {
-            // TODO
-            alert('Remove talent');
+            var name = $('table#talente tr#' + talent_id + ' td:nth-child(1)').text();
+            console.log('Name: ' + name);
+            alertify.confirm('Remove talent ' + name + '?', function(e) {
+               if (e) {
+                  $.ajax({
+                     datatype : 'json',
+                     url      : 'talente.php',
+                     data     : { id : talent_id, stage : 'remove' },
+                     type     : 'post',
+                     success  : do_remove_talent,
+                  });
+               }
+            });
             return false;
          }
          //-->{/literal}

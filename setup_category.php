@@ -33,8 +33,8 @@ function show() {
    $smarty->assign('category_name', $category_name);
    # Get talente
    $qry = 'SELECT talente.id, talente.name, talente.be, ';
-   $qry .= '      talente.komp, trait1.abbr trait1, ';
-   $qry .= '      trait2.abbr trait2, trait3.abbr trait3 ';
+   $qry .= '      talente.komp, trait1.abbr eigenschaft1, talente.skt, ';
+   $qry .= '      trait2.abbr eigenschaft2, trait3.abbr eigenschaft3 ';
    $qry .= 'FROM  talente ';
    $qry .= '      INNER JOIN traits trait1 ON (eigenschaft1 = trait1.id) ';
    $qry .= '      INNER JOIN traits trait2 ON (eigenschaft2 = trait2.id) ';

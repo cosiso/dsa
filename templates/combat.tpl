@@ -205,7 +205,6 @@
                        '</td></tr>';
             $('div#char_' + data.char_id + ' table#sf tbody').append(elem);
             $('table#sf tr#' + data.id).effect('highlight', {}, 2000);
-            console.log('DO something with data');
          }
       }
       //-->{/literal}
