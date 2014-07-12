@@ -114,10 +114,27 @@ function edit() {
                 'skt'     => $skt);
 }
 
+function remove_talent() {
+	global $db, $debug;
+
+	if (! check_int($_REQUEST[id], false)) {
+		return array('message' => 'invalid id specified');
+	}
+
+	$qry = 'DELETE FROM talente WHERE id = %d';
+	$db->do_query(sprintf($qry, $_REQUEST[id]), true);
+
+	return array('success' => true,
+					 'id'      => $_REQUEST[id]);
+}
+
 switch ($_REQUEST[stage]) {
    case 'edit':
       echo json_encode(edit());
       break;
+	case 'remove':
+		echo json_encode(remove_talent());
+		break;
    default:
       show();
       $smarty->display('divs/talente.tpl');

@@ -142,7 +142,6 @@
          }
          function remove_talent(talent_id) {
             var name = $('table#talente tr#' + talent_id + ' td:nth-child(1)').text();
-            console.log('Name: ' + name);
             alertify.confirm('Remove talent ' + name + '?', function(e) {
                if (e) {
                   $.ajax({
@@ -155,6 +154,16 @@
                }
             });
             return false;
+         }
+         function do_remove_talent(data) {
+            data = extract_json(data);
+            if (data.success) {
+               var row = 'table#talente tr#' + data.id;
+               $(row).effect('highlight', {}, 2000);
+               setTimeout(function() {
+                  $(row).remove();
+               }, 500);
+            }
          }
          //-->{/literal}
       </script>

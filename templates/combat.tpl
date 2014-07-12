@@ -150,7 +150,6 @@
       function do_remove_sf(data) {
          data = extract_json(data);
          if (data.success) {
-            console.log('Remove sf with id ' + data.id);
             var row = $('table#sf tr#' + data.id);
             $(row).effect('highlight', {}, 2000);
             setTimeout(function() {
