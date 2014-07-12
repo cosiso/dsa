@@ -92,6 +92,7 @@
                   alertify.alert('Error loading talent');
                   $('#popup').toggle();
                } else {
+                  $('#popup form#talente #name').focus();
                   $('div#popup form#talente').validate({
                      rules         : {
                         name         : { required : true },

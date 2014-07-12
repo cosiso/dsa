@@ -6,7 +6,7 @@ if ( ! $_REQUEST[cat_id] or intval($_REQUEST[cat_id]) != $_REQUEST[cat_id]) {?>
    <script type="text/javascript">
       alert('ERROR: No valid id!');
       history.go(-1);
-   </script><?
+   </script><?php
    exit;
 }
 
