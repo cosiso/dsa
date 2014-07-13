@@ -109,8 +109,37 @@ function set_name() {
                 'id'      => $_REQUEST[id],
                 'name'    => $name);
 }
+function get_eigenschaft() {
+   global $db, $debug, $smarty;
+
+   if (! check_int($_REQUEST[id], false)) {
+      $smarty->assign('error', 'Invalid id specified');
+   } else {
+      switch ($_REQUEST[eigenschaft]) {
+         case 'Lebenspunkte':
+            $qry = 'SELECT base_le(character_id), le_mod, le_bought ';
+            $qry .= 'FROM  basevalues WHERE character_id = %d';
+            break;
+         default:
+            $smarty->assign('error', 'Invalid eigenschaft ' . htmlspecialchars($_REQUEST[eigenschaft]) . ' specified');
+            $error = true;
+      }
+      if (! $error) {
+         $smarty->assign('eigenschaft', $_REQUEST[eigenschaft]);
+         $qry = sprintf($qry, $_REQUEST[id]);
+         list($base, $mod, $bought) = $db->get_list($qry, true);
+         $smarty->assign('base', $base);
+         $smarty->assign('mod', $mod);
+         $smarty->assign('bought', $bought);
+      }
+   }
+}
 
 switch ($_REQUEST[stage]) {
+   case 'get_eigenschaft':
+      get_eigenschaft();
+      $smarty->display('templates/divs/characters/edit_eigenschaft.tpl');
+      break;
    case 'set_name':
       echo json_encode(set_name());
       break;

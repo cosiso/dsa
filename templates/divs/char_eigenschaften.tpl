@@ -15,14 +15,19 @@
    </thead>
    <tbody class="hover">
       {section name='idx' loop=$chars}
-         <tr id="{$chars[idx].char_id}">
+         <tr id="{$chars[idx].char_id}" style="text-align: right">
             <th style="text-align: left">
                <span onclick="rename(this)" style="cursor: pointer">
                   <img src="images/page_white_paint.png" border="0" alt="rename">
                </span>
                <span id="name-{$chars[idx].char_id}">{$chars[idx].name|escape}</span>
             </th>
-            <td>{$chars[idx].tot_le}</td>
+            <td>
+               <span id="le-{$chars[idx].char_id}">{$chars[idx].tot_le}</span>
+               <span onclick="edit_eigenschaft(this, 'Lebenspunkte')" style="cursor: pointer">
+                  <img src="images/page_white_paint.png" border="0" alt="edit">
+               </span>
+            </td>
             <td>{$chars[idx].tot_au}</td>
             <td>{$chars[idx].tot_ae}</td>
             <td>{$chars[idx].tot_mr}</td>

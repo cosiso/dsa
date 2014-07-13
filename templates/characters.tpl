@@ -82,9 +82,6 @@
       function rename(span) {
          // Get id from parent_row span > td > tr
          var id = $(span).parent().parent().prop('id');
-         // Get current name from span
-         var name = $('table#basiswerte span#name-' + id).text();
-                       '<br><input type='
          $('#popup').html('Retrieving name');
          $.ajax({
             datatype : 'json',
@@ -132,6 +129,27 @@
             $('table#basiswerte span#name-' + data.id).text(data.name);
             $('table#basiswerte span#name-' + data.id).effect('highlight', {}, 2000);
          }
+      }
+      function edit_eigenschaft(span, eigenschaft) {
+         // Retrieve id from parent row span > td > tr
+         var id = $(span).parent().parent().prop('id');
+         console.log('ID: ' + id);
+         $('#popup').html('Retrieving values for ' + eigenschaft);
+         $('#popup').load('characters.php',
+                          { stage : 'get_eigenschaft', eigenschaft : eigenschaft, id : id},
+                          eigenschaft_loaded
+         );
+         $('#popup').width(250).height(250);
+         $('#popup').show();
+         $('#popup').position({
+            collision : 'none',
+            my        : 'left top',
+            at        : 'left top',
+            of        : $(span),
+         });
+      }
+      function eigenschaft_loaded(response, status, xhr) {
+         alertify.aleret('Loaded, success: ' + status.toSource());
       }
       /*
       function toggle(char_id) {
