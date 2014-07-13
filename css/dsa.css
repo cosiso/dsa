@@ -162,8 +162,8 @@ label {
 	margin-top: 5px;
 	display: block;
 }
-/* divs */
 
+/* divs */
 #popup {
 	z-index: 5;
 	background-color: #f5f5b5;
@@ -184,7 +184,6 @@ label {
 	color: #ff3939;
 	font-style: italic;
 }
-
 /* Small yellow bar below character name */
 .value-bar {
 	background-color: #fff2d8;
@@ -192,6 +191,7 @@ label {
 	padding: 3px;
 	font-size: 11px;
 }
+
 #head {
    margin-bottom: 10px;
 }

@@ -1,543 +1,169 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 <html>
-   <head>
-      <title>DSA - characters</title>
-      <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
-      <link href="css/dsa.css" rel="stylesheet" type="text/css" />
-      <link href="css/alertify.css" rel="stylesheet" type="text/css" />
-      <link href="css/selectize.default.css" rel="stylesheet" type="text/css" />
-   </head>
-   <body>
-      {include file="head.tpl"}
-      {include file="character_menu.tpl" selected="main"}
-      <div style="float: left">
-         <div id="main">
-            <div>
-               <h2 id="main_name" style="display: inline"></h2>
-               {carto_spacer width=40}
-               <img id="img_edit_name" src="images/page_white_paint.png" alt="edit" border="0" style="cursor: pointer" />
-            </div>
-            <div id="data">
-               <h3 onclick="toggle_h3('general_data', false)">General data</h3>
-               <div id="general_data" style="display: none">
-                  <div class="column" style="margin-left: 0px">
-                     <label for="rasse">Rasse:</label>
-                     {html_text name='rasse'}
-                     <label for="kultur">Kultur:</label>
-                     {html_text name='kultur'}
-                     <label for="profession">Profession:</label>
-                     {html_text name='profession'}
-                  </div>
-                  <div class="column">
-                     <label for="geschlecht">Geschlecht:</label>
-                     {html_text name='geschlecht'}
-                     <label for="alter">Alter:</label>
-                     {html_text name='alter'}
-                     <label for="haarfarbe">Haarfarbe:</label>
-                     {html_text name='haarfarbe'}
-                  </div>
-                  <div class="column">
-                     <label for="grosse">Grösse</label>
-                     {html_text name='grosse'}
-                     <label for="gewicht">Gewicht:</label>
-                     {html_text name='gewicht'}
-                     <label for='augenfarbe'>Augenfarbe</label>
-                     {html_text name='augenfarbe'}
-                  </div><br />
-                  <div>{carto_spacer}</div>
-                  <label for="aussehen">Aussehen:</label>
-                  {html_textarea name='aussehen' style='width: 100%; height: 60px'}
-                  <hr />
-                  <label>Abenteurpunkte</label>
-                  Available: {html_text name='ap' value=$ap style="width: 6em"}
-                  Add {html_text name="add_ap" style="width: 4em"}
-                  Subtract {html_text name="sub_ap" style="width: 4em"}
-               </div>
-               <hr />
-               <h3 id="h3_eigenschaften">Eigenschaften &amp; Basiswerte</h3>
-               <div id="eigenschaften" style="display: none">
-               </div>
-               <hr />
-               {* Vor- & Nachteile *}
-               <h3 id="h3_vorteile">Vor- &amp; Nachteile</h3>
-               <div id="vorteile"></div>
-               <hr />
-               {* Kampftechniken *}
-               <h3 id="h3_kampftechniken">Kampftechniken</h3>
-               <div id="kampftechniken" style="display: none"></div>
-            </div>
-            {carto_spacer height=16}<br /><a id="btn_remove_char" class="link-del">Remove character</a>
-         </div>
+<head>
+   {include file='part_head.tpl' title='DSA - Characters'}
+</head>
+<body>
+   {include file='head.tpl'}
+   {include file='character_menu.tpl' selected='main'}
+   <div id="main" style="float: left">
+      <div onclick="close_all_divs()" style="cursor: pointer">
+         <img src="images/badge-square-direction-up-24.png" border="0" width="24" height="24" />
+         Close all
       </div>
-      <script src="scripts/jquery.js"></script>
-      <script src="tools/jquery-ui-1.10.4/ui/minified/jquery-ui.min.js"></script>
-      <script type="text/javascript" src="scripts/jquery.validate.min.js"></script>
-      <script type="text/javascript" src="scripts/jquery.form.min.js"></script>
-      <script type="text/javascript" src="scripts/alertify.min.js"></script>
-      <script type="text/javascript" src="scripts/selectize.min.js"></script>
-      <script type="text/javascript" src="scripts/jquery.simpletip-1.3.1.min.js"></script>
-      <script type="text/javascript" src="scripts/jquery.tablesorter.min.js"></script>
-      <script type="text/javascript">
-         <!--{literal}
-         var old_val = {};
-         var character_id = 0;
-         $(document).ready(function() {
-            // Set validation on new character-form
-            $('#frm_name').validate({
-               submitHandler: function(form) {
-                  $(form).ajaxSubmit({
-                     success : do_add_character,
-                     type    : 'post',
-                     datatype: 'json'
-                  });
-                  $('#div_name').slideUp();
-                  return false;
-               }
-            });
-            $('#data input[type=text], #data textarea').each(function(index, value) {
-               // Set onfocus
-               $(value).unbind('focus').focus(function(e) {
-                  old_val[$(this).prop('id')] = parseInt($(this).val()) || 0;
-               });
-               // Set blur
-               var field_id = $(this).prop('id');
-               if (field_id != 'add_ap' &&
-                   field_id != 'sub_ap' &&
-                   field_id != 'ap') {
-                  $(this).unbind('blur').blur(blur_general_data);
-               } else {
-                  $(this).unbind('blur').blur(blur_ap);
-               }
-            });
-         });
-         function blur_ap(e) {
-            var field_id = $(this).prop('id');
-            var value = parseInt($(this).val()) || 0;
-
-
-            if (! character_id || value == 0) {
-               // No character selected or no value, simply clear field and return
-               $(this).val('');
-               return;
-            }
-
-            if (old_val[field_id] == value) {
-               return;
-            }
-
+      <h3 class="toggle" onclick="toggle_base()">Basiswerte &amp; Eigenschafte</h3>
+      <div id="basiswerte" style="display: none; padding-left: 20px"></div>
+      {section name=idx loop=$chars}
+         <h3 id="{$chars[idx].id}" class="toggle" onclick="toggle({$chars[idx].id})">{$chars[idx].name|escape}</h3>
+         <div id="char_{$chars[idx].id}" style="display: none; padding-left: 20px"></div>
+      {sectionelse}
+         <script type="text/javascript">
+            alert('No characters defined yet');
+         </script>
+      {/section}
+   </div>
+   <div id="popup" style="display: none"></div>
+   {include file='part_script_include.tpl'}
+   <script type="text/javascript">
+      <!--
+      var hasData = {};
+      function extract_json(data) {
+         try {
+            data = $.parseJSON(data);
+         } catch(e) {
+            alertify.alert(e + "\nData: " + data.toSource());
+            return false;
+         }
+         if (! data.success && data.message) {
+            alertify.alert('Error: ' + data.message);
+         }
+         return data;
+      }
+      function htmlescape(s) {
+         return $('<div />').text(s).html();
+      }
+      function toggle_base() {
+         var elem = 'div#basiswerte';
+         if ($(elem).is(':visible')) {
+            // close and return
+            $(elem).hide();
+            return;
+         }
+         if (! $(elem).html() || 1) {
+            $(elem).text('Retrieving data, please wait.');
             $.ajax({
                datatype : 'json',
                url      : 'characters.php',
                type     : 'post',
-               data     : {stage   : 'change_ap',
-                           char_id : character_id,
-                           field   : field_id,
-                           value   : value},
-               success  : do_change_ap
+               data     : { stage : 'retrieve_base'},
+               success  : show_basevalues
             });
          }
-         function do_change_ap(data) {
-            data = extract_json(data);
-            if (data.success) {
-               // Update fields
-               var old_ap = parseInt($('#data #general_data #ap').val()) || 0;
-               $('#data #general_data #' + data.field).val(data.value);
-               if (old_ap != data.ap) {
-                  $('#data #general_data #ap').val(data.ap);
-                  $('#data #general_data #ap').effect('highlight', {}, 2000);
-               }
-            }
-            $('#data #general_data #add_ap').val('');
-            $('#data #general_data #sub_ap').val('');
+         $(elem).slideDown();
+      }
+      function show_basevalues(data) {
+         data = extract_json(data);
+         if (data.success) {
+            $('div#basiswerte').html(data.out);
          }
-         function ask_new_character() {
-            alertify.prompt('Name of new character', function(e, str) {
-               if (e && str != '') {
+      }
+      function roll(span, eigenschaft) {
+         var value = parseInt($(span).parent().text()) || 0;
+         var name = $(span).parent().parent().children().first().text();
+         var d20 = Math.floor(Math.random() * 20 + 1);
+         var out = name + ' rolled <b>' + d20 + '</b>';
+         if (d20 > value || d20 == 20) {
+            alertify.error(out + ' on ' + eigenschaft);
+         } else {
+            value = value - d20;
+            alertify.success(out + ' (+' + value + ') on ' + eigenschaft);
+         }
+      }
+      function rename(span) {
+         // Get id from parent_row span > td > tr
+         var id = $(span).parent().parent().prop('id');
+         // Get current name from span
+         var name = $('table#basiswerte span#name-' + id).text();
+                       '<br><input type='
+         $('#popup').html('Retrieving name');
+         $.ajax({
+            datatype : 'json',
+            url      : 'characters.php',
+            type     : 'get',
+            data     : { stage : 'get_name', id : id },
+            success  : show_rename
+         });
+         $('#popup').width(250).height(80);
+         $('#popup').show();
+         $('#popup').position({
+            my        : 'left top',
+            at        : 'left top',
+            of        : $(span),
+            collision : 'none',
+         });
+      }
+      function show_rename(data) {
+         data = extract_json(data);
+         if (data.success) {
+            $('#popup').html(data.out);
+            $('#popup #name').focus().select();
+            $('#popup form#rename').validate({
+               rules : {
+                  name : 'required',
+               },
+               submitHandler : function(form) {
+                  $('#popup').hide();
                   $.ajax({
                      datatype : 'json',
                      url      : 'characters.php',
-                     data     : {'stage'   : 'new',
-                                 'char_id' : 0,
-                                 'name'    : str},
-                     success  : do_add_character
-                  });
-               }
-            });
-         }
-         function extract_json(data) {
-            try {
-               data = $.parseJSON(data);
-            } catch(e) {
-                  alertify.alert(e + "\nData: " + data.toSource());
-                  return false;
-            }
-            if (! data.success && data.message) {
-               alertify.alert('Error: ' + data.message);
-            }
-            return data;
-         }
-         function blur_general_data(e) {
-            var v = $(this).val();
-            if (old_val[this.id] == v) {
-               // Nothing changed, return
-               return;
-            }
-            // Update edit field in database
-            if (this.id == 'alter' ||
-                this.id == 'grosse' ||
-                this.id == 'gewicht') {
-               // Should be a number, show error if not and focus field again
-               var intRegEx = /^\d*$/;
-               if (! intRegEx.test(v)) {
-                  $(this).addClass('error');
-                  return;
-               } else {
-                  $(this).removeClass('error');
-               }
-            }
-            // Disable field
-            this.disabled = true;
-            // Send ajax-request
-            $.ajax({
-               datatype: 'json',
-               type    : 'post',
-               url     : 'characters.php',
-               data    : {stage    : 'update_field',
-                          char_id  : character_id,
-                          fieldname: this.id,
-                          value    : v},
-               success : update_field
-            });
-         }
-         function toggle_h3(div_name, close_others) {
-            // set close_others to true, TODO change later
-            close_others = true;
-            // Opens the div with the given name, closes all others
-            if (close_others) {
-               $('#data h3 + div').each(function(index, value) {
-                  if (div_name != $(value).prop('id')) {
-                     $(value).slideUp();
-                  }
-               });
-            }
-            $('h3 + div#' + div_name).slideDown();
-         }
-         function update_field(data) {
-            try {
-               data = $.parseJSON(data);
-            } catch(e) {
-                  alertify.alert(e + "\nData: " + data.toSource());
-                  return false;
-            }
-            if (! data.success) {
-               if (data.message) {
-                  alertify.alert('Error: ' + data.message);
-               }
-               // Something went wrong, restore old value
-               alertify.alert('Could not update ' + data.fieldname + ', reset to ' + old_val[data.fieldname]);
-               $('#' + data.fieldname).val(old_val[data.fieldname]);
-               $('#' + data.fieldname).prop('disabled', false);
-               return false;
-            }
-            // All went fine, enable field
-            $('#' + data.fieldname).prop('disabled', false);
-            return true;
-         }
-         function showRequest(formData, jqForm, options) {
-            // formData is an array; here we use $.param to convert it to a string to display it
-            // but the form plugin does this for you automatically when it submits the data
-            var queryString = $.param(formData);
-
-            // jqForm is a jQuery object encapsulating the form element.  To access the
-            // DOM element for the form do this:
-            // var formElement = jqForm[0];
-
-            alertify.alert('About to submit: \n\n' + queryString);
-
-            // here we could return false to prevent the form from being submitted;
-            // returning anything other than false will allow the form submit to continue
-            return true;
-         }
-         function htmlescape(s) {
-            return $('<div />').text(s).html();
-         }
-         function do_add_character(response, status, xhr, form) {
-            if (! status) {
-               alertify.alert('Error processing request, try again');
-               return false;
-            }
-            response = $.parseJSON(response);
-            if (! response.success) {
-               alertify.alert('Error: ' + response.message);
-               return false;
-            }
-            // Check if this was an update
-            if (response.update) {
-               // This is an update return from another function
-               return update_name(response.name, response.character_id);
-            }
-            // Add character to menu
-            var last = null; var put_before = null;
-            $('#sub-menu-helden li').each(function() {
-               var listname = $(this).text();
-               if (response.name.localeCompare(listname) <= 0) {
-                  last = $(this);
-                  put_before = $(this);
-                  return false;
-               }
-            });
-            var new_li = '<li id="li-char-' + response.character_id + '"><a href="#">' + htmlescape(response.name) + '</a></li>';
-            if (last == null || put_before == null) {
-               // No elements examined, add to <ol> or add as last
-               new_li = $('#sub-menu-helden').append(new_li);
-            } else {
-               // Add before given element
-               new_li = $(new_li).insertBefore(put_before);
-            }
-            // Add onclick to <li>
-            new_li.click(function() {
-               select_char(response.character_id);
-            });
-         }
-         function update_name(new_name, id) {
-            // Update h2 element
-            $('#main_name').text(htmlescape(new_name));
-            // Update li-item
-            $('#li-char-' + id).text(new_name);
-         }
-         function edit_name(char_id) {
-            var name = $('#main_name').text();
-            alertify.prompt('New name of character', function(e, str) {
-               if (e && str != '') {
-                  $.ajax({
-                     datatype : 'json',
-                     url      : 'characters.php',
-                     data     : {'stage'   : 'new',
-                                 'char_id' : char_id,
-                                 'name'    : str},
-                     success  : do_add_character
-                  });
-               }
-            }, name);
-            return false;
-         }
-         function select_char(char_id) {
-            $.ajax({
-               type    : 'POST',
-               url     : 'characters.php',
-               data    : { 'stage'   : 'main',
-                           'char_id' : char_id },
-               datatype: 'json',
-               success : show_char_main
-            });
-         }
-         function show_char_main(data) {
-            try {
-               character = $.parseJSON(data);
-            } catch(e) {
-                  alertify.alert(e + "\nData: " + character.toSource());
-                  return false;
-            }
-            if (! character.success) {
-               if (character.message) {
-                  alertify.alert('Error: ' + character.message);
-               }
-               return false;
-            }
-            // Character data is in an array called data, retrieve that
-            data = character.data;
-            character_id = data.id;
-            // Set data
-            $('#main_name').text(htmlescape(data.name));
-            $('#geschlecht').val(htmlescape(data.geschlecht));
-            $('#alter').val(htmlescape(data.alter));
-            $('#haarfarbe').val(htmlescape(data.haarfarbe));
-            $('#grosse').val(htmlescape(data.grosse));
-            $('#gewicht').val(htmlescape(data.gewicht));
-            $('#augenfarbe').val(htmlescape(data.augenfarbe));
-            $('#aussehen').val(htmlescape(data.aussehen));
-            $('#rasse').val(htmlescape(data.rasse));
-            $('#kultur').val(htmlescape(data.kultur));
-            $('#profession').val(htmlescape(data.profession));
-            // Set ap
-            $('#general_data #ap').val(data.ap);
-            // Set or replace function for name editing
-            $('#img_edit_name').unbind('click').click(function() {
-               edit_name(data.id);
-            });
-            // Set function on remove button
-            $('#btn_remove_char').unbind('click').click(function() {
-               confirm_delete_char(data.name, data.id);
-            });
-            // Set funtion on h3-elements
-            $('#h3_vorteile').unbind('click').click(function() {
-               retrieve_vorteile(data.id);
-               toggle_h3('vorteile', false);
-            })
-            $('#h3_eigenschaften').unbind('click').click(function() {
-               retrieve_eigenschaften(data.id);
-               toggle_h3('eigenschaften', false);
-            })
-            $('#h3_kampftechniken').unbind('click').click(function() {
-               retrieve_kampftechniken(data.id);
-               toggle_h3('kampftechniken', false);
-            })
-            // Set page on general data
-            toggle_h3('general_data', true);
-            // Set array with old_values
-            $('#eigenschaften #div_eigenschaften input[type=text]').each(function(index, value) {
-               old_val[$(value).prop('id')] = $(value).val();
-            });
-         }
-         function confirm_delete_char(name, id) {
-            alertify.confirm('Remove ' + name + '?', function(e) {
-               if (e) {
-                  $.ajax({
-                     datatype : 'json',
-                     url      : 'characters.php',
-                     data     : {'stage' : 'remove',
-                                 'id'    : id},
-                     success  : do_remove_character
-                  });
-                  alertify.log('Removing ' + name);
+                     type     : 'post',
+                     data     : { stage : 'set_name',
+                                  id    : $('form#rename #id').val(),
+                                  name  : $('form#rename #name').val()},
+                     success  : do_rename
+                  })
                }
             })
-            return false;
          }
-         function do_remove_character(data) {
-            data = extract_json(data);
-            if (data.success) {
-               // Hide main as the character is no longer available
-               $('#main').hide();
-               // Remove from list
-               $('#li-char-' + data.id).remove();
-            }
+      }
+      function do_rename(data) {
+         data = extract_json(data);
+         if (data.success) {
+            $('table#basiswerte span#name-' + data.id).text(data.name);
+            $('table#basiswerte span#name-' + data.id).effect('highlight', {}, 2000);
          }
-         /* Functions for kampftechniken */
-         function retrieve_kampftechniken(id) {
-            var name = $('#main_name').text();
-            alertify.log('Retrieving kampftechniken for ' + name);
+      }
+      /*
+      function toggle(char_id) {
+         var elem = $('h3#' + char_id ).next('div#char_' + char_id);
+         var isVisible = $(elem).is(':visible');
+         if (isVisible) {
+            // close and return
+            $(elem).hide();
+            return;
+         }
+         if (! hasData[char_id]) {
+            // Retriev data
+            $(elem).text('Retrieving data, please wait.');
             $.ajax({
                datatype : 'json',
+               url      : 'characters.php',
                type     : 'post',
-               url      : 'character_kampftechniken.php',
-               data     : {stage: 'get',
-                           id   : id},
-               success  : do_show_kampftechniken
+               data     : { id : char_id, stage : 'retrieve'},
+               success  : show_char
             });
          }
-         function do_show_kampftechniken(data) {
-            data = extract_json(data);
-            if (data.success) {
-               var div = '#data #kampftechniken';
-               $(div).html(data.out);
-               $(div).slideDown();
-            }
+         $(elem).slideDown();
+      }
+      function show_char(data) {
+         data = extract_json(data);
+         if (data.success) {
+            var elem = $('h3#' + data.id).next('div#char_' + data.id);
+            $(elem).html(data.out);
          }
-         function learn_kampftechnik(technik_id) {
-            $.ajax({
-               datatype : 'json',
-               type     : 'post',
-               url      : 'character_kampftechniken.php',
-               data     : {stage      : 'learn',
-                           char_id    : character_id,
-                           technik_id : technik_id},
-               success  : do_learn_kampftechnik,
-            });
-         }
-         function do_learn_kampftechnik(data) {
-            data = extract_json(data);
-            if (data.success) {
-               var row = 'table#kampftechniken tr#' + data.technik_id;
-               // Update fields
-               $(row + ' > #star >img').attr('src', 'images/star-16.png');
-               $(row + ' #at_' + data.technik_id).text('0');
-               $(row + ' #pa_' + data.technik_id).text('0');
-               $(row + ' #taw_' + data.technik_id).text('0');
-               var html='<img src="images/person-minus-16.png" border="0" width="16" height="16" />unlearn';
-               $(row + ' #lnk_' + data.technik_id + ' a').html(html);
-               $(row + ' #lnk_' + data.technik_id + ' a').unbind('click').click(function() {
-                  unlearn_kampftechnik(data.char_id, data.technik_id);
-               });
-               $(row + ' span').show();
-               $(row).effect('highlight', {}, 2000);
-            }
-         }
-         function unlearn_kampftechnik(char_id, technik_id) {
-            $.ajax({
-               datatype : 'json',
-               type     : 'post',
-               url      : 'character_kampftechniken.php',
-               data     : {stage      : 'unlearn',
-                           char_id    : char_id,
-                           technik_id : technik_id},
-               success  : do_unlearn_kampftechnik,
-            });
-         }
-         function do_unlearn_kampftechnik(data) {
-            data = extract_json(data);
-            if (data.success) {
-               var row = 'table#kampftechniken tr#' + data.technik_id;
-               // Update fields
-               $(row + ' > #star >img').attr('src', 'images/star-inactive-16.png');
-               $(row + ' #at_' + data.technik_id).text('');
-               $(row + ' #pa_' + data.technik_id).text('');
-               $(row + ' #taw_' + data.technik_id).text('');
-               var html='<img src="images/person-plus-16.png" border="0" width="16" height="16" />learn';
-               $(row + ' #lnk_' + data.technik_id + ' a').html(html);
-               $(row + ' #lnk_' + data.technik_id + ' a').unbind('click').click(function() {
-                  learn_kampftechnik(data.technik_id);
-               });
-               $(row + ' span').hide();
-               $(row).effect('highlight', {}, 2000);
-            }
-         }
-         function do_change_kt(data) {
-            data = extract_json(data);
-            if (data.success) {
-               var row = 'table#kampftechniken tr#' + data.technik_id;
-               if (data.kind == 'at') {
-                  fld = row + ' #at_' + data.technik_id;
-               } else {
-                  fld = row + ' #pa_' + data.technik_id;
-               }
-               $(fld).text(data.value);
-               $(row + ' #taw_' + data.technik_id).text(data.taw);
-               $(row).effect('highlight', {}, 2000);
-            }
-         }
-         function change_kt(technik_id, kind, value) {
-            if (kind != 'at' &&
-                kind != 'pa') {
-               alertify.alert('Invalid kind of kampftechnik to alter');
-            }
-            $.ajax({
-               datatype : 'json',
-               type     : 'post',
-               url      : 'character_kampftechniken.php',
-               data     : {technik_id : technik_id,
-                           char_id    : character_id,
-                           kind       : kind,
-                           stage      : 'update_kt_value',
-                           value      : value},
-               success  : do_change_kt,
-            });
-         }
-         function raise_at(kt_id) {
-            change_kt(kt_id, 'at', 1);
-         }
-         function raise_pa(kt_id) {
-            change_kt(kt_id, 'pa', 1);
-         }
-         function lower_at(kt_id) {
-            change_kt(kt_id, 'at', -1);
-         }
-         function lower_pa(kt_id) {
-            change_kt(kt_id, 'pa', -1);
-         }
-         {/literal}//-->
-      </script>
-      {include file='characters_vorteile_js.tpl'}
-      {include file='character_eigenschaften_js.tpl'}
-   </body>
+      }
+      */
+      //-->
+   </script>
+</body>
 </html>

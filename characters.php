@@ -3,7 +3,7 @@
 
 require_once('config.inc.php');
 require_once('db.inc.php');
-require_once('smarty.inc.php');
+require_once('smarty3.inc.php');
 
 function show() {
    global $db, $smarty, $debug;
@@ -14,217 +14,111 @@ function show() {
    $qry .= 'ORDER BY name';
    $rid = $db->do_query($qry, true);
    while ($row = $db->get_array($rid)) {
-      $characters[] = $row;
+      $chars[] = $row;
    }
-   $smarty->assign('characters', $characters);
+   $smarty->assign('chars', $chars);
 }
 
-function add_character($name) {
-   global $db, $debug;
-
-   $name = trim($name);
-   if (! $name) {
-      return array('success' => false,
-                   'message' => 'No name given');
-   }
-   $_name = pg_escape_string($name);
-   $qry = 'SELECT id ';
-   $qry .= 'FROM  characters ';
-   $qry .= "WHERE name = '$_name'";
-   if ($db->fetch_field($qry, true)) {
-      return array('success' => false,
-                   'message' => 'This name is already in use');
-   }
-
-   $qry = 'INSERT INTO characters ';
-   $qry .= '(name) VALUES (';
-   $qry .= "'$_name')";
-   if (! @$db->do_query($qry, false)) {
-      $message = 'Database-error while adding character' . ( ($debug) ? ': ' . pg_last_error() : '');
-      return array('success' => false,
-                   'message' => $message);
-   }
-
-   $char_id = $db->insert_id('characters');
-
-   return array('success'      => true,
-                'character_id' => $char_id,
-                'name'         => $name);
-}
-function show_main($char_id) {
-   global $db, $debug;
-
-   if (! $char_id or intval($char_id) != $char_id)  {
-      return array('success' => false,
-                   'message' => 'invalid id for character');
-   }
-
-   // Get general data
-   $qry = 'SELECT * ';
-   $qry .= 'FROM  characters ';
-   $qry .= "WHERE id = $char_id";
-   $rid = $db->do_query($qry, true);
-   $data = $db->get_array($rid);
-   return array('success'       => true,
-                'data'          => $data);
-}
-function edit_name($char_id, $name) {
-   global $db, $debug;
-
-   if (intval($char_id) != $char_id) {
-      return array('success' => false,
-                   'message' => 'invalid id for character');
-   }
-   $name = trim($name);
-   if (! $name) {
-      return array('success' => false,
-                   'message' => 'empty name given');
-   }
-
-   $_name = pg_escape_string($name);
-   # Check if name already exits
-   $qry = 'SELECT id ';
-   $qry .= 'FROM  characters ';
-   $qry .= "WHERE name = '$_name'";
-   $old_id = $db->fetch_field($qry, true);
-   if ($old_id and $old_id != $char_id) {
-      return array('success' => false,
-                   'message' => 'name already in use');
-   }
-   # Name is unchanged, return success
-   if ($old_id) {
-      return array('success' => true,
-                   'update'  => true,
-                   'name'    => $name);
-   }
-   # Update name
-   $qry = 'UPDATE characters SET ';
-   $qry .= "      name = '$_name' ";
-   $qry .= "WHERE id = $char_id";
-   if (! @$db->do_query($qry, false)) {
-      $msg = 'database error while updating' . ( ($debug) ? ': ' . pg_last_error() : '');
-      return array('success' => false,
-                   'message' => $msg);
-   }
-   return array('success'      => true,
-                'update'       => true,
-                'character_id' => $char_id,
-                'name'         => $name);
+function check_int($value, $zero=true) {
+   if ($value and $value != intval($value)) {
+	   return false;
+	}
+	if (! $value and ! $zero) {
+	   return false;
+	}
+	return true;
 }
 
-function remove_char() {
-   global $db, $debug;
+function retrieve_base() {
+   global $db, $smarty, $debug;
 
-   if (! $_REQUEST[id] or
-       $_REQUEST[id] != intval($_REQUEST[id])) {
-      return array('success' => false,
-                   'message' => 'invalid id specified');
-   }
-   $qry = 'DELETE FROM characters ';
-   $qry .= 'WHERE id = ' . $_REQUEST[id];
+   # Basiswerte
+   $qry = 'SELECT characters.id AS char_id, characters.name, basevalues.*, ';
+   $qry .= '      tot_le(characters.id) AS tot_le, tot_au(characters.id) AS tot_au, ';
+   $qry .= '      tot_ae(characters.id) AS tot_ae, tot_mr(characters.id) AS tot_mr, ';
+   $qry .= '      tot_ini(characters.id) AS tot_ini, tot_at(characters.id) AS tot_at, ';
+   $qry .= '      tot_pa(characters.id) AS tot_pa, tot_fk(characters.id) AS tot_fk ';
+   $qry .= 'FROM characters LEFT JOIN basevalues ON basevalues.character_id = characters.id ';
+   $qry .= 'ORDER BY characters.name';
    $rid = @$db->do_query($qry, false);
    if (! $rid) {
-      return array('success' => false,
-                   'message' => 'database-error while removing');
+      return array('message' => 'database-error' . ($debug) ? ': ' . pg_last_error() : '');
    }
+   while ($row = $db->get_array($rid)) {
+      $chars[] = $row;
+   }
+   $smarty->assign('chars', $chars);
+
+   # Eigenschafte
+   $qry = 'SELECT id, name, ';
+   $qry .= '      calc_mu(id) AS mu, calc_kl(id) AS kl, ';
+   $qry .= '      calc_in(id) AS in, calc_ch(id) AS ch, ';
+   $qry .= '      calc_ff(id) AS ff, calc_ge(id) AS ge, ';
+   $qry .= '      calc_ko(id) AS ko, calc_kk(id) AS kk ';
+   $qry .= 'FROM  characters ';
+   $qry .= 'ORDER BY name';
+   $rid = @$db->do_query($qry, false);
+   if (! $rid) {
+      return array('message' => 'database-error' . ($debug) ? ': ' . pg_last_error() : '');
+   }
+   while ($row = $db->get_array($rid)) {
+      $traits[] = $row;
+   }
+   $smarty->assign('traits', $traits);
+
+   $out = $smarty->fetch('templates/divs/char_eigenschaften.tpl');
    return array('success' => true,
-                'id'      => $_REQUEST[id]);
+                'out'     => $out);
 }
 
-function update_field() {
-   global $db, $debug;
+function get_name() {
+   global $db, $debug, $smarty;
 
-   $field = trim($_REQUEST[fieldname]);
-   $_field = pg_escape_string($field);
-   if (! $_field) {
-      return array('success' => false,
-                   'message' => 'invalid field specified');
+   if (! check_int($_REQUEST[id], false)) {
+      return array('message' => 'invalid id specified');
    }
-   if (! $_REQUEST[char_id] or
-       $_REQUEST[char_id] != intval($_REQUEST[char_id])) {
-      return array('success' => false,
-                   'message' => 'invalid character id given');
-   }
-   $qry = 'UPDATE characters SET ';
-   $qry .= $_field . " = '" . pg_escape_string($_REQUEST[value]) . "' ";
-   $qry .= 'WHERE id = ' . $_REQUEST[char_id];
-   #return array('success' => false,
-                #'message' => $qry);
 
-   if (! $db->do_query($qry, false)) {
-      if ($debug) {
-         return array('success'   => false,
-                      'message'   => 'database-error ' + pg_last_error(),
-                      'fieldname' => $field);
-      }
-      return array('success'   => false,
-                   'fieldname' => $field);
-   }
-   return array('success'   => true,
-                'fieldname' => $field);
+   $qry = 'SELECT name FROM characters WHERE id = %d';
+   $name = $db->fetch_field(sprintf($qry, $_REQUEST[id]), true);
+
+   $smarty->assign('id', $_REQUEST[id]);
+   $smarty->assign('name', $name);
+   return array('success' => true,
+                'out'     => $smarty->fetch('templates/divs/char_get_name.tpl'));
 }
 
-function change_ap() {
+function set_name() {
    global $db, $debug;
 
-   if (! $_REQUEST[char_id] or
-       $_REQUEST[char_id] != intval($_REQUEST[char_id])) {
-      return array('message' => 'invalid character id');
-   }
-   if (! $_REQUEST[value] or
-       $_REQUEST[value] != intval($_REQUEST[value])) {
-      $_REQUEST[value] = 0;
+   if (! check_int($_REQUEST[id], false)) {
+      return array('message' => 'invalid id specified');
    }
 
-   $field = trim($_REQUEST[field]);
-   $qry = 'UPDATE characters SET ap = ';
-   switch ($field) {
-      case 'ap':
-         # Simply set the field to the specified value
-         $qry .= $_REQUEST[value];
-         break;
-      case 'add_ap':
-         # Add value to ap
-         $qry .= 'COALESCE(ap, 0) + ' . $_REQUEST[value];
-         break;
-      case 'sub_ap':
-         # Subtract value from ap
-         $qry .= 'COALESCE(ap, 0) - ' . $_REQUEST[value];
-         break;
-      default:
-         # Invalid field
-         return array('message' => 'invalid field');
+   $name = trim($_REQUEST[name]);
+   if (! $name) {
+      return array('message' => 'no name specified');
    }
-   $qry .= ' WHERE id = ' . $_REQUEST[char_id];
+
+   $qry = "UPDATE characters SET name = '%s' WHERE id = %d";
+   $qry = sprintf($qry, pg_escape_string($name), $_REQUEST[id]);
    if (! @$db->do_query($qry, false)) {
-      return array('message' => 'database-error while updating AP' . ( ($debug) ? ': ' . pg_last_error() : ''));
+      return array('message' => 'database-error' . ($debug) ? " -- $qry -- " . ': ' . pg_last_error() : '');
    }
-   $qry = 'SELECT ap FROM characters WHERE id = ' . $_REQUEST[char_id];
-   $ap = $db->fetch_field($qry, true);
+
    return array('success' => true,
-                'field'   => $field,
-                'value'   => $_REQUEST[value],
-                'ap'      => $ap);
+                'id'      => $_REQUEST[id],
+                'name'    => $name);
 }
 
 switch ($_REQUEST[stage]) {
-   case 'main':
-      echo json_encode(show_main($_REQUEST[char_id]));
+   case 'set_name':
+      echo json_encode(set_name());
       break;
-   case 'new':
-      if ($_REQUEST[char_id])
-         echo json_encode(edit_name($_REQUEST[char_id], $_REQUEST[name]));
-      else
-         echo json_encode(add_character($_REQUEST[name]));
+   case 'get_name':
+      echo json_encode(get_name());
       break;
-   case 'update_field':
-      echo json_encode(update_field());
-      break;
-   case 'remove':
-      echo json_encode(remove_char());
-      break;
-   case 'change_ap':
-      echo json_encode(change_ap());
+   case 'retrieve_base':
+      echo json_encode(retrieve_base());
       break;
    default:
       show();

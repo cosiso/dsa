@@ -1,9 +1,9 @@
 <div id="head">
-   {carto_button id='home' value='home' onclick="location = 'index.php'"}
-   {carto_spacer width='10px'}
-   {carto_button id='characters' value='characters' onclick="location = 'characters.php'"}
-   {carto_button id='spells' value='spells' onclick="javascript:alert('Spells')"}
-   {carto_spacer width='30px'}
-   {carto_button id='setup' value='setup' onclick="location = 'setup.php'"}
+   <input type="button" class="menu-button" value="home" onclick="location = 'index.php'">
+   <img src="images/spacer.gif" width="10" border="0">
+   <input type="button" class="menu-button" value="characters" onclick="location = 'characters.php'">
+   <input type="button" class="menu-button" value="spells" onclick="alert('Spells')">
+   <img src="images/spacer.gif" width="30" border="0">
+   <input type="button" class="menu-button" value="setup" onclick="location = 'setup.php'">
    <hr />
 </div>

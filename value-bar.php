@@ -26,7 +26,7 @@ function show() {
       $qry .= "      calc_ch($cid) AS ch, calc_in($cid) AS in, ";
       $qry .= "      calc_ff($cid) AS ff, calc_ge($cid) AS ge, ";
       $qry .= "      calc_ko($cid) AS ko, calc_kk($cid) AS kk, ";
-      $qry .= "      calc_fk($cid) AS fk, calc_ini($cid) AS ini ";
+      $qry .= "      tot_fk($cid) AS fk, tot_ini($cid) AS ini ";
       $rid = $db->do_query($qry, true);
       $row = $db->get_array($rid);
 
