@@ -1,0 +1,12 @@
+-- Create basevalues after creating character
+CREATE OR REPLACE FUNCTION create_basevalues() RETURNS TRIGGER AS $$
+   BEGIN
+      INSERT INTO basevalues (character_id) VALUES (NEW.id);
+      RETURN NEW;
+   END
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER trig_basevalues ON characters;
+CREATE TRIGGER trig_basevalues AFTER INSERT
+            ON characters FOR EACH ROW
+       EXECUTE PROCEDURE create_basevalues();

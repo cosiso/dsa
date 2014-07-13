@@ -11,6 +11,7 @@
          <th>AT</th>
          <th>PA</th>
          <th>FK</th>
+         <th></th>
       </tr>
    </thead>
    <tbody class="hover">
@@ -28,13 +29,51 @@
                   <img src="images/page_white_paint.png" border="0" alt="edit">
                </span>
             </td>
-            <td>{$chars[idx].tot_au}</td>
-            <td>{$chars[idx].tot_ae}</td>
-            <td>{$chars[idx].tot_mr}</td>
-            <td>{$chars[idx].tot_ini}</td>
-            <td>{$chars[idx].tot_at}</td>
-            <td>{$chars[idx].tot_pa}</td>
-            <td>{$chars[idx].tot_fk}</td>
+            <td>
+               <span id="au-{$chars[idx].char_id}">{$chars[idx].tot_au}</span>
+               <span onclick="edit_eigenschaft(this, 'Ausdauer')" style="cursor: pointer">
+                  <img src="images/page_white_paint.png" border="0" alt="edit">
+               </span>
+            </td>
+            <td>
+               <span id="ae-{$chars[idx].char_id}">{$chars[idx].tot_ae}</span>
+               <span onclick="edit_eigenschaft(this, 'Astralenergie')" style="cursor: pointer">
+                  <img src="images/page_white_paint.png" border="0" alt="edit">
+               </span>
+            </td>
+            <td>
+               <span id="mr-{$chars[idx].char_id}">{$chars[idx].tot_mr}</span>
+               <span onclick="edit_eigenschaft(this, 'Magieresistenz')" style="cursor: pointer">
+                  <img src="images/page_white_paint.png" border="0" alt="edit">
+               </span>
+            </td>
+            <td>
+               <span id="ini-{$chars[idx].char_id}">{$chars[idx].tot_ini}</span>
+               <span onclick="edit_eigenschaft(this, 'Initiativ')" style="cursor: pointer">
+                  <img src="images/page_white_paint.png" border="0" alt="edit">
+               </span>
+            </td>
+            <td>
+               <span id="at-{$chars[idx].char_id}">{$chars[idx].tot_at}</span>
+               <span onclick="edit_eigenschaft(this, 'Attack')" style="cursor: pointer">
+                  <img src="images/page_white_paint.png" border="0" alt="edit">
+               </span>
+            </td>
+            <td>
+               <span id="pa-{$chars[idx].char_id}">{$chars[idx].tot_pa}</span>
+               <span onclick="edit_eigenschaft(this, 'Parry')" style="cursor: pointer">
+                  <img src="images/page_white_paint.png" border="0" alt="edit">
+               </span>
+            </td>
+            <td>
+               <span id="fk-{$chars[idx].char_id}">{$chars[idx].tot_fk}</span>
+               <span onclick="edit_eigenschaft(this, 'Fernkampf')" style="cursor: pointer">
+                  <img src="images/page_white_paint.png" border="0" alt="edit">
+               </span>
+            </td>
+            <td>
+               <a href="#" class="link-cancel" onclick="remove_char(this)">remove</a>
+            </td>
          </tr>
       {/section}
    </tbody>
@@ -113,5 +152,7 @@
       {/section}
    </tbody>
 </table>
+<br>
+<a class="link-add" href="#" onclick="ask_new_character()">Add character</a><br>
 <br>
 <hr>

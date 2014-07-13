@@ -16,17 +16,23 @@
       {section name=idx loop=$chars}
          <h3 id="{$chars[idx].id}" class="toggle" onclick="toggle({$chars[idx].id})">{$chars[idx].name|escape}</h3>
          <div id="char_{$chars[idx].id}" style="display: none; padding-left: 20px"></div>
-      {sectionelse}
-         <script type="text/javascript">
-            alert('No characters defined yet');
-         </script>
       {/section}
    </div>
    <div id="popup" style="display: none"></div>
    {include file='part_script_include.tpl'}
    <script type="text/javascript">
       <!--
-      var hasData = {};
+      $(document).ready(function() {
+         toggle_base();
+      });
+      jQuery.fn.center = function () {
+          this.css("position","absolute");
+          this.css("top", Math.max(0, (($(window).height() - $(this).outerHeight()) / 2) +
+                                                      $(window).scrollTop()) + "px");
+          this.css("left", Math.max(0, (($(window).width() - $(this).outerWidth()) / 2) +
+                                                      $(window).scrollLeft()) + "px");
+          return this;
+      }
       function extract_json(data) {
          try {
             data = $.parseJSON(data);
@@ -133,13 +139,12 @@
       function edit_eigenschaft(span, eigenschaft) {
          // Retrieve id from parent row span > td > tr
          var id = $(span).parent().parent().prop('id');
-         console.log('ID: ' + id);
          $('#popup').html('Retrieving values for ' + eigenschaft);
          $('#popup').load('characters.php',
                           { stage : 'get_eigenschaft', eigenschaft : eigenschaft, id : id},
                           eigenschaft_loaded
          );
-         $('#popup').width(250).height(250);
+         $('#popup').width(250).height(175);
          $('#popup').show();
          $('#popup').position({
             collision : 'none',
@@ -149,7 +154,75 @@
          });
       }
       function eigenschaft_loaded(response, status, xhr) {
-         alertify.aleret('Loaded, success: ' + status.toSource());
+         if (status == 'success') {
+            $('form#edit_eigenschaft #modifier').focus().select();
+            $('form#edit_eigenschaft').validate({
+               rules : {
+                  modifier : { digits : true },
+                  bought   : { digits : true },
+               },
+               submitHandler : function(form) {
+                  $('#popup').hide();
+                  $(form).ajaxSubmit({
+                     datatype : 'json',
+                     url      : 'characters.php',
+                     type     : 'post',
+                     success  : do_change_eigenschaft,
+                  });
+               }
+            })
+         } else {
+            alertify.alert('An error occured');
+            $('#popup').hide();
+         }
+      }
+      function do_change_eigenschaft(data) {
+         data = extract_json(data);
+         if (data.success) {
+            // Update field
+            var field = '#' + data.eigenschaft + '-' + data.id;
+            $(field).text(data.value);
+            $(field).effect('highlight', {} , 2000);
+         }
+      }
+      function ask_new_character() {
+         $('#popup').center();
+         $('#popup').html('Retrieving form');
+         $('#popup').load('characters.php',
+                          { stage : 'show_new_char' },
+                          show_new_character
+         );
+         $('#popup').width(250).height(175);
+         $('#popup').show();
+         return false;
+      }
+      function show_new_character() {
+         $('form#new_char #name').focus().select();
+         $('form#new_char').validate({
+            rules : {
+               name : { required : true },
+            },
+            submitHandler: function(form) {
+               $('#popup').hide();
+               form.submit();
+            }
+         });
+      }
+      function remove_char(lnk) {
+         // Get id from parent link > td > tr
+         var id = $(lnk).parent().parent().prop('id');
+         // Get name
+         var name = $('#name-' + id).text();
+         alertify.confirm('Remove ' + name + '?', function(e) {
+            if (e) {
+               var frm = '<div style="display: none"><form id="remove" method="post">' +
+                  '<input type="hidden" name="stage" value="remove">' +
+                  '<input type="hidden" name="id" value="' + id + '">' +
+                  '</form></div>';
+                $(frm).appendTo('body');
+               $('form#remove').submit();
+            }
+         });
       }
       /*
       function toggle(char_id) {

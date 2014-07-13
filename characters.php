@@ -66,7 +66,7 @@ function retrieve_base() {
    }
    $smarty->assign('traits', $traits);
 
-   $out = $smarty->fetch('templates/divs/char_eigenschaften.tpl');
+   $out = $smarty->fetch('templates/divs/characters/eigenschaften.tpl');
    return array('success' => true,
                 'out'     => $out);
 }
@@ -115,16 +115,39 @@ function get_eigenschaft() {
    if (! check_int($_REQUEST[id], false)) {
       $smarty->assign('error', 'Invalid id specified');
    } else {
+      $_REQUEST[eigenschaft] = trim($_REQUEST[eigenschaft]);
+      $qry = 'SELECT %s(character_id), %s, %s FROM basevalues WHERE character_id = ' . $_REQUEST[id];
       switch ($_REQUEST[eigenschaft]) {
          case 'Lebenspunkte':
-            $qry = 'SELECT base_le(character_id), le_mod, le_bought ';
-            $qry .= 'FROM  basevalues WHERE character_id = %d';
+            $qry = sprintf($qry, 'base_le', 'le_mod', 'le_bought');
+            break;
+         case 'Ausdauer':
+            $qry = sprintf($qry, 'base_au', 'au_mod', 'au_bought');
+            break;
+         case 'Astralenergie':
+            $qry = sprintf($qry, 'base_ae', 'ae_mod', 'ae_bought');
+            break;
+         case 'Magieresistenz':
+            $qry = sprintf($qry, 'base_mr', 'mr_mod', 'mr_bought');
+            break;
+         case 'Initiativ':
+            $qry = sprintf($qry, 'base_ini', 'ini_mod', "'--'");
+            break;
+         case 'Attack':
+            $qry = sprintf($qry, 'base_at', 'at_mod', "'--'");
+            break;
+         case 'Parry':
+            $qry = sprintf($qry, 'base_pa', 'pa_mod', "'--'");
+            break;
+         case 'Fernkampf':
+            $qry = sprintf($qry, 'base_fk', 'fk_mod', "'--'");
             break;
          default:
             $smarty->assign('error', 'Invalid eigenschaft ' . htmlspecialchars($_REQUEST[eigenschaft]) . ' specified');
             $error = true;
       }
       if (! $error) {
+         $smarty->assign('id', $_REQUEST[id]);
          $smarty->assign('eigenschaft', $_REQUEST[eigenschaft]);
          $qry = sprintf($qry, $_REQUEST[id]);
          list($base, $mod, $bought) = $db->get_list($qry, true);
@@ -134,8 +157,92 @@ function get_eigenschaft() {
       }
    }
 }
+function edit_eigenschaft() {
+   global $db, $debug;
+
+   if (! check_int($_REQUEST[id], false)) {
+      return array('message' => 'invalid id specified');
+   }
+   if (! check_int($_REQUEST[modifier], true)) {
+      return array('message' => 'invalid value for modifier');
+   }
+   if (! check_int($_REQUEST[bought], true)) {
+      return array('message' => 'invalid value for bought specified');
+   }
+   $eigenschaft = trim($_REQUEST[eigenschaft]);
+   switch ($eigenschaft) {
+         case 'Lebenspunkte':
+            $col1 = 'le_mod'; $col2 = 'le_bought'; $ret = 'tot_le'; $eig = 'le';
+            break;
+         case 'Ausdauer':
+            $col1 = 'au_mod'; $col2 = 'au_bought'; $ret = 'tot_au'; $eig = 'au';
+            break;
+         case 'Astralenergie':
+            $col1 = 'ae_mod'; $col2 = 'ae_bought'; $ret = 'tot_ae'; $eig = 'ae';
+            break;
+         case 'Magieresistenz':
+            $col1 = 'mr_mod'; $col2 = 'mr_bought'; $ret = 'tot_mr'; $eig = 'mr';
+            break;
+         case 'Initiativ':
+            $col1 = 'ini_mod'; $ret = 'tot_ini'; $eig = 'ini';
+            break;
+         case 'Attack':
+            $col1 = 'at_mod'; $ret = 'tot_at'; $eig = 'at';
+            break;
+         case 'Parry':
+            $col1 = 'pa_mod'; $ret = 'tot_pa'; $eig = 'pa';
+            break;
+         case 'Fernkampf':
+            $col1 = 'fk_mod'; $ret = 'tot_fk'; $eig = 'fk';
+            break;
+      default:
+         return array('message' => 'invalid eigenschaft specified');
+   }
+   $mod = ($_REQUEST[modifier]) ? $_REQUEST[modifier] : 'NULL';
+   $bought = ($_REQUEST[bought]) ? $_REQUEST[bought] : 'NULL';
+   $qry = "UPDATE basevalues SET $col1 = $mod";
+   if ($col2) {
+      $qry .= ", $col2 = $bought";
+   }
+   $qry .= ' WHERE character_id = ' . $_REQUEST[id];
+   if (! @$db->do_query($qry, false)) {
+      return array('message' => 'database-error' . ($debug) ? ': ' . pg_last_error() : '');
+   }
+   // Retrieve new total
+   $qry = "SELECT $ret(" . $_REQUEST[id] . ")";
+   $value = $db->fetch_field($qry, true);
+
+   return array('success'     => true,
+                'id'          => $_REQUEST[id],
+                'eigenschaft' => $eig,
+                'value'       => $value);
+}
+
+function new_char() {
+   global $db, $debug;
+
+   $name = trim($_REQUEST[name]);
+   if (! $name) return;
+
+   $qry = "INSERT INTO characters (name) VALUES ('%s')";
+   $db->do_query(sprintf($qry, $name), true);
+}
+
+function remove_char() {
+   global $db, $debug;
+
+   if (! check_int($_REQUEST[id], false)) {
+      return;
+   }
+
+   $qry = 'DELETE FROM characters WHERE id = ' . $_REQUEST[id];
+   $db->do_query($qry, true);
+}
 
 switch ($_REQUEST[stage]) {
+   case 'edit_eigenschaft':
+      echo json_encode(edit_eigenschaft());
+      break;
    case 'get_eigenschaft':
       get_eigenschaft();
       $smarty->display('templates/divs/characters/edit_eigenschaft.tpl');
@@ -149,7 +256,17 @@ switch ($_REQUEST[stage]) {
    case 'retrieve_base':
       echo json_encode(retrieve_base());
       break;
-   default:
+   case 'show_new_char':
+      $smarty->display('templates/divs/characters/new_char.tpl');
+      break;
+   case 'remove':
+      remove_char();
       show();
+      $smarty->display('characters.tpl');
+   case 'new_char':
+      new_char();
+      # fall down to default after adding character
+   default:
+      show();  # Can be removed should we not do something with individual characters
       $smarty->display('characters.tpl');
 }
