@@ -8,6 +8,8 @@
    </div>
    <h3 class="toggle" onclick="toggle_base()">Basiswerte &amp; Eigenschafte</h3>
    <div id="basiswerte" style="display: none; padding-left: 20px"></div>
+   <h3 class="toggle" onclick="toggle_vorteile()">Vor - &amp; Nachteile</h3>
+   <div id="vor_nach_teile" style="display: none; padding-left: 20px; max-width: 700px"></div>
    {section name=idx loop=$chars}
       <h3 id="{$chars[idx].id}" class="toggle" onclick="toggle({$chars[idx].id})">{$chars[idx].name|escape}</h3>
       <div id="char_{$chars[idx].id}" style="display: none; padding-left: 20px"></div>
@@ -49,7 +51,7 @@
             $(elem).hide();
             return;
          }
-         if (! $(elem).html() || 1) {
+         if (! $(elem).html()) {
             $(elem).text('Retrieving data, please wait.');
             $.ajax({
                datatype : 'json',
@@ -90,7 +92,7 @@
             data     : { stage : 'get_name', id : id },
             success  : show_rename
          });
-         $('#popup').width(250).height(80);
+         $('#popup').width(250).height(80).css('max-width', '');
          $('#popup').show();
          $('#popup').position({
             my        : 'left top',
@@ -130,15 +132,15 @@
             $('table#basiswerte span#name-' + data.id).effect('highlight', {}, 2000);
          }
       }
-      function edit_eigenschaft(span, eigenschaft) {
+      function edit_basiswert(span, basiswert) {
          // Retrieve id from parent row span > td > tr
          var id = $(span).parent().parent().prop('id');
-         $('#popup').html('Retrieving values for ' + eigenschaft);
+         $('#popup').html('Retrieving values for ' + basiswert);
          $('#popup').load('characters.php',
-                          { stage : 'get_eigenschaft', eigenschaft : eigenschaft, id : id},
-                          eigenschaft_loaded
+                          { stage : 'get_eigenschaft', eigenschaft : basiswert, id : id},
+                          basiswert_loaded
          );
-         $('#popup').width(250).height(175);
+         $('#popup').width(250).height(175).css('max-width', '');
          $('#popup').show();
          $('#popup').position({
             collision : 'none',
@@ -147,7 +149,7 @@
             of        : $(span),
          });
       }
-      function eigenschaft_loaded(response, status, xhr) {
+      function basiswert_loaded(response, status, xhr) {
          if (status == 'success') {
             $('form#edit_eigenschaft #modifier').focus().select();
             $('form#edit_eigenschaft').validate({
@@ -161,7 +163,7 @@
                      datatype : 'json',
                      url      : 'characters.php',
                      type     : 'post',
-                     success  : do_change_eigenschaft,
+                     success  : do_change_basiswert,
                   });
                }
             })
@@ -170,7 +172,7 @@
             $('#popup').hide();
          }
       }
-      function do_change_eigenschaft(data) {
+      function do_change_basiswert(data) {
          data = extract_json(data);
          if (data.success) {
             // Update field
@@ -186,7 +188,7 @@
                           { stage : 'show_new_char' },
                           show_new_character
          );
-         $('#popup').width(250).height(175);
+         $('#popup').width(250).height(175).css('max-width', '');
          $('#popup').show();
          return false;
       }
@@ -223,7 +225,7 @@
          var id = $(span).parent().parent().prop('id');
          $('#popup').center();
          $('#popup').html('Retrieving data');
-         $('#popup').width('auto').height('auto');
+         $('#popup').width('auto').height('auto').css('max-width', '');
          $('#popup').load('characters.php',
                           { stage : 'show_char', id : id },
                           show_edit_char);
@@ -259,36 +261,107 @@
             alertify.log('Character values saved');
          }
       }
-      /*
-      function toggle(char_id) {
-         var elem = $('h3#' + char_id ).next('div#char_' + char_id);
-         var isVisible = $(elem).is(':visible');
-         if (isVisible) {
+      function edit_eigenschaft(span) {
+         // Retrieve id from parent span > td > tr
+         var id = $(span).parent().parent().prop('id');
+         // Retrieve eigenschaft
+         var dummy = $(span).parent().children('span').first().prop('id');
+         dummy = dummy.split('-');
+         var eigenschaft = dummy[0];
+         $('#popup').html('Retrieving eigenschaft values');
+         $('#popup').width('auto').height('auto').center().show().css('max-width', '');
+         $('#popup').load('characters.php',
+                          { stage : 'show_eigenschaft', id : id, eigenschaft : eigenschaft },
+                          show_eigenschaft);
+      }
+      function show_eigenschaft() {
+         $('form#eigenschaft #base').focus().select();
+         $('form#eigenschaft').validate({
+            rules : {
+               base      : { digits : true, required : true },
+               modifier  : { digits : true },
+               zugekauft : { digits : true },
+               note      : { maxlength : 255 },
+            },
+            submitHandler : function(form) {
+               $(form).ajaxSubmit({
+                  datatype : 'json',
+                  url      : 'characters.php',
+                  type     : 'post',
+                  success  : do_change_eigenschaft,
+               });
+               $('#popup').hide();
+            },
+         });
+      }
+      function do_change_eigenschaft(data) {
+         data = extract_json(data);
+         if (data.success) {
+            // Set new value
+            var span ='table#eigenschafte span#' + data.eigenschaft + '-' + data.char_id;
+            $(span).text(data.total);
+            $(span).effect('highlight', {}, 2000);
+         }
+      }
+      function toggle_vorteile() {
+         var elem = 'div#vor_nach_teile';
+         if ($(elem).is(':visible')) {
             // close and return
             $(elem).hide();
             return;
          }
-         if (! hasData[char_id]) {
-            // Retriev data
+         if (! $(elem).html() || 1) {
             $(elem).text('Retrieving data, please wait.');
-            $.ajax({
-               datatype : 'json',
-               url      : 'characters.php',
-               type     : 'post',
-               data     : { id : char_id, stage : 'retrieve'},
-               success  : show_char
-            });
+            $(elem).slideDown();
+            $(elem).load('char_vorteile.php', {}, show_vorteile);
          }
-         $(elem).slideDown();
       }
-      function show_char(data) {
+      function show_vorteile() {
+         // do something?
+      }
+      function show_vorteil(span) {
+         var id = $(span).prop('id');
+         // get character from parent
+         var dummy = $(span).parent().prop('id');
+         dummy = dummy.split('-');
+         var char_id = dummy[1];
+         $('#popup').html('Retrieving information about vorteil');
+         $('#popup').show();
+         $('#popup').width('auto').height('auto').center().css('max-width', '500px');
+         $('#popup').load('char_vorteile.php', { stage : 'info', id : id, char_id : char_id }, do_show_vorteil);
+      }
+      function do_show_vorteil() {
+         $('#popup').center();
+         $('form#edit_vorteil #value').focus().select();
+         $('form#edit_vorteil').validate({
+            rules : {
+               value : { digits    : true },
+               note  : { maxlength : 1024 },
+            },
+            submitHandler : function(form) {
+               $(form).ajaxSubmit({
+                  datatype : 'json',
+                  url      : 'char_vorteile.php',
+                  type     : 'post',
+                  success  : do_edit_vorteil,
+               });
+               $('#popup').hide();
+            }
+         });
+      }
+      function do_edit_vorteil(data) {
          data = extract_json(data);
          if (data.success) {
-            var elem = $('h3#' + data.id).next('div#char_' + data.id);
-            $(elem).html(data.out);
+            var v = data.name;
+            if (data.value != '') {
+               v = v + ' (' + data.value + ')';
+            }
+            var span = (data.vorteil) ? '#vorteile' : '#nachteile';
+            span += '-' + data.char_id + ' span#' + data.vorteil_id;
+            $(span).text(v);
+            $(span).effect('highlight', {}, 2000);
          }
       }
-      */
       //-->
    </script>
 {/block}

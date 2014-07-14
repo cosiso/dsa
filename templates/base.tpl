@@ -18,6 +18,10 @@
          {custom_button value='spells' onclick="alert('Spells')"}
          {custom_spacer width=30}
          {custom_button value='setup' onclick="location = 'setup.php'"}
+         {custom_spacer width=100}
+         {custom_button value='roll d6' onclick="dieroll('d6')"}
+         {custom_button value='roll d20' onclick="dieroll('d20')"}
+         {custom_button value='roll 3d20' onclick="dieroll('3d20')"}
          <hr />
       {/block}
    </div>
@@ -41,6 +45,33 @@
       <script type="text/javascript" src="scripts/jquery.simpletip-1.3.1.min.js"></script>
       <script type="text/javascript" src="scripts/jquery.tablesorter.min.js"></script>
       <script type="text/javascript" src="scripts/selectize.min.js"></script>
+      <script type="text/javascript">
+         <!--
+         function dieroll(dice) {
+            var roll;
+            if (dice == 'd6') {
+               roll = Math.floor(Math.random() * 6 + 1);
+            } else if (dice == 'd20') {
+               roll = Math.floor(Math.random() * 20 + 1);
+            } else if (dice == '3d20') {
+               roll = Math.floor(Math.random() * 20 + 1) + ' - ' +
+                      Math.floor(Math.random() * 20 + 1) + ' - ' +
+                      Math.floor(Math.random() * 20 + 1);
+            } else {
+               alertify.alert('Unknown die-roll');
+               return;
+            }
+            var msg = 'You rolled: <b>' + roll + '</b>';
+            if (roll == '1' && dice == 'd20') {
+               alertify.success(msg)
+            } else if (roll == '20') {
+               alertify.error(msg);
+            } else {
+               alertify.log(msg);
+            }
+         }
+         //-->
+      </script>
    {/block}
    {block name='javascript'}{/block}
 </body>

@@ -33,7 +33,7 @@
          </td>
       </tr>
    </table>
-   {custom_textarea name='aussehen' style="width: 250px; height: 100px" value=$aussehen|escape|nl2br label='Aussehen'}
+   {custom_textarea name='aussehen' style="width: 250px; height: 100px" value=$aussehen|escape label='Aussehen'}
    <div class="button_bar">
       {custom_button type='submit'}
       {custom_button type='reset' onclick="$('#popup').hide()"}

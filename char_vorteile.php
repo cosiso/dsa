@@ -3,8 +3,106 @@
 
 require_once('config.inc.php');
 require_once('db.inc.php');
-require_once('smarty.inc.php');
+require_once('smarty3.inc.php');
 
+function check_int($value, $zero=true) {
+   if ($value and $value != intval($value)) {
+	   return false;
+	}
+	if (! $value and ! $zero) {
+	   return false;
+	}
+	return true;
+}
+
+function show_vorteile() {
+   global $db, $debug, $smarty;
+
+   $qry = 'SELECT id, name FROM characters ORDER BY name';
+   $rid = $db->do_query($qry, true);
+   while ($row = $db->get_array($rid)) {
+      $qry = 'SELECT vorteile.id, vorteile.name, vorteile.vorteil, char_vorteile.value FROM vorteile, char_vorteile WHERE char_vorteile.vorteil_id = vorteile.id AND char_vorteile.character_id = ' . $row[id] . ' ORDER BY name';
+      $rid2 = $db->do_query($qry, true);
+      while ($row2 = $db->get_array($rid2)) {
+         if ($row2[value]) {
+            $row2[name] .= ' (' . $row2[value] . ')';
+         }
+         if ($row2[vorteil] == 't') {
+            $row[vorteile][$row2[id]] = $row2[name];
+         } else {
+            $row[nachteile][$row2[id]] = $row2[name];
+         }
+      }
+      $chars[] = $row;
+   }
+   $smarty->assign('chars', $chars);
+}
+
+function show_info() {
+   global $db, $debug, $smarty;
+
+   if (! check_int($_REQUEST[id], false)) {
+      $smarty->assign('error', 'Invalid id specified');
+      return;
+   }
+   $smarty->assign('vorteil_id', $_REQUEST[id]);
+   if (! check_int($_REQUEST[char_id], false)) {
+      $smarty->assign('error', 'Invalid id for character specified');
+   }
+   $smarty->assign('char_id', $_REQUEST[char_id]);
+
+   $qry = 'SELECT name, effect, description FROM vorteile WHERE id = ' . $_REQUEST[id];
+   $rid = $db->do_query($qry, true);
+   $row = $db->get_array($rid);
+   $smarty->assign($row);
+   $qry = 'SELECT id, value, note FROM char_vorteile WHERE character_id = %d AND vorteil_id = %d';
+   $rid = $db->do_query(sprintf($qry, $_REQUEST[char_id], $_REQUEST[id]));
+   $row = $db->get_array($rid);
+   $smarty->assign($row);
+}
+
+function edit_vorteil() {
+   global $db, $debug;
+
+   if (! check_int($_REQUEST[vorteil_id], false) or
+       ! check_int($_REQUEST[char_id], false) or
+       ! check_int($_REQUEST[cv_id], false)) {
+      return array('message' => 'invalid id specified');
+   }
+   if (! check_int($_REQUEST[value], true)) {
+      return array('message' => 'invalid value specified');
+   }
+   $note = trim($_REQUEST[note]);
+
+   $qry = 'UPDATE char_vorteile SET value = %s, note = %s WHERE id = %d';
+   $qry = sprintf($qry, ($_REQUEST[value]) ? $_REQUEST[value] : 'NULL',
+                        ($note)            ? "'" . pg_escape_string($note) . "'" : 'NULL',
+                        $_REQUEST[cv_id]);
+   $db->do_query($qry, true);
+
+   $qry = 'SELECT name, vorteil FROM vorteile WHERE id = %d';
+   list($name, $vorteil) = $db->get_list(sprintf($qry, $_REQUEST[vorteil_id]), true);
+   return array('success'    => true,
+                'name'       => $name,
+                'value'      => $_REQUEST[value],
+                'vorteil'    => ($vorteil == 't') ? true : false,
+                'char_id'    => $_REQUEST[char_id],
+                'vorteil_id' => $_REQUEST[vorteil_id]);
+}
+
+switch ($_REQUEST[stage]) {
+   case 'edit':
+      echo json_encode(edit_vorteil());
+      break;
+   case 'info':
+      show_info();
+      $smarty->display('divs/characters/info_vorteil.tpl');
+      break;
+   default:
+      show_vorteile();
+      $smarty->display('divs/characters/vorteile.tpl');
+}
+/*
 function fetch_vorteile() {
    global $db, $debug, $smarty;
 
@@ -194,4 +292,6 @@ switch ($_REQUEST[stage]) {
       echo json_encode(array('success' => false,
                              'message' => 'unknow action'));
 }
+*/
+
 ?>

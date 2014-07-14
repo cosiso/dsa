@@ -84,7 +84,7 @@ function get_name() {
    $smarty->assign('id', $_REQUEST[id]);
    $smarty->assign('name', $name);
    return array('success' => true,
-                'out'     => $smarty->fetch('templates/divs/char_get_name.tpl'));
+                'out'     => $smarty->fetch('templates/divs/characters/get_name.tpl'));
 }
 
 function set_name() {
@@ -299,6 +299,96 @@ function edit_char() {
    return array('success' => true);
 }
 
+function show_eigenschaft() {
+   global $db, $smarty;
+
+   if (! check_int($_REQUEST[id], false)) {
+      $smarty->assign('error', 'Invalid id specified');
+      return;
+   }
+   $smarty->assign('char_id', $_REQUEST[id]);
+   $eig = trim($_REQUEST[eigenschaft]);
+   if (! $eig) {
+      $smarty->assign('error', 'No eigenschaft specified');
+      return;
+   }
+
+   $qry = "SELECT id, name FROM traits WHERE abbr = '" . strtoupper(pg_escape_string($eig)) . "'";
+   list($trait_id, $eigenschaft) = $db->get_list($qry, true);
+   if (! $trait_id) {
+      $smarty->assign('error', 'Non-existing eigenschaft specified');
+      return;
+   }
+
+   $qry = 'SELECT name FROM characters WHERE id = ' . $_REQUEST[id];
+   $smarty->assign('name', $db->fetch_field($qry, true));
+   $qry = 'SELECT * from character_eigenschaften ' .
+          'WHERE  character = ' . $_REQUEST[id] .
+          '  AND  eigenschaft = ' . $trait_id;
+   $rid = $db->do_query($qry, true);
+   $row = $db->get_array($rid);
+   $smarty->assign($row);
+
+   $smarty->assign('trait_id', $trait_id);
+   $smarty->assign('eigenschaft', $eigenschaft);
+}
+
+function edit_real_eigenschaft() {
+   global $db, $debug;
+
+   if (! check_int($_REQUEST[trait_id], false)) {
+      return array('message' => 'invalid eigenschaft id specified');
+   }
+   if (! check_int($_REQUEST[char_id], false)) {
+      return array('message' => 'invalid charcater id specified');
+   }
+   if (! check_int($_REQUEST[base], false)) {
+      return array('message' => 'no base value specified');
+   }
+   if (! check_int($_REQUEST[modifier], true)) {
+      return array('message' => 'invalid modifier specified');
+   }
+   if (! check_int($_REQUEST[zugekauft], true)) {
+      return array('message' => 'invalid raised value specified');
+   }
+   $note = trim($_REQUEST[note]);
+   # Check if record exists
+   $qry = 'SELECT id FROM character_eigenschaften WHERE character = %d AND eigenschaft = %d';
+   $id = $db->fetch_field(sprintf($qry, $_REQUEST[char_id], $_REQUEST[trait_id]), true);
+   if ($id) {
+      # Update record
+      $qry = 'UPDATE character_eigenschaften SET base = %d, modifier = %s, zugekauft = %s, note = %s WHERE id = %d';
+      $qry = sprintf($qry, $_REQUEST[base],
+                           ($_REQUEST[modifier])  ? $_REQUEST[modifier] : 'NULL',
+                           ($_REQUEST[zugekauft]) ? $_REQUEST[zugekauft] : 'NULL',
+                           ($note)                ? "'" . pg_escape_string($note) . "'" : 'NULL',
+                           $id);
+   } else {
+      # Create record
+      $qry = 'INSERT INTO character_eigenschaften (character, eigenschaft, base, modifier, zugekauft, note) VALUES (%d, %d, %d, %s, %s, %s)';
+      $qry = sprintf($qry, $_REQUEST[char_id],
+                           $_REQUEST[trait_id],
+                           $_REQUEST[base],
+                           ($_REQUEST[modifier])  ? $_REQUEST[modifier] : 'NULL',
+                           ($_REQUEST[zugekauft]) ? $_REQUEST[zugekauft] : 'NULL',
+                           ($note)                ? "'" . pg_escape_string($note) . "'" : 'NULL');
+   }
+   if (! @$db->do_query($qry, false)) {
+      return array('message' => 'database-error' . ($debug) ? ': ' . pg_last_error() : '');
+   }
+   # Fetch new total
+   $qry = 'SELECT abbr FROM traits WHERE id = ' . $_REQUEST[trait_id];
+   $abbr = strtolower($db->fetch_field($qry, true));
+
+   $qry = 'SELECT calc_' . $abbr . '(' . $_REQUEST[char_id] . ')';
+   $total = $db->fetch_field($qry, true);
+
+   return array('success'     => true,
+                'char_id'     => $_REQUEST[char_id],
+                'eigenschaft' => $abbr,
+                'total'       => $total);
+}
+
 switch ($_REQUEST[stage]) {
    case 'retrieve_base':
       echo json_encode(retrieve_base());
@@ -309,6 +399,13 @@ switch ($_REQUEST[stage]) {
    case 'get_eigenschaft':
       get_eigenschaft();
       $smarty->display('templates/divs/characters/edit_eigenschaft.tpl');
+      break;
+   case 'show_eigenschaft':
+      show_eigenschaft();
+      $smarty->display('divs/characters/show_eigenschaft.tpl');
+      break;
+   case 'edit_real_eigenschaft':
+      echo json_encode(edit_real_eigenschaft());
       break;
    case 'show_char':
       show_char();
