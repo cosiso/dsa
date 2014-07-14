@@ -239,7 +239,70 @@ function remove_char() {
    $db->do_query($qry, true);
 }
 
+function show_char() {
+   global $db, $smarty;
+
+   if (! check_int($_REQUEST[id], false)) {
+      $smarty->assign('error', 'Invalid id specified');
+      return;
+   }
+
+   $qry = 'SELECT * FROM characters WHERE id = ' . $_REQUEST[id];
+   $rid = $db->do_query($qry, true);
+   $row = $db->get_array($rid);
+   $smarty->assign($row);
+}
+
+function edit_char() {
+   global $db, $debug;
+
+   if (! check_int($_REQUEST[id], false)) {
+      return array('message' => 'invalid id specified');
+   }
+   $grosse = trim($_REQUEST[grosse]);
+   if (! check_int($grosse, true)) {
+      return array('errormsg' => 'Invalid height specified');
+   }
+   $gewicht = trim($_REQUEST[gewicht]);
+   if (! check_int($gewicht, true)) {
+      return array('errormsg' => 'Invalid weight specified');
+   }
+   $alter = trim($_REQUEST[alter]);
+   if (! check_int($alter, true)) {
+      return array('errormsg' => 'Invalid age specified');
+   }
+   $rasse = trim($_REQUEST[rasse]);
+   $kultur = trim($_REQUEST[kultur]);
+   $profession = trim($_REQUEST[profession]);
+   $augenfarbe = trim($_REQUEST[augenfarbe]);
+   $geschlecht = trim($_REQUEST[geschlecht]);
+   $aussehen = trim($_REQUEST[aussehen]);
+   $haarfarbe = trim($_REQUEST[haarfarbe]);
+
+   $qry = 'UPDATE characters SET rasse = %s, kultur = %s, profession = %s, ' .
+      'geschlecht = %s, grosse = %s, gewicht = %s, haarfarbe = %s, augenfarbe = %s, ' .
+      'aussehen = %s, alter = %s WHERE id = %d';
+   $qry = sprintf($qry, ($rasse)      ? "'" . pg_escape_string($rasse) . "'" : 'NULL',
+                        ($kultur)     ? "'" . pg_escape_string($kultur) . "'" : 'NULL',
+                        ($profession) ? "'" . pg_escape_string($profession) . "'" : 'NULL',
+                        ($geschlecht) ? "'" . pg_escape_string($geschlecht) . "'" : 'NULL',
+                        ($grosse)     ? $grosse : 'NULL',
+                        ($gewicht)    ? $gewicht : 'NULL',
+                        ($haarfarbe)  ? "'" . pg_escape_string($haarfarbe) . "'" : 'NULL',
+                        ($augenfarbe) ? "'" . pg_escape_string($augenfarbe) . "'" : 'NULL',
+                        ($aussehen)   ? "'" . pg_escape_string($aussehen) . "'" : 'NULL',
+                        ($alter)      ? $alter : 'NULL',
+                        $_REQUEST[id]);
+   if (! @$db->do_query($qry, false)) {
+      return array('message' => 'database-error' . ($debug) ? ': ' . pg_last_error() : '');
+   }
+   return array('success' => true);
+}
+
 switch ($_REQUEST[stage]) {
+   case 'retrieve_base':
+      echo json_encode(retrieve_base());
+      break;
    case 'edit_eigenschaft':
       echo json_encode(edit_eigenschaft());
       break;
@@ -247,14 +310,18 @@ switch ($_REQUEST[stage]) {
       get_eigenschaft();
       $smarty->display('templates/divs/characters/edit_eigenschaft.tpl');
       break;
+   case 'show_char':
+      show_char();
+      $smarty->display('divs/characters/edit_char.tpl');
+      break;
+   case 'edit_char':
+      echo json_encode(edit_char());
+      break;
    case 'set_name':
       echo json_encode(set_name());
       break;
    case 'get_name':
       echo json_encode(get_name());
-      break;
-   case 'retrieve_base':
-      echo json_encode(retrieve_base());
       break;
    case 'show_new_char':
       $smarty->display('templates/divs/characters/new_char.tpl');
@@ -263,6 +330,7 @@ switch ($_REQUEST[stage]) {
       remove_char();
       show();
       $smarty->display('characters.tpl');
+      break;
    case 'new_char':
       new_char();
       # fall down to default after adding character

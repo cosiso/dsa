@@ -136,6 +136,17 @@ ul.tabs {
 	text-align: left;
 }
 
+/* legend */
+legend {
+	font-weight: bold;
+	color: #A64646;
+	padding-left: 16px;
+	background-image: url(/dsa/images/arrow_right_blue.png);
+	background-repeat: no-repeat;
+	margin-top: 5px;
+	display: block;
+}
+
 /* labels */
 label.error {
 	font-weight: bold;
@@ -155,9 +166,8 @@ label.error {
 }
 label {
 	font-weight: bold;
-	color: #A64646;
 	padding-left: 16px;
-	background-image: url(/dsa/images/arrow_right_blue.png);
+	background-image: url(/dsa/images/bullet_orange.png);
 	background-repeat: no-repeat;
 	margin-top: 5px;
 	display: block;

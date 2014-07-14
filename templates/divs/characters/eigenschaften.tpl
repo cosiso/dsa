@@ -19,7 +19,10 @@
          <tr id="{$chars[idx].char_id}" style="text-align: right">
             <th style="text-align: left">
                <span onclick="rename(this)" style="cursor: pointer">
-                  <img src="images/page_white_paint.png" border="0" alt="rename">
+                  <img src="images/rename.png" border="0" alt="rename">
+               </span>
+               <span onclick="char_edit(this)" style="cursor: pointer">
+                  <img src="images/page_white_paint.png" border="0" alt="edit char">
                </span>
                <span id="name-{$chars[idx].char_id}">{$chars[idx].name|escape}</span>
             </th>

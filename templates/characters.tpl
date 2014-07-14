@@ -1,25 +1,19 @@
-<!DOCTYPE html>
-<html>
-<head>
-   {include file='part_head.tpl' title='DSA - Characters'}
-</head>
-<body>
-   {include file='head.tpl'}
-   {include file='character_menu.tpl' selected='main'}
-   <div id="main" style="float: left">
-      <div onclick="close_all_divs()" style="cursor: pointer">
-         <img src="images/badge-square-direction-up-24.png" border="0" width="24" height="24" />
-         Close all
-      </div>
-      <h3 class="toggle" onclick="toggle_base()">Basiswerte &amp; Eigenschafte</h3>
-      <div id="basiswerte" style="display: none; padding-left: 20px"></div>
-      {section name=idx loop=$chars}
-         <h3 id="{$chars[idx].id}" class="toggle" onclick="toggle({$chars[idx].id})">{$chars[idx].name|escape}</h3>
-         <div id="char_{$chars[idx].id}" style="display: none; padding-left: 20px"></div>
-      {/section}
+{extends file='base.tpl'}
+{block name='title'}DSA - Characters{/block}
+{block name='menu_left'}{include file='character_menu.tpl' selected='main'}{/block}
+{block name='main'}
+   <div onclick="close_all_divs()" style="cursor: pointer">
+      <img src="images/badge-square-direction-up-24.png" border="0" width="24" height="24" />
+      Close all
    </div>
-   <div id="popup" style="display: none"></div>
-   {include file='part_script_include.tpl'}
+   <h3 class="toggle" onclick="toggle_base()">Basiswerte &amp; Eigenschafte</h3>
+   <div id="basiswerte" style="display: none; padding-left: 20px"></div>
+   {section name=idx loop=$chars}
+      <h3 id="{$chars[idx].id}" class="toggle" onclick="toggle({$chars[idx].id})">{$chars[idx].name|escape}</h3>
+      <div id="char_{$chars[idx].id}" style="display: none; padding-left: 20px"></div>
+   {/section}
+{/block}
+{block name='javascript'}
    <script type="text/javascript">
       <!--
       $(document).ready(function() {
@@ -224,6 +218,47 @@
             }
          });
       }
+      function char_edit(span) {
+         // Get id from parent span > td > tr
+         var id = $(span).parent().parent().prop('id');
+         $('#popup').center();
+         $('#popup').html('Retrieving data');
+         $('#popup').width('auto').height('auto');
+         $('#popup').load('characters.php',
+                          { stage : 'show_char', id : id },
+                          show_edit_char);
+         $('#popup').show();
+      }
+      function show_edit_char() {
+         $('#popup').center();
+         $('form#edit_char #rasse').focus().select();
+         $('form#edit_char').validate({
+            rules : {
+               grosse  : { digits : true },
+               gewicht : { digits : true },
+               alter   : { digits : true },
+            },
+            submitHandler : function(form) {
+               $(form).ajaxSubmit({
+                  datatype : 'json',
+                  url      : 'characters.php',
+                  type     : 'post',
+                  success  : done_edit_char,
+               });
+               $('#popup').hide();
+            }
+         });
+      }
+      function done_edit_char(data) {
+         data = extract_json(data);
+         if (data.errormsg) {
+            // Validation error, show errmsg and show form again
+            $('#popup').show();
+            alertify.alert(data.errmsg);
+         } else if (data.success) {
+            alertify.log('Character values saved');
+         }
+      }
       /*
       function toggle(char_id) {
          var elem = $('h3#' + char_id ).next('div#char_' + char_id);
@@ -256,5 +291,4 @@
       */
       //-->
    </script>
-</body>
-</html>
+{/block}
