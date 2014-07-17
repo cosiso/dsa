@@ -8,7 +8,7 @@
    </div>
    <h3 class="toggle" onclick="toggle_base()">Basiswerte &amp; Eigenschafte</h3>
    <div id="basiswerte" style="display: none; padding-left: 20px"></div>
-   <h3 class="toggle" onclick="toggle_vorteile()">Vor - &amp; Nachteile</h3>
+   <h3 class="toggle" onclick="toggle_vorteile()">Vor- &amp; Nachteile</h3>
    <div id="vor_nach_teile" style="display: none; padding-left: 20px; max-width: 700px"></div>
    {section name=idx loop=$chars}
       <h3 id="{$chars[idx].id}" class="toggle" onclick="toggle({$chars[idx].id})">{$chars[idx].name|escape}</h3>
@@ -154,7 +154,7 @@
             $('form#edit_eigenschaft #modifier').focus().select();
             $('form#edit_eigenschaft').validate({
                rules : {
-                  modifier : { digits : true },
+                  modifier : { number : true },
                   bought   : { digits : true },
                },
                submitHandler : function(form) {
@@ -279,7 +279,7 @@
          $('form#eigenschaft').validate({
             rules : {
                base      : { digits : true, required : true },
-               modifier  : { digits : true },
+               modifier  : { number : true },
                zugekauft : { digits : true },
                note      : { maxlength : 255 },
             },
@@ -361,6 +361,31 @@
             $(span).text(v);
             $(span).effect('highlight', {}, 2000);
          }
+      }
+      function remove_vorteil(cv_id) {
+         // Fetch name from popup
+         var name = $('#popup h4').text();
+         alertify.confirm('Remove ' + name + '?', function(e) {
+            if (e) {
+               $('#popup').hide();
+               $.ajax({
+                  datatype : 'json',
+                  url      : 'char_vorteile.php',
+                  type     : 'post',
+                  data     : { stage : 'remove', id : cv_id },
+                  success  : do_remove_vorteil
+               });
+            }
+         });
+      }
+      function do_remove_vorteil(data) {
+         data = extract_json(data);
+         if (data.success) {
+            console.log('Removing');
+         }
+      }
+      function add_vorteil() {
+         alertify.log('Adding vorteil... Soon!');
       }
       //-->
    </script>

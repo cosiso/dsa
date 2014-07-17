@@ -29,4 +29,6 @@
    {/section}
 </div>
 <br clear="all">
+<a href="#" class="link-add" onclick="add_vorteil()">Add vor/nachteil</a><br>
+<br>
 <hr>

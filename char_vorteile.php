@@ -90,6 +90,26 @@ function edit_vorteil() {
                 'vorteil_id' => $_REQUEST[vorteil_id]);
 }
 
+function remove() {
+   global $db, $debug;
+
+   if (! check_int($_REQUEST[id], false)) {
+      return array('message' => 'invalid id specified');
+   }
+
+   # Get some values to send back to client
+   $qry = 'SELECT cv.character_id, cv.vorteil_id, v.vorteil FROM char_vorteile cv, vorteile v WHERE v.id = cv.vorteil_id and cv.id = ' . $_REQUEST[id];
+   list($char_id, $vorteil_id, $vorteil) = $db->do_query($qry, true);
+
+   $qry = 'DELETE FROM char_vorteile WHERE id = ' . $_REQUEST[id];
+   #$db->do_query($qry, true);
+
+   return array('success'    => true,
+                'char_id'    => $char_id,
+                'vorteil_id' => $vorteil_id,
+                'vorteil'    => ($vorteil == 't') ? true : fale);
+}
+
 switch ($_REQUEST[stage]) {
    case 'edit':
       echo json_encode(edit_vorteil());
@@ -97,6 +117,9 @@ switch ($_REQUEST[stage]) {
    case 'info':
       show_info();
       $smarty->display('divs/characters/info_vorteil.tpl');
+      break;
+   case 'remove':
+      echo json_encode(remove());
       break;
    default:
       show_vorteile();
