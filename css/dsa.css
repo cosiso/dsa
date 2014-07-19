@@ -70,7 +70,6 @@ br {
 
 /* span with a thin border */
 .vorteil {
-	border: 1px dotted #CCC;
 	cursor: pointer;
 	padding: 1px;
 }

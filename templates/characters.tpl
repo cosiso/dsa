@@ -19,6 +19,9 @@
    <script type="text/javascript">
       <!--
       $(document).ready(function() {
+         $.validator.addMethod('notempty', function(value, element, parameter) {
+            return false;
+         }, 'Dummy message');
          toggle_base();
       });
       jQuery.fn.center = function () {
@@ -381,11 +384,57 @@
       function do_remove_vorteil(data) {
          data = extract_json(data);
          if (data.success) {
-            console.log('Removing');
+            // Remove the span from both vor- and nachteile
+            var t = 'vorteile';
+            if (! data.vorteil) { t = 'nachteile' };
+            var span = 'span#' + t + '-' + data.char_id + ' span#' + data.vorteil_id + '.vorteil';
+            $(span).effect('highlight', {}, 2000);
+            setTimeout(function() {
+               $(span).remove();
+            }, 500);
          }
       }
-      function add_vorteil() {
-         alertify.log('Adding vorteil... Soon!');
+      function fn_add_vorteil() {
+         show_add_vorteil(1);
+      }
+      function fn_add_nachteil() {
+         show_add_vorteil(0);
+      }
+      function show_add_vorteil(vorteil) {
+         $('#popup').html('Retrieving information');
+         $('#popup').show();
+         $('#popup').width('auto').height('auto').center().css('max-width', '500px');
+         $('#popup').load('char_vorteile.php', { stage : 'load_vorteil', vorteil : vorteil }, do_show_add_vorteil);
+      }
+      function do_show_add_vorteil() {
+         $('#popup').center();
+         $('#popup form#add_vorteil').validate({
+            rules : {
+               char    : { required : true },
+               vorteil : { required : true },
+            },
+            submitHandler : function(form) {
+               $('#popup').hide();
+               $(form).ajaxSubmit({
+                  datatype : 'json',
+                  url      : 'char_vorteile.php',
+                  type     : 'post',
+                  success  : do_add_vorteil,
+               })
+            },
+         });
+      }
+      function do_add_vorteil(data) {
+         data = extract_json(data);
+         if (data.success) {
+            var parent = 'vorteile-';
+            if (! data.is_vorteil) { parent = 'nachteile-' }
+            parent += data.char_id;
+            var span = '<span id="' + data.vorteil_id + '" class="vorteil" onclick="show_vorteil(this)">' +
+               ' - ' + htmlescape(data.name) + '</span>';
+            $('#' + parent).append(span);
+            $('#' + parent + ' span#' + data.vorteil_id + '.vorteil').effect('highlight', {}, 2000);
+         }
       }
       //-->
    </script>

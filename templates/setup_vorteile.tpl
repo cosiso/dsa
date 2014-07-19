@@ -1,4 +1,4 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 <html>
    <head>
       <title>DSA - setup</title>
@@ -12,7 +12,7 @@
       <div style="float: left">
          <div id="main">
             <h3 onclick="toggle_h3(this)">Vorteile</h3>
-            <div id="vorteile" style="display: none">
+            <div id="vorteile" style="display: none; max-width: 800px">
                <table id="table_vorteile" cellspacing="0" cellpadding="1" class="sortable">
                   <thead>
                      <tr>

@@ -94,20 +94,78 @@ function remove() {
    global $db, $debug;
 
    if (! check_int($_REQUEST[id], false)) {
-      return array('message' => 'invalid id specified');
+      return array('message' => 'invalid id (' . $_REQUEST[id] . ') specified');
    }
 
    # Get some values to send back to client
    $qry = 'SELECT cv.character_id, cv.vorteil_id, v.vorteil FROM char_vorteile cv, vorteile v WHERE v.id = cv.vorteil_id and cv.id = ' . $_REQUEST[id];
-   list($char_id, $vorteil_id, $vorteil) = $db->do_query($qry, true);
+   list($char_id, $vorteil_id, $vorteil) = $db->get_list($qry, true);
 
    $qry = 'DELETE FROM char_vorteile WHERE id = ' . $_REQUEST[id];
-   #$db->do_query($qry, true);
+   $db->do_query($qry, true);
 
    return array('success'    => true,
                 'char_id'    => $char_id,
                 'vorteil_id' => $vorteil_id,
-                'vorteil'    => ($vorteil == 't') ? true : fale);
+                'vorteil'    => ($vorteil == 't') ? true : false);
+}
+
+function load_vorteil() {
+   global $db, $debug, $smarty;
+
+   # Fetch characters
+   $chars[""] = '-- Select a character';
+   $qry = 'SELECT id, name FROM characters ORDER BY name';
+   $rid = $db->do_query($qry, true);
+   while ($row = $db->get_array($rid)) {
+      $chars[$row[id]] = $row[name];
+   }
+   $smarty->assign('chars', $chars);
+
+   # Fetch vor- or nachteile
+   $vorteile[""] = '-- Select a ' . ( ($_REQUEST[vorteil]) ? 'vorteil' : 'nachteil');
+   $qry = 'SELECT id, name FROM vorteile WHERE vorteil = %s ORDER BY name';
+   $qry = sprintf($qry, ($_REQUEST[vorteil]) ? 'true' : 'false');
+   $rid = $db->do_query($qry, true);
+   while ($row = $db->get_array($rid)) {
+      $vorteile[$row[id]] = $row[name];
+   }
+   $smarty->assign('vorteile', $vorteile);
+
+   $smarty->assign('vorteil', ($_REQUEST[vorteil]) ? 'vorteil' : 'nachteil');
+}
+
+function add_vorteil() {
+   global $db, $debug;
+
+   if (! check_int($_REQUEST[char], false)) {
+      return array('message' => 'invalid character selected');
+   }
+   if (! check_int($_REQUEST[vorteil], false)) {
+      return array('message' => 'invalid vor- / nachteil selected');
+   }
+
+   $qry = 'SELECT id FROM char_vorteile WHERE character_id = %d AND vorteil_id = %d';
+   $exist = $db->fetch_field(sprintf($qry, $_REQUEST[char], $_REQUEST[vorteil]));
+   if ($exist) {
+      return array('success'  => true,
+                   'existing' => true);
+   }
+
+   $qry = 'INSERT INTO char_vorteile (character_id, vorteil_id) VALUES (%d, %d)';
+   if (! @$db->do_query(sprintf($qry, $_REQUEST[char], $_REQUEST[vorteil]))) {
+      return array('message' => 'database-error' . ( ($debug) ? ': ' . pg_last_error() : ''));
+   }
+   $id = $db->insert_id('char_vorteile');
+
+   $qry = 'SELECT name, vorteil FROM vorteile WHERE id = ' . $_REQUEST[vorteil];
+   list($name, $is_vorteil) = $db->get_list($qry, true);
+
+   return array('success'    => true,
+                'char_id'    => $_REQUEST[char],
+                'vorteil_id' => $_REQUEST[vorteil],
+                'name'       => $name,
+                'is_vorteil' => ($is_vorteil == 't') ? true : false);
 }
 
 switch ($_REQUEST[stage]) {
@@ -117,6 +175,13 @@ switch ($_REQUEST[stage]) {
    case 'info':
       show_info();
       $smarty->display('divs/characters/info_vorteil.tpl');
+      break;
+   case 'load_vorteil':
+      load_vorteil();
+      $smarty->display('divs/characters/load_vorteil.tpl');
+      break;
+   case 'add_vorteil':
+      echo json_encode(add_vorteil());
       break;
    case 'remove':
       echo json_encode(remove());
