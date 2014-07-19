@@ -7,7 +7,7 @@
    <label for="vorteil">{$vorteil|capitalize}</label>
    {html_options name='vorteil' id='vorteil' options=$vorteile}<br>
    <br>
-   <div class="button-bar">
+   <div class="button_bar">
       {custom_button type='submit'}
       {custom_button type='reset' onclick="$('#popup').hide()"}
    </div>

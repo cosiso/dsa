@@ -3,36 +3,41 @@
 
 require_once('config.inc.php');
 require_once('db.inc.php');
-require_once('smarty.inc.php');
+require_once('smarty3.inc.php');
+
+function check_int($value, $zero=true) {
+   if ($value and $value != intval($value)) {
+	   return false;
+	}
+	if (! $value and ! $zero) {
+	   return false;
+	}
+	return true;
+}
 
 function update_vorteil() {
    global $db, $debug;
 
    $id = $_REQUEST[id];
-   if ($id and intval($id) != $id) {
-      return array('success' => false,
-                   'message' => 'invalid id given');
+   if (! check_int($id, true)) {
+      return array('message' => 'invalid id given');
    }
    $name = trim($_REQUEST[name]);
    if (! $name) {
-      return array('success' => false,
-                   'message' => 'no name given');
+      return array('message' => 'no name given');
    }
    $vorteil = ($_REQUEST[is_vorteil]) ? 't' : 'f';
    $gp = trim($_REQUEST[gp]);
-   if ($gp and $gp != intval($gp)) {
-      return array('success' => false,
-                   'message' => 'GP should be a number');
+   if (! check_int($gp, true)) {
+      return array('message' => 'GP should be a number');
    }
    $ap = trim($_REQUEST[ap]);
    if ($ap and $ap != intval($ap)) {
-      return array('success' => false,
-                   'message' => 'AP should be a number');
+      return array('message' => 'AP should be a number');
    }
    $effect = trim($_REQUEST[effect]);
    if (! $effect) {
-      return array('success' => false,
-                   'message' => 'no effect given');
+      return array('message' => 'no effect given');
    }
    $effect = preg_replace('~\R~u', "\n", $effect);
    $description = trim($_REQUEST[description]);
@@ -98,67 +103,33 @@ function show() {
    $smarty->assign('nachteile', $nachteile);
 }
 
-function get_description() {
-   global $db, $debug;
-
-   if (! $_REQUEST[id] or intval($_REQUEST[id]) != $_REQUEST[id]) {
-      return array('success' => false,
-                   'message' => 'invalid id given');
-   }
-
-   $qry = 'SELECT description ';
-   $qry .= 'FROM  vorteile ';
-   $qry .= 'WHERE id = ' . $_REQUEST[id];
-   $desc= $db->fetch_field($qry, true);
-   return array('success'     => true,
-                'id'          => $_REQUEST[id],
-                'description' => $desc);
-}
-
-function tip_description() {
-   global $db, $debug;
-
-   if (! $_REQUEST[id] or
-       intval($_REQUEST[id] != $_REQUEST[id])) {
-      return 'Invalid id specified';
-   }
-   $qry = 'SELECT description ';
-   $qry .= 'FROM  vorteile ';
-   $qry .= 'WHERE id = ' . $_REQUEST[id];
-   $description = $db->fetch_field($qry, true);
-   if (! $description) $description = '&lt;no description available&gt;';
-   return nl2br($description);
-}
-
 function show_edit() {
    global $db, $debug, $smarty;
 
-   $smarty->assign('id', 0);
-   if (intval($_REQUEST[id]) != $_REQUEST[id]) {
-      $smarty->assign('name', 'Invalid id passed!');
+   if (! check_int($_REQUEST[id], true)) {
+      $smarty->assign('error', 'Invalid id specified');
       return;
    }
+
    if ($_REQUEST[id]) {
-      $qry = 'SELECT * ';
-      $qry .= 'FROM  vorteile ';
-      $qry .= 'WHERE id = ' . $_REQUEST[id];
-      $rid = $db->do_query($qry, true);
+      $qry = 'SELECT * FROM vorteile WHERE id = %d';
+      $rid = $db->do_query(sprintf($qry, $_REQUEST[id]), true);
       $row = $db->get_array($rid);
       $row[is_vorteil] = ($row[vorteil] == 't') ? 1 : 0;
       $smarty->assign($row);
    } else {
-      $smarty->assign('is_vorteil', ($_REQUEST[vorteil]) ? 1 : 0);
+      $smarty->assign('id', 0);
+      $smarty->assign('is_vorteil', ($_REQUEST[is_vorteil]) ? 1 : 0);
    }
 }
 
 function remove_vorteil() {
    global $db, $debug;
 
-   if (! $_REQUEST[id] or
-       $_REQUEST[id] != intval($_REQUEST[id])) {
-      return array('success' => false,
-                   'message' => 'invalid id specified');
+   if (! check_int($_REQUEST[id], false)) {
+      return array('message' => 'invalid id specified');
    }
+
    $qry = 'DELETE FROM vorteile ';
    $qry .= 'WHERE id = ' . $_REQUEST[id];
    $rid = @$db->do_query($qry, false);
@@ -170,22 +141,34 @@ function remove_vorteil() {
                 'id'      => $_REQUEST[id]);
 }
 
+function info() {
+   global $db, $debug, $smarty;
+
+   if (! check_int($_REQUEST[id], false)) {
+      $smarty->assign('error', 'Invalid id specified');
+      return;
+   }
+   $qry = 'SELECT description FROM vorteile WHERE id = %d';
+   $info = $db->fetch_field(sprintf($qry, $_REQUEST[id]), true);
+   if (! $info) $info = 'No description available';
+
+   $smarty->assign('info', $info);
+}
+
 switch ($_REQUEST[stage]) {
-   case 'remove':
-      echo json_encode(remove_vorteil());
+   case 'info':
+      info();
+      $smarty->display('divs/setup/vorteile/info.tpl');
       break;
-   case "new":
+   case 'show_edit':
+      show_edit();
+      $smarty->display('divs/setup/vorteile/edit.tpl');
+      break;
+   case 'edit':
       echo json_encode(update_vorteil());
       break;
-   case 'get_description':
-      echo json_encode(get_description());
-      break;
-   case 'tip_description':
-      echo tip_description();
-      break;
-   case 'popup_edit':
-      show_edit();
-      $smarty->display('setup_vorteile_frm_edit.tpl');
+   case 'remove':
+      echo json_encode(remove_vorteil());
       break;
    default:
       show();
