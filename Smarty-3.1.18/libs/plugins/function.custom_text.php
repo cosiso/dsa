@@ -27,7 +27,7 @@ function smarty_function_custom_text($params, &$smarty)
          case 'extra':
          case 'id':
             if ( is_array($_val) )
-               $smarty->trigger_error("custom_text: attribute '$_key' cannot be an array", E_USER_NOTICE);
+               trigger_error("custom_text: attribute '$_key' cannot be an array", E_USER_NOTICE);
             else
                $$_key = $_val;
             break;
@@ -35,7 +35,7 @@ function smarty_function_custom_text($params, &$smarty)
             $extra .= "$_key=\"$_val\" ";
       }
    }
-   if (! $name) $smarty->trigger_error('custom_text: attribute "name" must be given', E_USER_ERROR);
+   if (! $name) trigger_error('custom_text: attribute "name" must be given', E_USER_ERROR);
    $result = ( ($label) ? '<label for="' . $name . '">' . $label . '</label>' : '') .
          '<input type="text" name="' . $name . '"' .
          ' id="' . ( ($id) ? $id : $name) . '"';

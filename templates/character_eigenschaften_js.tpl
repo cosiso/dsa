@@ -119,7 +119,6 @@
       }
       // All went fine, recalc total and enable field
       var field = data.fieldname.split('_');
-      console.log('FIELD: ' + field.toSource());
       recalc_total(field[0], true);
       $('#eigenschaften #' + data.fieldname).prop('disabled', false);
    }

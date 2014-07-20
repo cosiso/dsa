@@ -1,0 +1,277 @@
+-- Functions to retrieve various LE values
+CREATE OR REPLACE FUNCTION base_le(char_id INT) RETURNS INTEGER AS $$
+   DECLARE
+      ko INT;
+      kk INT;
+   BEGIN
+      SELECT calc_ko(char_id)
+      INTO   ko;
+      SELECT calc_kk(char_id)
+      INTO kk;
+      RETURN ROUND(((ko + ko + kk) * 1.0) / 2);
+   END
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION tot_le(char_id INT) RETURNS INTEGER AS $$
+   DECLARE
+      le INT;
+   BEGIN
+      SELECT base_le(char_id) + COALESCE(le_mod, 0) + COALESCE(le_bought, 0)
+      INTO   le
+      FROM   basevalues
+      WHERE  character_id = char_id;
+      RETURN le;
+   END
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION cur_le(char_id INT) RETURNS INTEGER AS $$
+   DECLARE
+      le INT;
+   BEGIN
+      SELECT tot_le(char_id) - COALESCE(le_used, 0)
+      INTO   le
+      FROM   basevalues
+      WHERE  character_id = char_id;
+      RETURN le;
+   END
+$$ LANGUAGE plpgsql;
+
+-- Functions to retrieve various AU values
+CREATE OR REPLACE FUNCTION base_au(char_id INT) RETURNS INTEGER AS $$
+   DECLARE
+      mu INT;
+      ko INT;
+      ge INT;
+   BEGIN
+      SELECT calc_mu(char_id) INTO mu;
+      SELECT calc_ko(char_id) INTO ko;
+      SELECT calc_ge(char_id) INTO ge;
+      RETURN ROUND(((mu + ko +ge) * 1.0) / 2);
+   END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION tot_au(char_id INT) RETURNS INTEGER AS $$
+   DECLARE
+      au INT;
+   BEGIN
+      SELECT base_au(char_id) + COALESCE(au_bought, 0) + COALESCE(au_mod, 0)
+      INTO   au
+      FROM   basevalues
+      WHERE  character_id = char_id;
+      RETURN au;
+   END
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION cur_au(char_id INT) RETURNS INTEGER AS $$
+   DECLARE
+      au INT;
+   BEGIN
+      SELECT tot_au(char_id) - COALESCE(au_used, 0)
+      INTO   au
+      FROM   basevalues
+      WHERE  character_id = char_id;
+      RETURN au;
+   END
+$$ LANGUAGE plpgsql;
+
+-- Functions to retrieve various AE values
+CREATE OR REPLACE FUNCTION base_ae(char_id INT) RETURNS INTEGER AS $$
+   DECLARE
+      mu INT;
+      it INT;
+      ch INT;
+      temp INT;
+      gds BOOLEAN;
+   BEGIN
+      SELECT calc_mu(char_id) INTO mu;
+      SELECT calc_in(char_id) INTO it;
+      SELECT calc_ch(char_id) INTO ch;
+      temp := mu + it + ch;
+      PERFORM char_vorteile.id
+      FROM   char_vorteile, vorteile
+      WHERE  vorteile.id = char_vorteile.vorteil_id AND
+             vorteile.name = 'Gefäß der Sterne';
+      IF FOUND THEN temp := temp + ch; END IF;
+      RETURN ROUND((temp * 1.0) / 2);
+   END
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION tot_ae(char_id INT) RETURNS INTEGER AS $$
+   DECLARE
+      ae INT;
+   BEGIN
+      SELECT base_ae(char_id) + COALESCE(ae_mod, 0) + COALESCE(ae_bought, 0)
+      INTO   ae
+      FROM   basevalues
+      WHERE  character_id = char_id;
+      RETURN ae;
+   END
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION cur_ae(char_id INT) RETURNS INTEGER AS $$
+   DECLARE
+      ae INT;
+   BEGIN
+      SELECT tot_ae(char_id) - COALESCE(ae_used, 0)
+      INTO   ae
+      FROM   basevalues
+      WHERE  character_id = char_id;
+      RETURN ae;
+   END
+$$ LANGUAGE plpgsql;
+
+-- Functions to retrieve various MR values
+CREATE OR REPLACE FUNCTION base_mr(char_id INT) RETURNS INTEGER AS $$
+   DECLARE
+      mu INT;
+      kl INT;
+      ko INT;
+   BEGIN
+      SELECT calc_mu(char_id) INTO mu;
+      SELECT calc_kl(char_id) INTO kl;
+      SELECT calc_ko(char_id) INTO ko;
+      RETURN ROUND(((mu + kl +ko) * 1.0) / 5);
+   END
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION tot_mr(char_id INT) RETURNS INTEGER AS $$
+   DECLARE
+      mr INT;
+   BEGIN
+      SELECT base_mr(char_id) + COALESCE(mr_bought, 0) + COALESCE(mr_mod, 0)
+      INTO   mr
+      FROM   basevalues
+      WHERE  character_id = char_id;
+      RETURN mr;
+   END
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION cur_mr(char_id INT) RETURNS INTEGER AS $$
+   DECLARE
+      mr INT;
+   BEGIN
+      SELECT tot_mr(char_id) - COALESCE(mr_used, 0)
+      INTO   mr
+      FROM   basevalues
+      WHERE  character_id = char_id;
+      RETURN mr;
+   END
+$$ LANGUAGE plpgsql;
+
+-- Functions to retrieve various INI values
+CREATE OR REPLACE FUNCTION base_ini(char_id INT) RETURNS INTEGER AS $$
+   DECLARE
+     mu INT;
+     it INT;
+     ge INT;
+   BEGIN
+      SELECT calc_mu(char_id) INTO mu;
+      SELECT calc_in(char_id) INTO it;
+      SELECT calc_ge(char_id) INTO ge;
+      RETURN ROUND(((mu * 2 + it + ge) * 1.0) / 5);
+   END
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION tot_ini(char_id INT) RETURNS INTEGER AS $$
+   DECLARE
+      ini INT;
+      kg  INT;
+      kr  BOOLEAN;
+   BEGIN
+      SELECT base_ini(char_id) + COALESCE(ini_mod, 0)
+      INTO   ini
+      FROM   basevalues
+      WHERE  character_id = char_id;
+      -- Verify if character has Kampfgespür
+      PERFORM char_kampf_sf.id
+      FROM    char_kampf_sf, kampf_sf
+      WHERE   kampf_sf.name = 'Kampfgespür' AND
+              char_kampf_sf.kampf_sf_id = kampf_sf.id;
+      IF FOUND THEN ini := ini + 2; END IF;
+      -- Verify if character has Kampfreflexe
+      PERFORM char_kampf_sf.id
+      FROM    char_kampf_sf, kampf_sf
+      WHERE   kampf_sf.name = 'Kampfreflexe' AND
+              char_kampf_sf.kampf_sf_id = kampf_sf.id;
+      IF FOUND THEN ini := ini + 4; END IF;
+      RETURN ini;
+   END
+$$ LANGUAGE plpgsql;
+
+-- Functions to retrieve various AT values
+CREATE OR REPLACE FUNCTION base_at(char_id INT) RETURNS INTEGER AS $$
+   DECLARE
+      mu INT;
+      ge INT;
+      kk INT;
+   BEGIN
+      SELECT calc_mu(char_id) INTO mu;
+      SELECT calc_ge(char_id) INTO ge;
+      SELECT calc_kk(char_id) INTO kk;
+      RETURN ROUND((mu + ge + kk) / 5.0);
+   END
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION tot_at(char_id INT) RETURNS INTEGER AS $$
+   DECLARE
+      att INT;
+   BEGIN
+      SELECT base_at(char_id) + COALESCE(at_mod, 0)
+      INTO   att
+      FROM   basevalues
+      WHERE  character_id = char_id;
+      RETURN att;
+   END
+$$ LANGUAGE plpgsql;
+
+-- Functions to retrieve various PA values
+CREATE OR REPLACE FUNCTION base_pa(char_id INT) RETURNS INTEGER AS $$
+   DECLARE
+      it INT;
+      ge INT;
+      kk INT;
+   BEGIN
+      SELECT calc_in(char_id) INTO it;
+      SELECT calc_ge(char_id) INTO ge;
+      SELECT calc_kk(char_id) INTO kk;
+      RETURN ROUND((it + ge + kk) / 5.0);
+   END
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION tot_pa(char_id INT) RETURNS INTEGER AS $$
+   DECLARE
+      pa INT;
+   BEGIN
+      SELECT base_pa(char_id) + COALESCE(pa_mod, 0)
+      INTO   pa
+      FROM   basevalues
+      WHERE  character_id = char_id;
+      RETURN pa;
+   END
+$$ LANGUAGE plpgsql;
+
+-- Functions to retrieve various FK values
+CREATE OR REPLACE FUNCTION base_fk(char_id INT) RETURNS INTEGER AS $$
+   DECLARE
+      it INT;
+      ff INT;
+      kk INT;
+   BEGIN
+      SELECT calc_in(char_id) INTO it;
+      SELECT calc_ff(char_id) INTO ff;
+      SELECT calc_kk(char_id) INTO kk;
+      RETURN ROUND((it + ff + kk) / 5.0);
+   END
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION tot_fk(char_id INT) RETURNS INTEGER AS $$
+   DECLARE
+      fk INT;
+   BEGIN
+      SELECT base_fk(char_id) + COALESCE(fk_mod, 0)
+      INTO   fk
+      FROM   basevalues
+      WHERE  character_id = char_id;
+      RETURN fk;
+   END
+$$ LANGUAGE plpgsql;

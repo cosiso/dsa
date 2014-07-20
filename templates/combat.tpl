@@ -1,14 +1,9 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
-      "http://www.w3.org/TR/html4/loose.dtd">
-<html>
-<head>
-   {include file=part_head.tpl title='DSA - Combat'}
-</head>
-<body>
-   {include file=head.tpl}
-   {include file=character_menu.tpl selected='combat'}
+{extends file='base.tpl'}
+{block name='title'}DSA - Combat{/block}
+{block name='menu_left'}{include file='character_menu.tpl' selected='combat'}{/block}
+{block name='main'}
    <div id="div" style="float: left">
-      <div id="main">
+      <div id="main" style="max-width: 800px">
          <div onclick="close_all_divs()" style="cursor: pointer">
             <img src="images/badge-square-direction-up-24.png" border="0" width="24" height="24" />
             Close all
@@ -24,9 +19,11 @@
       </div>
    </div>
    <div id="popup" style="display: none"></div>
-   {include file=part_script_include.tpl}
+{/block}
+{block name='javascript'}
+   {include file='divs/valuebar/value-bar.js.tpl'}
    <script type="text/javascript">
-      <!--{literal}
+      <!--
       var hasData = {};
       jQuery.fn.center = function () {
           this.css("position","absolute");
@@ -63,8 +60,8 @@
                datatype : 'json',
                type     : 'post',
                url      : 'combat.php',
-               data     : {stage : 'get_char',
-                           id    : char_id},
+               data     : { stage : 'get_char',
+                            id    : char_id },
                success  : do_show_char,
             });
          } else {
@@ -158,8 +155,8 @@
          }
       }
       function add_sf(char_id) {
-         $('#popup').width(400).height(175);
-         $('#popup').html('Please wait, loading content');
+         $('#popup').width('auto').height('auto');
+         $('#popup').text('Please wait, loading content').show();
          $('#popup').center();
          $('#popup').load('combat.php',
                           { stage : 'load_sf', char_id : char_id },
@@ -168,30 +165,24 @@
                alertify.alert('Error loading kampfsonderfertigkeiten');
                $('#popup').toggle();
             } else {
-               $('#p_sf').selectize({
-                  sortField   : 'text',
-                  selectOnTab : true,
-               });
                $('form#p_add_sf').validate({
+                  rules : {
+                     p_sf : { required : true, min : 1 },
+                  },
                   submitHandler : function(form) {
-                     $('#popup').slideUp();
-                     if ($('#popup #p_sf').val() == 0) {
-                        alertify.error('No kampfsonderfertigkeit selected');
-                     } else {
-                        $(form).ajaxSubmit({
-                           url      : 'combat.php',
-                           type     : 'post',
-                           datatype : 'json',
-                           success  : do_add_sf,
-                        });
-                     }
+                     $(form).ajaxSubmit({
+                        url      : 'combat.php',
+                        type     : 'post',
+                        datatype : 'json',
+                        success  : do_add_sf,
+                     });
+                     $('#popup').hide();
                      return false;
                   }
                });
             }
          });
          $('#popup').slideDown();
-         return false;
       }
       function do_add_sf(data) {
          data = extract_json(data);
@@ -206,7 +197,14 @@
             $('table#sf tr#' + data.id).effect('highlight', {}, 2000);
          }
       }
-      //-->{/literal}
+      function reload_char(id) {
+         // Unset hasData
+         hasData[id] = false;
+         // Hide div
+         $('#main div#char_' + id).hide();
+         // Toggle div
+         toggle(id);
+      }
+      //-->
    </script>
-</body>
-</html>
+{/block}

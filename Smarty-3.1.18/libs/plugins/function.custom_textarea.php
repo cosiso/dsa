@@ -20,7 +20,7 @@ function smarty_function_custom_textarea($params, &$smarty)
          case 'id':
          case 'label':
             if ( is_array($_val) )
-               $smarty->trigger_error("custom_textarea: attribute '$_key' cannot be an array", E_USER_NOTICE);
+               trigger_error("custom_textarea: attribute '$_key' cannot be an array", E_USER_NOTICE);
             else
                $$_key = $_val;
             break;
@@ -28,7 +28,7 @@ function smarty_function_custom_textarea($params, &$smarty)
             $extra .= ' ' . $_key . '="' . $_val . '"';
       }
    }
-   if (! $name) $smarty->trigger_error('custom_textarea: attribute "name" must be specified', E_USER_ERROR);
+   if (! $name) trigger_error('custom_textarea: attribute "name" must be specified', E_USER_ERROR);
    $result = ( ($label) ? '<label for="' . $name . '">' . $label . '</label>' : '') .
       '<textarea name="' . $name . '" ' .
       'id="' . (($id) ? $id : $name) . '"';

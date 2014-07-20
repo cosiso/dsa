@@ -146,7 +146,6 @@
          }
          if (response.update) {
             // Update the specified vorteil
-            console.log('Name: ' + response.name + ', ID: ' + response.id);
             var row = '#vorteil_' + response.id;
             $(row + ' #cell_name').text(response.name);
             $(row + ' #cell_gp').text(response.gp);
@@ -198,6 +197,7 @@
                $('#popup').center();
             }
          });
+         return false;
       }
       function show_edit(link) {
          // Get id from parent a > td > tr
@@ -205,6 +205,7 @@
          var dummy = id.split('_');
          id = dummy[1];
          show_edit_cont(id, undefined)
+         return false;
       }
       function show_edit_cont(id, is_vorteil) {
          $('#popup').text('Retrieving information');
@@ -239,6 +240,7 @@
                });
             }
          });
+         return false;
       }
       //-->
    </script>

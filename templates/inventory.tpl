@@ -117,7 +117,6 @@
             } else {
                var row_id = table_id + ' #' + id;
                // Update values
-               console.log('Row_id = ' + row_id);
                $(row_id + ' #tp').text(data.tp);
                $(row_id + ' #tpkk').text(data.tpkk);
                $(row_id + ' #ini').text(data.ini);

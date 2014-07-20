@@ -37,7 +37,7 @@ function smarty_function_custom_hidden($params, &$smarty)
             break;
          case 'extra':
             if ( is_array($_val) )
-               $smarty->trigger_error("custom_hidden: attribute '$_key' cannot be an array", E_USER_NOTICE);
+               trigger_error("custom_hidden: attribute '$_key' cannot be an array", E_USER_NOTICE);
             else
                $$_key = $_val;
             break;

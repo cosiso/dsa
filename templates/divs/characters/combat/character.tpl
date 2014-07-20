@@ -1,5 +1,4 @@
-<div id="value-bar" class="value-bar">
-</div>
+<div id="value-bar" class="value-bar"></div>
 <h4>Armed</h4>
 <table id="armed">
    <thead>
@@ -106,3 +105,4 @@
 </table>
 <br />
 <a id="btn_add_sf" href="#" class="link-add" onclick="add_sf({$char_id})">Add kampfsonderfertigkeit</a>
+<a href="#" class="link-reload" onclick="reload_char({$char_id})">Reload</a>

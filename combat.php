@@ -3,7 +3,7 @@
 
 require_once('config.inc.php');
 require_once('db.inc.php');
-require_once('smarty.inc.php');
+require_once('smarty3.inc.php');
 
 function check_int($value, $zero=true) {
    if ($value and $value != intval($value)) {
@@ -42,7 +42,7 @@ function get_char() {
    $qry .= "      tot_at($char_id) AS c_at, tot_pa($char_id)  AS c_ap, ";
    $qry .= '      COALESCE(char_weapons.tp, weapons.tp) AS tp, ';
    $qry .= '      weapons.dk, weapons.ini, char_weapons.ini AS w_ini, ';
-   $qry .= "      calc_ini($char_id) AS c_ini, ";
+   $qry .= "      tot_ini($char_id) AS c_ini, ";
    $qry .= '      COALESCE(char_weapons.tpkk, weapons.tpkk) AS tpkk, ';
    $qry .= "      kk_bonus($char_id, COALESCE(char_weapons.tpkk, weapons.tpkk)) AS tp_bonus, ";
    $qry .= '      COALESCE(char_weapons.bf, weapons.bf) AS bf ';
@@ -68,7 +68,7 @@ function get_char() {
    $qry .= "      tot_at($char_id) + char_kampftechniken.at AS at, ";
    $qry .= "      tot_pa($char_id) + char_kampftechniken.pa AS pa, ";
    $qry .= "      '1D6+0' AS roll, kk_bonus($char_id, '10/3')  AS tp_bonus, ";
-   $qry .= "      calc_ini($char_id) AS ini ";
+   $qry .= "      tot_ini($char_id) AS ini ";
    $qry .= 'FROM  characters, char_kampftechniken, kampftechniken ';
    $qry .= "WHERE characters.id = $char_id AND ";
    $qry .= '      char_kampftechniken.character_id = characters.id AND ';
@@ -94,7 +94,7 @@ function get_char() {
       $sf[] = $row;
    }
    $smarty->assign('sf', $sf);
-   $out = $smarty->fetch('div_combat.tpl');
+   $out = $smarty->fetch('divs/characters/combat/character.tpl');
 
    return array('success' => true,
                 'out'     => $out,
@@ -192,7 +192,7 @@ switch ($_REQUEST[stage]) {
       break;
    case 'load_sf':
       load_sf();
-      $smarty->display('divs/load_sf.tpl');
+      $smarty->display('divs/characters/combat/load_sf.tpl');
       break;
    case 'add_sf':
       echo json_encode(add_sf());

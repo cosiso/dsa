@@ -365,6 +365,20 @@ a.link-add {
 a.link-add:hover {
 	background-color: #F5F5B5;
 }
+a.link-reload {
+	background-image: url('../images/sync.png');
+	background-repeat: no-repeat;
+	background-position: left center;
+	border-radius: 12px;
+	padding: 8px;
+	padding-left: 28px;
+	font-size: 12px;
+	font-variant: small-caps;
+	border: 1px solid #AAA;
+}
+a.link-reload:hover {
+	background-color: #F5F5B5;
+}
 a.link-del {
 	background-image: url('../images/minus-24.png');
 	background-repeat: no-repeat;

@@ -80,14 +80,14 @@ function smarty_function_custom_button($params, &$smarty)
             break;
          default:
             if ( is_array($_val) )
-               $smarty->trigger_error("custom_button: attribute '$_key' cannot be an array", E_USER_NOTICE);
+               trigger_error("custom_button: attribute '$_key' cannot be an array", E_USER_NOTICE);
             else
                $extra .= " " . $_key . '="' . $_val . '"';
             break;
       }
    }
    if (! $value)
-      $smarty->trigger_error("custom_button: missing required attribute 'value'", E_USER_NOTICE);
+      trigger_error("custom_button: missing required attribute 'value'", E_USER_NOTICE);
 
    $result = '<input value="' . $value . '" class="' . $class . '" type="' . $type . '"';
    if ($name) $result .= ' name="' . $name . '"';
