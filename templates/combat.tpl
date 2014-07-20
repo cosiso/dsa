@@ -190,8 +190,8 @@
             var elem = '<tr id="' + data.id + '">' +
                        '<td>' + htmlescape(data.name) + '</td>' +
                        '<td>' + htmlescape(data.effect) + '</td>' +
-                       '<td><a href="#" onclick="sf_info(' + data.sf_id + ')" class="link-info">note</a>' +
-                       ' | <a href="#" onclick="sf_remove(' + data.id + ')" class="link-cancel">remove</a>' +
+                       '<td><span onclick="sf_info(' + data.sf_id + ')" class="link-info">note</span>' +
+                       ' | <span onclick="sf_remove(' + data.id + ')" class="link-cancel">remove</span>' +
                        '</td></tr>';
             $('div#char_' + data.char_id + ' table#sf tbody').append(elem);
             $('table#sf tr#' + data.id).effect('highlight', {}, 2000);

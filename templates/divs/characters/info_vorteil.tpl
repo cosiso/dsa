@@ -21,7 +21,7 @@
       <div class="button_bar">
          {custom_button type="submit"}
          {custom_button type="reset" onclick="$('#popup').hide()" value="close"}
-         | <a href="#" class="link-cancel" onclick="remove_vorteil({$id})">remove</a>
+         | <span class="link-cancel" onclick="remove_vorteil({$id})">remove</span>
       </div>
    {/custom_form}
 {/if}

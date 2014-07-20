@@ -36,15 +36,15 @@
                         <td>{$talente[idx].be|escape}</td>
                         <td>{$talente[idx].komp|escape}</td>
                         <td>
-                           <a href="#" onclick="edit_talent({$talente[idx].id})" class="link-edit">edit</a>
-                           | <a href="#" onclick="remove_talent({$talente[idx].id})" class="link-cancel">remove</a>
+                           <span onclick="edit_talent({$talente[idx].id})" class="link-edit">edit</span>
+                           | <span onclick="remove_talent({$talente[idx].id})" class="link-cancel">remove</span>
                         </td>
                      </tr>
                   {/section}
                </tbody>
             </table>
             <br />
-            <a id="add_talent" class="link-add" href="#" onclick="edit_talent(0)">Add talent</a>
+            <span class="link-add" onclick="edit_talent(0)">Add talent</span>
          </div>
       </div>
       <div id="popup" style="display: none"></div>
@@ -125,8 +125,8 @@
                      '<td>' + htmlescape(data.skt) + '</td>' +
                      '<td>' + htmlescape(data.be) + '</td>' +
                      '<td>' + htmlescape(data.komp) + '</td>' +
-                     '<td><a href="#" class="link-edit" onclick="edit_talent(' + data.id + ')">edit</a>' +
-                     ' | <a href="#" class="link-cancel" onclick="remove_talent(' + data.id + ')">remove</a></td>' +
+                     '<td><span class="link-edit" onclick="edit_talent(' + data.id + ')">edit</span>' +
+                     ' | <span class="link-cancel" onclick="remove_talent(' + data.id + ')">remove</span></td>' +
                      '</tr>';
                   $('table#talente tbody').append(row);
                } else {

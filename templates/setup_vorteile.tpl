@@ -25,9 +25,9 @@
                         <td id="cell_effect">{$vorteile[idx].effect}</td>
                         <td id="cell_links">
                            <span id="span_desc_{$vorteile[idx].id}" style="display: none"></span>
-                           <a href="#" class="link-info" onclick="show_info(this)">info</a>
-                           | <a href="#" class="link-edit" onclick="show_edit(this)">edit</a>
-                           | <a href="#" onclick="confirm_delete({$vorteile[idx].id})" class="link-cancel">remove</a>
+                           <span class="link-info" onclick="show_info(this)">info</span>
+                           | <span class="link-edit" onclick="show_edit(this)">edit</span>
+                           | <span onclick="confirm_delete({$vorteile[idx].id})" class="link-cancel">remove</span>
                         </td>
                      </tr>
                   {/section}
@@ -37,7 +37,7 @@
                <div id="div_no_vorteile">No vorteile defined yet</div>
             {/if}
             <br />
-            <a class="link-add" href="#" onclick="show_edit_cont(0, 1)">Add vorteil</a>
+            <span class="link-add" onclick="show_edit_cont(0, 1)">Add vorteil</span>
          </div>
          <h3 onclick="toggle_h3(this)">Nachteile</h3>
          <div id="nachteile" style="display: none">
@@ -60,9 +60,9 @@
                         <td id="cell_effect">{$nachteile[idx].effect}</td>
                         <td id="cell_links">
                            <span id="span_desc_{$nachteile[idx].id}" style="display: none"></span>
-                           <a href="#" class="link-info" onclick="show_info(this)">info</a>
-                           | <a href="#" class="link-edit" onclick="show_edit(this)">edit</a>
-                           | <a href="#" onclick="alert('delete')" class="link-cancel">remove</a>
+                           <span class="link-info" onclick="show_info(this)">info</span>
+                           | <span class="link-edit" onclick="show_edit(this)">edit</span>
+                           | <span onclick="alert('delete')" class="link-cancel">remove</span>
                         </td>
                      </tr>
                   {/section}
@@ -72,7 +72,7 @@
                <div id="div_no_nachteile">No nachteile defined yet</div>
             {/if}
             <br />
-            <a class="link-add" href="#" onclick="show_edit_cont(0, 0)">Add nachteil</a>
+            <span class="link-add" onclick="show_edit_cont(0, 0)">Add nachteil</span>
          </div>
       </div>
    </div>
@@ -160,9 +160,9 @@
                '<td id="cell_ap">' + htmlescape(response.ap) + '</td>' +
                '<td id="cell_effect">' + htmlescape(response.effect) + '</td>' +
                '<td id="cell_links">' +
-               '<a class="link-info" href="#" onclick="show_info(this)">info</a>' +
-               '| <a href="#" class="link-edit" onclick="show_edit(this)">edit</a>' +
-               ' | <a class="link-cancel" onclick="confirm_delete(' + response.id + ')" href="#">remove</a>' +
+               '<span class="link-info" onclick="show_info(this)">info</span>' +
+               '| <span class="link-edit" onclick="show_edit(this)">edit</span>' +
+               ' | <span class="link-cancel" onclick="confirm_delete(' + response.id + ')">remove</span>' +
                '</td></tr>';
             // Append the row to the table
             if (response.vorteil) {

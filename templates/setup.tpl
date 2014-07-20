@@ -48,8 +48,8 @@
                   <td style="padding-right: 5px" id="cell_name">{$traits[idx].name|escape}</td>
                   <td style="padding-right: 5px" id="cell_abbr">{$traits[idx].abbr|escape}</td>
                   <td>
-                     <a href="javascript:edit_trait({$traits[idx].id})" class="link-edit">edit</a>
-                     | <a href="javascript:remove_trait({$traits[idx].id})" class="link-cancel">remove</a>
+                     <span onclick="edit_trait({$traits[idx].id})" class="link-edit">edit</span>
+                     | <span onclick="remove_trait({$traits[idx].id})" class="link-cancel">remove</span>
                   </td>
                </tr>
             {/section}
@@ -119,8 +119,8 @@
          var row = '<tr rowhover="yes" id="row_' + trait_id +'" >';
          row += '<td style="padding-right: 5px" id="cell_name">' + trait_name.escapeHTML() + '</td>';
          row += '<td style="padding-right: 5px" id="cell_abbr">' + trait_abbr.escapeHTML() + '</td>';
-         row += '<td><a href="javascript:edit_trait(' + trait_id + ')" class="link-edit">edit</a> | ';
-         row += '<a href="javascript:remove_trait(' + trait_id + ')" class="link-cancel">remove</a></td></tr>';
+         row += '<td><span onclick="edit_trait(' + trait_id + ')" class="link-edit">edit</span> | ';
+         row += '<span onclick="remove_trait(' + trait_id + ')" class="link-cancel">remove</span></td></tr>';
          // Insert new element
          if (last == true) {
             jQuery(row).insertAfter(jQuery('#table_traits tr').last());

@@ -309,49 +309,56 @@ ol.sub-menu li {
 }
 
 /* links with images */
-a.link-bekijk {
+span.link-bekijk, a.link-bekijk {
 	background-image: url('../images/page_magnify.png');
 	background-repeat: no-repeat;
 	padding-left: 16px;
 	padding-bottom: 5px;
+	cursor: pointer;
 }
-a.link-zend {
+span.link-zend, a.link-zend {
 	background-image: url('../images/email_transfer.png');
 	background-repeat: no-repeat;
 	padding-left: 16px;
 	padding-bottom: 5px;
+	cursor: pointer;
 }
-a.link-edit {
+span.link-edit, a.link-edit {
 	background-image: url('../images/page_white_paint.png');
 	background-repeat: no-repeat;
 	padding-left: 16px;
 	padding-bottom: 5px;
+	cursor: pointer;
 }
-a.link-accept {
+span.link-accept, a.link-accept {
 	background-image: url('../images/accept.png');
 	background-repeat: no-repeat;
 	padding-left: 16px;
 	padding-bottom: 5px;
+	cursor: pointer;
 }
-a.link-terug {
+span.link-terug, a.link-terug {
 	background-image: url('../images/nav/yellow_arrow_undo.png');
 	background-repeat: no-repeat;
 	padding-left: 16px;
 	padding-bottom: 5px;
+	cursor: pointer;
 }
-a.link-cancel {
+span.link-cancel, a.link-cancel {
 	background-image: url('../images/page_white_delete.png');
 	background-repeat: no-repeat;
 	padding-left: 16px;
 	padding-bottom: 5px;
+	cursor: pointer;
 }
-a.link-info {
+span.link-info, a.link-info {
 	background-image: url('../images/information-balloon.png');
 	background-repeat: no-repeat;
 	padding-left: 16px;
 	padding-bottom: 5px;
+	cursor: pointer;
 }
-a.link-add {
+span.link-add, a.link-add {
 	background-image: url('../images/plus-24.png');
 	background-repeat: no-repeat;
 	background-position: left center;
@@ -361,11 +368,12 @@ a.link-add {
 	font-size: 12px;
 	font-variant: small-caps;
 	border: 1px solid #AAA;
+	cursor: pointer;
 }
-a.link-add:hover {
+span.link-add:hover, a.link-add:hover {
 	background-color: #F5F5B5;
 }
-a.link-reload {
+span.link-reload, a.link-reload {
 	background-image: url('../images/sync.png');
 	background-repeat: no-repeat;
 	background-position: left center;
@@ -375,11 +383,12 @@ a.link-reload {
 	font-size: 12px;
 	font-variant: small-caps;
 	border: 1px solid #AAA;
+	cursor: pointer;
 }
-a.link-reload:hover {
+span.link-reload:hover, a.link-reload:hover {
 	background-color: #F5F5B5;
 }
-a.link-del {
+span.link-del, a.link-del {
 	background-image: url('../images/minus-24.png');
 	background-repeat: no-repeat;
 	background-position: left center;
@@ -389,8 +398,9 @@ a.link-del {
 	font-size: 12px;
 	font-variant: small-caps;
 	border: 1px solid #AAA;
+	cursor: pointer;
 }
-a.link-del:hover {
+span.link-del:hover, a.link-del:hover {
 	background-color: #F5F5B5;
 }
 

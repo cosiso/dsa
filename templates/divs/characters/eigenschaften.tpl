@@ -173,13 +173,13 @@
                </span>
             </td>
             <td>
-               <a href="#" class="link-cancel" onclick="remove_char(this)">remove</a>
+               <span class="link-cancel" onclick="remove_char(this)">remove</span>
             </td>
          </tr>
       {/section}
    </tbody>
 </table>
 <br>
-<a class="link-add" href="#" onclick="ask_new_character()">Add character</a><br>
+<span class="link-add" onclick="ask_new_character()">Add character</span><br>
 <br>
 <hr>

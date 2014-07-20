@@ -96,13 +96,13 @@
             <td>{$sf[idx].name|escape}</td>
             <td>{$sf[idx].effect|escape}</td>
             <td>
-               <a href="#" onclick="sf_info({$sf[idx].kampf_sf_id})" class="link-info">note</a>
-               | <a href="#" onclick="sf_remove({$sf[idx].id})" class="link-cancel">remove</a>
+               <span onclick="sf_info({$sf[idx].kampf_sf_id})" class="link-info">note</span>
+               | <span onclick="sf_remove({$sf[idx].id})" class="link-cancel">remove</span>
             </td>
          </tr>
       {/section}
    </tbody>
 </table>
 <br />
-<a id="btn_add_sf" href="#" class="link-add" onclick="add_sf({$char_id})">Add kampfsonderfertigkeit</a>
-<a href="#" class="link-reload" onclick="reload_char({$char_id})">Reload</a>
+<span class="link-add" onclick="add_sf({$char_id})">Add kampfsonderfertigkeit</span>
+<span class="link-reload" onclick="reload_char({$char_id})">Reload</span>

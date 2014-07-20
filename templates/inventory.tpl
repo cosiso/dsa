@@ -106,9 +106,9 @@
                      '<td id="wm">' + htmlescape(data.at) + '/' + htmlescape(data.pa) + '</td>' +
                      '<td id="bf">' + htmlescape(data.bf) + '</td>' +
                      '<td>' +
-                        '<a id="note" href="#" class="link-info">note</a> ' +
-                        '| <a id="edit" href="#" class="link-edit">edit</a> ' +
-                        '| <a id="remove" href="#" class="link-cancel" onclick="remove_weapon(' + id + ')">remove</a>' +
+                        '<span id="note" class="link-info">note</span> ' +
+                        '| <span id="edit" class="link-edit">edit</span> ' +
+                        '| <span id="remove" class="link-cancel" onclick="remove_weapon(' + id + ')">remove</span>' +
                      '</td></tr>';
                $(table_id + ' tbody').append(elem);
                add_simpletip($(table_id + ' tr#' + id), id, 0);
@@ -229,7 +229,7 @@
             // attached to link
             $('tr#' + id + ' #edit').eq(0).simpletip().hide();
          } else {
-            $('a[id^="btn_add_weapon_"]').each(function() {
+            $('span[id^="btn_add_weapon_"]').each(function() {
                $(this).eq(0).simpletip().hide();
             })
          }

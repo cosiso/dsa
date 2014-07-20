@@ -112,13 +112,13 @@
                // Add simpletip to button
                attach_simpletip_frm('#btn_add_kampftechnik', 0);
                // Add simpletip to links
-               $('#table_kampftechniken a[id^=link_edit]').each(function() {
+               $('#table_kampftechniken span[id^=link_edit]').each(function() {
                   var id = $(this).prop('id');
                   var dummy = id.split('_');
                   attach_simpletip_frm('#' + id, dummy[2]);
                });
                // Add remove function to links
-               $('tr[id^=row_] a[id^=link_remove_]').each(function(index) {
+               $('tr[id^=row_] span[id^=link_remove_]').each(function(index) {
                   // Fetch id from name
                   var id = $(this).prop('id');
                   var dummy = id.split('_');
@@ -180,8 +180,8 @@
                      '<td id="cell_be">' + htmlescape(data.be) + '</td>' +
                      '<td id="cell_ua">' + cell_ua + '</td>';
                      '<td>' +
-                     '<a id="link_edit_' + data.id + '" href="#" class="link-edit">edit</a>' +
-                     ' | <a id="link_remove_' + data.id + '" href="#" class="link-cancel">remove</a>' +
+                     '<span id="link_edit_' + data.id + '" class="link-edit">edit</span>' +
+                     ' | <span id="link_remove_' + data.id + '" class="link-cancel">remove</span>' +
                      '</td>' +
                      '</tr>';
                   $('#talente #table_kampftechniken tbody').append(elem);
@@ -314,15 +314,13 @@
                      '<td id="ap">' + data.ap + '</td>' +
                      '<td id="effect">' + htmlescape(data.effect) + '</td>' +
                      '<td>' +
-                        '<a href="#" id="note" class="link-info">note</a>' +
-                        ' | <a href="#" id="edit" class="link-edit">edit</a>' +
-                        ' | <a href="#" id="remove" class="link-cancel" onclick="remove_kampf_sf(' + data.id + ')">remove</a>' +
+                        '<span id="note" class="link-info">note</span>' +
+                        ' | <span id="edit" class="link-edit">edit</span>' +
+                        ' | <span id="remove" class="link-cancel" onclick="remove_kampf_sf(' + data.id + ')">remove</span>' +
                      '</td></tr>';
                   $('table#kampf_sf tbody').append(row);
                   add_simpletip_sf($('table#kampf_sf tr#' + data.id).find('#edit'), data.id);
                   add_note_sf($('table#kampf_sf tr#' + data.id).find('#note'), data.id);
-                  //add_simpletip_sf($('table#kampf_sf tr#' + data.id + ' #edit'), data.id);
-                  //add_note_sf($('table#kampf_sf tr#' + data.id + ' #note'), data.id);
                } else {
                   // change row
                   $(row_id + ' #name').text(data.name);

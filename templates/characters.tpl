@@ -10,6 +10,8 @@
    <div id="basiswerte" style="display: none; padding-left: 20px"></div>
    <h3 class="toggle" onclick="toggle_vorteile()">Vor- &amp; Nachteile</h3>
    <div id="vor_nach_teile" style="display: none; padding-left: 20px; max-width: 700px"></div>
+   <h3 class="toggle" onclick="toggle_kampftechniken()">Kampftechniken</h3>
+   <div id="kampftechniken" style="display: none; padding-left: 20px; max-width: 700px"></div>
    {section name=idx loop=$chars}
       <h3 id="{$chars[idx].id}" class="toggle" onclick="toggle({$chars[idx].id})">{$chars[idx].name|escape}</h3>
       <div id="char_{$chars[idx].id}" style="display: none; padding-left: 20px"></div>
@@ -46,6 +48,9 @@
       }
       function htmlescape(s) {
          return $('<div />').text(s).html();
+      }
+      function close_all_divs() {
+         $('h3 + div').hide();
       }
       function toggle_base() {
          var elem = 'div#basiswerte';
@@ -313,14 +318,23 @@
             $(elem).hide();
             return;
          }
-         if (! $(elem).html() || 1) {
+         if (! $(elem).html()) {
             $(elem).text('Retrieving data, please wait.');
-            $(elem).slideDown();
-            $(elem).load('char_vorteile.php', {}, show_vorteile);
+            $(elem).load('char_vorteile.php', {});
          }
+         $(elem).slideDown();
       }
-      function show_vorteile() {
-         // do something?
+      function toggle_kampftechniken() {
+         var elem='div#kampftechniken';
+         if ($(elem).is(':visible')) {
+            $(elem).hide();
+            return;
+         }
+         if (! $(elem).html() || 1) {
+            $(elem).text('Retrieving data, please wait');
+            $(elem).load('char_kampftechniken.php');
+         }
+         $(elem).slideDown();
       }
       function show_vorteil(span) {
          var id = $(span).prop('id');
@@ -423,10 +437,15 @@
                })
             },
          });
+         return falsedd
       }
       function do_add_vorteil(data) {
          data = extract_json(data);
          if (data.success) {
+            if (data.existing) {
+               alertify.log('Character already had this vor-/nachteil');
+               return;
+            }
             var parent = 'vorteile-';
             if (! data.is_vorteil) { parent = 'nachteile-' }
             parent += data.char_id;
@@ -435,6 +454,17 @@
             $('#' + parent).append(span);
             $('#' + parent + ' span#' + data.vorteil_id + '.vorteil').effect('highlight', {}, 2000);
          }
+      }
+      function raise_kt(img, kind, value) {
+         console.log('Raising something by ' + value);
+         // Get parent row img > td > tr
+         var tr = $(img).parent().parent();
+         var ckt_id = $(tr).prop('id');
+         console.log('ID: ' + ckt_id);
+         // Get column based on "kind"
+         if (kind == 'at') { nr_col = 2; } else { nr_col = 3; }
+         var td = $(tr).filter(':nth-child(' + nr_col + ')');
+         console.log('Current: ' + $(td).text());
       }
       //-->
    </script>

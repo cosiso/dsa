@@ -16,12 +16,12 @@
             <td id="ap">{$sf[idx].ap}</td>
             <td id="effect">{$sf[idx].effect|escape}</td>
             <td>
-               <a href="#" id="note" class="link-info">note</a>
-               | <a href="#" id="edit" class="link-edit">edit</a>
-               | <a href="#" id="remove" class="link-cancel" onclick="remove_kampf_sf({$sf[idx].id})">remove</a>
+               <span id="note" class="link-info">note</span>
+               | <span id="edit" class="link-edit">edit</span>
+               | <span id="remove" class="link-cancel" onclick="remove_kampf_sf({$sf[idx].id})">remove</span>
             </td>
          </tr>
       {/section}
    </tbody>
 </table><br />
-<a id="btn_add_sf" class="link-add" href="#">Add sonderfertigkeit</a>
+<span id="btn_add_sf" class="link-add" href="#">Add sonderfertigkeit</span>

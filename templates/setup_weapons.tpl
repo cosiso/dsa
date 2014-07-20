@@ -41,15 +41,15 @@
                         <td id="cell_wm">{$weapons[idx].wm|escape}</td>
                         <td id="cell_dk">{$weapons[idx].dk|escape}</td>
                         <td>
-                           <a id="link_info_{$weapons[idx].id}" href="#" class="link-info">info</a>
-                           <a id="link_edit_{$weapons[idx].id}" href="#" class="link-edit">edit</a>
-                           | <a id="link_remove_{$weapons[idx].id}" href="#" class="link-cancel" onclick="remove_weapon({$weapons[idx].id})">remove</a>
+                           <span id="link_info_{$weapons[idx].id}" class="link-info">info</span>
+                           <span id="link_edit_{$weapons[idx].id}" class="link-edit">edit</span>
+                           | <span id="link_remove_{$weapons[idx].id}" class="link-cancel" onclick="remove_weapon({$weapons[idx].id})">remove</span>
                         </td>
                      </tr>
                   {/section}
                </tbody>
             </table><br />
-            <a id="btn_add_weapon" class="link-add" href="#">Add weapon</a>
+            <span id="btn_add_weapon" class="link-add">Add weapon</span>
          </div>
       </div>
       {include file='part_script_include.tpl'}
@@ -205,9 +205,9 @@
                         '<td id="cell_wm">' + data.wm + '</td>' +
                         '<td id="cell_dk">' + data.dk + '</td>' +
                         '<td>' +
-                        '<a id="link_info_' + data.id + '" href="#" class="link-info">info</a>' +
-                        '| <a id="link_edit_' + data.id + '" href="#" class="link-edit">edit</a>' +
-                        '| <a id="link_remove_' + data.id + '" href="#" class="link-cancel">remove</a>' +
+                        '<span id="link_info_' + data.id + '" class="link-info">info</span>' +
+                        '| <span id="link_edit_' + data.id + '" class="link-edit">edit</span>' +
+                        '| <span id="link_remove_' + data.id + '" class="link-cancel">remove</span>' +
                         '</td></tr>';
                   $('#table_weapons tbody').append(elem);
                   attach_simpletip_frm('#table_weapons #link_edit_' + data.id);

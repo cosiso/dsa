@@ -21,15 +21,15 @@
             <td id="wm">{$weapons[idx].at|default:'0'}/{$weapons[idx].pa|default:'0'}</td>
             <td id="bf">{$weapons[idx].bf}</td>
             <td>
-               <a id="note" href="#" class="link-info">note</a>
-               | <a id="edit" href="#" class="link-edit">edit</a>
-               | <a id="remove" href="#" class="link-cancel" onclick="remove_weapon({$weapons[idx].id})">remove</a>
+               <span id="note" class="link-info">note</span>
+               | <span id="edit" class="link-edit">edit</span>
+               | <span id="remove" class="link-cancel" onclick="remove_weapon({$weapons[idx].id})">remove</span>
             </td>
          </tr>
       {/section}
    </tbody>
 </table><br />
-<a id="btn_add_weapon_{$char_id}" class="link-add" href="#">Add weapon</a><br />
+<span id="btn_add_weapon_{$char_id}" class="link-add" href="#">Add weapon</span><br />
 
 <h4>Kleidung</h4>
 

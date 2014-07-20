@@ -13,7 +13,7 @@
       <br><br>
    {/section}
    <br>
-   <a href="#" class="link-add" onclick="fn_add_vorteil()">Add vorteil</a><br>
+   <span class="link-add" onclick="fn_add_vorteil()">Add vorteil</span><br>
 </div>
 <div style="float: left; max-width: 325px">
    <h4>Nachteile</h4>
@@ -30,7 +30,7 @@
       <br><br>
    {/section}
    <br>
-   <a href="#" class="link-add" onclick="fn_add_nachteil()">Add nachteil</a><br>
+   <span class="link-add" onclick="fn_add_nachteil()">Add nachteil</span><br>
 </div>
 <br clear="all">
 <br>

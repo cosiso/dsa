@@ -50,8 +50,8 @@
                      <td style="padding-right: 5px" id="cell_name">{$categories[idx].name|escape}</td>
                      <td style="padding-right: 5px" id="cell_skt">{$categories[idx].default_skt|escape}</td>
                      <td>
-                        <a href="javascript:edit_categories({$categories[idx].id})" class="link-edit">edit</a>
-                        | <a href="javascript:remove_categories({$categories[idx].id})" class="link-cancel">remove</a>
+                        <span onclick="edit_categories({$categories[idx].id})" class="link-edit">edit</span>
+                        | <span onclick="remove_categories({$categories[idx].id})" class="link-cancel">remove</span>
                      </td>
                   </tr>
                {/section}
@@ -156,8 +156,8 @@
          var row = '<tr rowhover="yes" id="row_' + category_id +'" >';
          row += '<td style="padding-right: 5px" id="cell_name">' + category_name + '</td>';
          row += '<td style="padding-right: 5px" id="cell_skt">' + category_skt + '</td>';
-         row += '<td><a href="javascript:edit_category(' + category_id + ')" class="link-edit">edit</a> | ';
-         row += '<a href="javascript:remove_categories(' + category_id + ')" class="link-cancel">remove</a></td></tr>';
+         row += '<td><span onclick="edit_category(' + category_id + ')" class="link-edit">edit</span> | ';
+         row += '<span onclick="remove_categories(' + category_id + ')" class="link-cancel">remove</span></td></tr>';
          // Insert new element
          if (last == true) {
             $(row).insertAfter($('#table_categories tr').last());
