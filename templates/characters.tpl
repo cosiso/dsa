@@ -456,15 +456,103 @@
          }
       }
       function raise_kt(img, kind, value) {
-         console.log('Raising something by ' + value);
          // Get parent row img > td > tr
          var tr = $(img).parent().parent();
          var ckt_id = $(tr).prop('id');
-         console.log('ID: ' + ckt_id);
          // Get column based on "kind"
-         if (kind == 'at') { nr_col = 2; } else { nr_col = 3; }
-         var td = $(tr).filter(':nth-child(' + nr_col + ')');
-         console.log('Current: ' + $(td).text());
+         var td = $(tr).find('#' + kind);
+         var v = $(td).text();
+         // Set new value
+         v = parseInt(v) + parseInt(value);
+         $(td).text(v);
+         $.ajax({
+            url  : 'char_kampftechniken.php',
+            type : 'post',
+            data : { stage : 'update', id : ckt_id, kind : kind, value : v },
+         });
+      }
+      function kt_add(char_id) {
+         $('#popup').width('auto').height('auto').css('max-width', '').text('Fetching kampftechniken').center().show();
+         $('#popup').load('char_kampftechniken.php', { stage : 'list_techniken', id : char_id }, function(response, status, xhr) {
+            if (status == 'error') {
+               alertify.alert('Unknown error');
+               $('#popup').hide();
+               return;
+            }
+            $('#popup').center();
+            $('#frm_kt_add').validate({
+               rules : {
+                  technik : { required : true, min : 1 },
+               },
+               submitHandler : function(form) {
+                  $(form).ajaxSubmit({
+                     datatype : 'json',
+                     type     : 'post',
+                     url      : 'char_kampftechniken.php',
+                     success  : do_add_kampftechnik,
+                  });
+                  $('#popup').hide();
+               }
+            });
+         });
+      }
+      function do_add_kampftechnik(data) {
+         data = extract_json(data);
+         if (data.success) {
+            var name = '';
+            var img_plus = '<img src="images/plus-16.png" alt="plus" border="0" style="cursor: pointer" ';
+            var img_minus = '<img src="images/minus-16.png" alt="plus" border="0" style="cursor: pointer" ';
+            if (data.unarmed) {
+               name = '<img src="images/bullet_orange.png" alt="yes" border="0">' + htmlescape(data.name);
+            } else {
+               name = htmlescape(data.name)
+            }
+            var row = '<tr id="' + data.id + '">' +
+               '<td>' + name + '</td>' +
+               '<td style="text-align: right"><span id="at">0</span> ' +
+               img_plus + ' onclick="raise_kt(this, \'at\', 1)"> ' +
+               img_minus + ' onclick="raise_kt(this, \'at\', -1)">' +
+               '</td>' +
+               '<td style="text-align: right"><span id="pa">0</span> ' +
+               img_plus + ' onclick="raise_kt(this, \'pa\', 1)"> ' +
+               img_minus + ' onclick="raise_kt(this, \'pa\', -1)">' +
+               '</td>' +
+               '<td><span class="link-cancel" onclick="remove_kt(this)">remove</span></td>' +
+               '</tr>';
+            // Find where to prepend
+            var tr = $('tr#kt_add_' + data.char_id);
+            $(tr).before(row);
+            $(tr).prev().effect('highlight', {}, 2000);
+            console.log('I added it!');
+         }
+      }
+      function remove_kt(span) {
+         // Get kampftechnik from parent span > td > tr (and down to td)
+         var tr = $(span).parent().parent();
+         var ckt_id = $(tr).prop('id');
+         var technik = $(tr).children(':first-child').text();
+         alertify.confirm('Remove ' + technik + '?', function(e) {
+            if (e) {
+               $.ajax({
+                  datatype : 'json',
+                  url      : 'char_kampftechniken.php',
+                  type     : 'post',
+                  data     : { stage : 'remove', id : ckt_id },
+                  success  : do_remove_kt,
+               })
+            }
+         });
+      }
+      function do_remove_kt(data) {
+         data = extract_json(data);
+         if (data.success) {
+            // Find row
+            var tr = $('div#kampftechniken').find('tr#' + data.id);
+            $(tr).effect('highlight', {}, 2000);
+            setTimeout(function() {
+               $(tr).remove();
+            }, 500);
+         }
       }
       //-->
    </script>

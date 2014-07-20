@@ -223,9 +223,9 @@
                $('form#edit_vorteil').validate({
                   rules : {
                      name        : { required : true, maxlength : 64 },
-                     gp          : { digits : true },
-                     ap          : { digits : true },
-                     effect      : { maxlength : 255 },
+                     gp          : { number : true },
+                     ap          : { number : true },
+                     effect      : { required : true, maxlength : 255 },
                      description : { maxlength : 4096 },
                   },
                   submitHandler : function(form) {
