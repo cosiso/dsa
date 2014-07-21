@@ -72,7 +72,7 @@
             // Add simpletip to button
             add_simpletip('#btn_add_weapon', 0);
             // Add simpletip to links
-            $('#table_weapons a[id^=link_edit]').each(
+            $('#table_weapons span[id^=link_edit]').each(
                function() {
                   // Id of element is in form edit_link_<id>
                   var link_id = $(this).prop('id');
