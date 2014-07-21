@@ -176,9 +176,12 @@
       function toggle_h3(elem_h3) {
          var div = $(elem_h3).text();
          div = div.toLowerCase();
-         // Opens the div with the given name, closes all others
-         $('#main h3 + div').slideUp();
-         $('#' + div).slideDown();
+         // If div is opened, close it
+         if ($('#' + div).is(':visible')) {
+            $('#' + div).hide();
+         } else {
+            $('#' + div).slideDown();
+         }
       }
       function show_info(link) {
          // Get id from parent a > td > tr
