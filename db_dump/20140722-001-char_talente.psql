@@ -1,0 +1,12 @@
+-- Create table
+CREATE TABLE char_talente (
+   id SERIAL PRIMARY KEY,
+   character_id INT REFERENCES characters (id) ON DELETE CASCADE ON UPDATE CASCADE NOT NULL,
+   talent_id INT REFERENCES talente (id) ON DELETE CASCADE ON UPDATE CASCADE NOT NULL,
+   value INT,
+   note VARCHAR(1024)
+);
+
+-- Grants
+GRANT ALL ON char_talente TO nginx;
+GRANT ALL ON char_talente_id_seq TO nginx;

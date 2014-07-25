@@ -4,13 +4,13 @@
   "value": [
     "require_once('config.inc.php');", 
     "require_once('db.inc.php');", 
-    "require_once('smarty.inc.php');!@#_currentPos!@#_anchor"
+    "require_once('smarty3.inc.php');!@#_currentPos!@#_anchor"
   ], 
   "set_selection": "false", 
   "version": "1.0.12", 
-  "auto_abbreviation": "false", 
-  "treat_as_ejs": "false", 
-  "type": "snippet", 
   "indent_relative": "false", 
-  "icon": "chrome://icomoon/skin/icons/box-add.png"
+  "icon": "chrome://icomoon/skin/icons/box-add.png", 
+  "type": "snippet", 
+  "treat_as_ejs": "false", 
+  "auto_abbreviation": "false"
 }

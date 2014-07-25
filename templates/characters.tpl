@@ -523,7 +523,6 @@
             var tr = $('tr#kt_add_' + data.char_id);
             $(tr).before(row);
             $(tr).prev().effect('highlight', {}, 2000);
-            console.log('I added it!');
          }
       }
       function remove_kt(span) {
