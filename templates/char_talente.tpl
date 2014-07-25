@@ -94,7 +94,7 @@
                '<td>' + htmlescape(data.name) + '</td>' +
                '<td id="values">' + data.eig1 + ' - ' + data.eig2 + ' - ' + data.eig3 + '</td>' +
                '<td style="text-align: right">' + data.value + '</td>' +
-               '<td>'
+               '<td>' +
                   '<img src="images/plus-16.png" border="0" alt="plus" style="cursor: pointer" onclick="ct_change(this, 1)"> ' +
                   '<img src="images/minus-16.png" border="0" alt="minus" style="cursor: pointer" onclick="ct_change(this, -1)">' +
                '</td>' +
