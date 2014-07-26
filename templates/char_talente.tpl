@@ -102,13 +102,38 @@
                '<td id="note">' + htmlescape(data.note) + '</td>' +
                '<td>' +
                '<span class="link-edit" onclick="edit_note(this)">edit note</span> | ' +
-               '<span class="link-cancel" onclick="remove(this)">remove</span></td>' +
+               '<span class="link-cancel" onclick="remove_char(this)">remove</span></td>' +
                '</tr>';
             // Find where to prepend
             var last = $('table#chars-' + data.talent_id + ' tr:last');
             $(last).before(row);
             $(last).prev().effect('highlight', {}, 2000);
          }
+      }
+      function remove_char(span) {
+         // Fetch row
+         var row = $(span).parent().parent();
+         // Fetch id from row
+         var id = $(row).prop('id').split('-')[1];
+         // Fetch char-name from td
+         var name = $(row).children('td:first').text();
+         console.log('Name: ' + name);
+         alertify.confirm('Remove talent from ' + name + '?', function(e) {
+            if (e) {
+               // Remove row
+               $(row).effect('highlight', {}, 2000);
+               setTimeout(function() {
+                  $(row).remove();
+               }, 500);
+               // Update database
+               $.ajax({
+                  datatype : 'json',
+                  url      : 'char_talente.php',
+                  type     : 'post',
+                  data     : { stage : 'remove', id : id },
+               });
+            }
+         })
       }
       function ct_change(img, value) {
          // Fetch id from parent img > td > tr
@@ -143,6 +168,7 @@
          $('#popup').width('auto').height('auto').css('max-width', '').text('Fetching note').center().show();
          $('#popup').load('char_talente.php', { stage : 'show-note', id : id }, function(response, status, xhr) {
             $('#popup').center();
+            $('#popup #note').select().focus();
             $('#frm_note').validate({
                rules : {
                   note : { maxlength : 1024 },

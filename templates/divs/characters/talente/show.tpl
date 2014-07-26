@@ -39,7 +39,7 @@
                <td id="note">{$talente[idx].chars[idx2].note|escape|nl2br}</td>
                <td>
                   <span class="link-edit" onclick="edit_note(this)">edit note</span>
-                  | <span class="link-cancel" onclick="remove(this)">remove</span>
+                  | <span class="link-cancel" onclick="remove_char(this)">remove</span>
                </td>
             </tr>
          {/section}

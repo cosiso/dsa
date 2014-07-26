@@ -127,6 +127,7 @@ function add() {
 					 'eig1'         => $eig1,
 					 'eig2'         => $eig2,
 					 'eig3'         => $eig3,
+					 'note'         => $note,
 					 'ct_id'        => $id);
 }
 
@@ -181,6 +182,17 @@ function edit_note() {
 					 'note'    => $note);
 }
 
+function remove() {
+	global $db, $debug;
+
+	if (! check_int($_REQUEST['id'], false)) {
+		return;
+	}
+
+	$qry = 'DELETE FROM char_talente WHERE id = %d';
+	$db->do_query(sprintf($qry, $_REQUEST['id']), true);
+}
+
 switch ($_REQUEST['stage']) {
    case 'show_talente':
       show_talente();
@@ -202,6 +214,9 @@ switch ($_REQUEST['stage']) {
 		break;
 	case 'add':
 		echo json_encode(add());
+		break;
+	case 'remove':
+		remove();
 		break;
    default:
       show();
