@@ -32,6 +32,10 @@
          $(document).ready(function() {
             // Activate talente
             show_talente();
+            // Add validation method
+            $.validator.addMethod('num', function(value, element, parameter) {
+               return this.optional(element) || parseInt(value) == value;
+            }, 'Value must be an integer');
          });
          function show_talente() {
             $.ajax({
@@ -70,18 +74,9 @@
                   // Add validation to form
                   $('#frm_kampftechniken').validate({
                      rules        : {
-                        name : {
-                           required : true
-                        },
-                        skt  : {
-
-                           required : true,
-                           minlength: 1,
-                           maxlength: 1
-                        },
-                        be   : {
-                           number   : true
-                        }
+                        name : { required : true },
+                        skt  : { required : true, minlength: 1, maxlength: 1 },
+                        be   : { num   : true },
                      },
                      submitHandler: function(form) {
                         $(form).ajaxSubmit({

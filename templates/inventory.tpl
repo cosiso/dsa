@@ -29,12 +29,16 @@
       var hasData = {};
       var is_retrieving = false;
       $(document).ready(function() {
+         // Add validation method
          $.validator.addMethod('tp', function(value, element) {
             return this.optional(element) || value.match(/^\d+[dwDW]\d+(\+\d+)$/);
          }, 'Please format like f.e. 1d6+1');
          $.validator.addMethod('tpkk', function(value, element) {
             return this.optional(element) || value.match(/^\d+\/\d+$/);
          }, 'Please format like f.e. 2/3');
+         $.validator.addMethod('num', function(value, element, parameter) {
+            return this.optional(element) || parseInt(value) == value;
+         }, 'Value must be an integer');
       })
       function add_simpletip(elem, id, char_id) {
          $(elem).unbind('click');
@@ -61,10 +65,10 @@
                }
                $('#frm_weapons').validate({
                   rules         : {
-                     ini  : 'number',
-                     at   : 'number',
-                     pa   : 'number',
-                     bf   : 'number',
+                     ini  : 'num',
+                     at   : 'num',
+                     pa   : 'num',
+                     bf   : 'num',
                      tp   : 'tp',
                      tpkk : 'tpkk',
                   },

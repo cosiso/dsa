@@ -90,6 +90,10 @@
          $('a[id^="edit_desc"]').each(function(index, value) {
             add_simpletip_to_edit($(this));
          });
+         // Add validation method
+         $.validator.addMethod('num', function(value, element, parameter) {
+            return this.optional(element) || parseInt(value) == value;
+         }, 'Value must be an integer');
       })
       jQuery.fn.center = function () {
           this.css("position","absolute");
@@ -226,8 +230,8 @@
                $('form#edit_vorteil').validate({
                   rules : {
                      name        : { required : true, maxlength : 64 },
-                     gp          : { number : true },
-                     ap          : { number : true },
+                     gp          : { num : true },
+                     ap          : { num : true },
                      effect      : { required : true, maxlength : 255 },
                      description : { maxlength : 4096 },
                   },

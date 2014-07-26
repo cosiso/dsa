@@ -21,9 +21,10 @@
    <script type="text/javascript">
       <!--
       $(document).ready(function() {
-         $.validator.addMethod('notempty', function(value, element, parameter) {
-            return false;
-         }, 'Dummy message');
+         // Add validation method
+         $.validator.addMethod('num', function(value, element, parameter) {
+            return this.optional(element) || parseInt(value) == value;
+         }, 'Value must be an integer');
          toggle_base();
       });
       jQuery.fn.center = function () {
@@ -162,7 +163,7 @@
             $('form#edit_eigenschaft #modifier').focus().select();
             $('form#edit_eigenschaft').validate({
                rules : {
-                  modifier : { number : true },
+                  modifier : { num : true },
                   bought   : { digits : true },
                },
                submitHandler : function(form) {
@@ -287,7 +288,7 @@
          $('form#eigenschaft').validate({
             rules : {
                base      : { digits : true, required : true },
-               modifier  : { number : true },
+               modifier  : { num : true },
                zugekauft : { digits : true },
                note      : { maxlength : 255 },
             },
