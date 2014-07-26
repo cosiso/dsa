@@ -37,9 +37,8 @@ function get_char() {
    $smarty->assign('char_id', $char_id);
 
    $qry = 'SELECT weapons.name, kampftechniken.name as technik, ';
-	$qry .= '      combat_at(char_weapons.id) AS combat_at, combat_pa(char_weapons.pa) AS combat_pa, ';
+	$qry .= '      combat_at(char_weapons.id) AS combat_at, combat_pa(char_weapons.id) AS combat_pa, ';
    $qry .= '      char_kampftechniken.at, char_kampftechniken.pa, ';
-   $qry .= "      tot_at($char_id) AS c_at, tot_pa($char_id)  AS c_ap, ";
    $qry .= '      COALESCE(char_weapons.tp, weapons.tp) AS tp, ';
    $qry .= '      weapons.dk, weapons.ini, char_weapons.ini AS w_ini, ';
    $qry .= "      tot_ini($char_id) AS c_ini, ";
