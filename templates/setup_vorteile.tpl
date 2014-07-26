@@ -23,7 +23,7 @@
                         <td id="cell_gp">{$vorteile[idx].gp|escape}</td>
                         <td id="cell_ap">{$vorteile[idx].ap|escape}</td>
                         <td id="cell_effect">{$vorteile[idx].effect}</td>
-                        <td id="cell_links">
+                        <td id="cell_links" style="white-space: nowrap">
                            <span id="span_desc_{$vorteile[idx].id}" style="display: none"></span>
                            <span class="link-info" onclick="show_info(this)">info</span>
                            | <span class="link-edit" onclick="show_edit(this)">edit</span>
@@ -40,7 +40,7 @@
             <span class="link-add" onclick="show_edit_cont(0, 1)">Add vorteil</span>
          </div>
          <h3 onclick="toggle_h3(this)">Nachteile</h3>
-         <div id="nachteile" style="display: none">
+         <div id="nachteile" style="display: none; max-width: 800px">
             <table id="table_nachteile" cellspacing="0" cellpadding="1" class="sortable">
                <thead>
                   <tr>
@@ -58,7 +58,7 @@
                         <td id="cell_gp">{$nachteile[idx].gp|escape}</td>
                         <td id="cell_ap">{$nachteile[idx].ap|escape}</td>
                         <td id="cell_effect">{$nachteile[idx].effect}</td>
-                        <td id="cell_links">
+                        <td id="cell_links" style="white-space: nowrap">
                            <span id="span_desc_{$nachteile[idx].id}" style="display: none"></span>
                            <span class="link-info" onclick="show_info(this)">info</span>
                            | <span class="link-edit" onclick="show_edit(this)">edit</span>
