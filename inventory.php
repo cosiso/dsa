@@ -144,10 +144,10 @@ function update_weapon() {
       $qry .= '      note = ' . ( ($note) ? "'" . pg_escape_string($note) . "'" : 'NULL') . ', ';
       $qry .= '      tp = ' . ( ($tp) ? "'$tp'" : 'NULL') . ', ';
       $qry .= '      tpkk = ' . ( ($tpkk) ? "'$tpkk'" : 'NULL') . ', ';
-      $qry .= '      ini = ' . ( ($ini) ? $ini : 0) . ', ';
-      $qry .= '      at = ' . ( ($at) ? $at : 0) . ', ';
-      $qry .= '      pa = ' . ( ($pa) ? $pa : 0) . ', ';
-      $qry .= '      bf = ' . ( ($bf) ? $bf : 0) . ' ';
+      $qry .= '      ini = ' . ( ($ini !== '') ? $ini : 'NULL') . ', ';
+      $qry .= '      at = ' . ( ($at !== '') ? $at : 'NULL') . ', ';
+      $qry .= '      pa = ' . ( ($pa !== '') ? $pa : 'NULL') . ', ';
+      $qry .= '      bf = ' . ( ($bf !== '') ? $bf : 'NULL') . ' ';
       $qry .= 'WHERE id = ' . $_REQUEST[id];
    } else {
       # Add new weapon
@@ -159,13 +159,12 @@ function update_weapon() {
       $qry .= ( ($note) ? "'" . pg_escape_string($note) . "'" : 'NULL') . ', ';
       $qry .= ( ($tp) ? "'$tp'" : 'NULL') . ', ';
       $qry .= ( ($tpkk) ? "'$tpkk'" : 'NULL') . ', ';
-      $qry .= ( ($ini) ? $ini : 0) . ', ';
-      $qry .= ( ($at) ? $at : 0) . ', ';
-      $qry .= ( ($pa) ? $pa : 0) . ', ';
-      $qry .= ( ($bf) ? $bf : 0) . ')';
+      $qry .= ( ($ini !== '') ? $ini : 'NULL') . ', ';
+      $qry .= ( ($at !== '') ? $at : 'NULL') . ', ';
+      $qry .= ( ($pa !== '') ? $pa : 'NULL') . ', ';
+      $qry .= ( ($bf !== '') ? $bf : 'NULL') . ')';
    }
 
-   #return array('message' => $qry);
    if (! @$db->do_query($qry)) {
       return array('message' => 'database-error' . ($debug) ? ': ' . pg_last_error() : '');
    }

@@ -117,11 +117,17 @@
             } else {
                var row_id = table_id + ' #' + id;
                // Update values
-               $(row_id + ' #tp').text(data.tp);
-               $(row_id + ' #tpkk').text(data.tpkk);
-               $(row_id + ' #ini').text(data.ini);
-               $(row_id + ' #wm').text(data.at + '/' + data.pa);
-               $(row_id + ' #bf').text(data.bf);
+               $(row_id).children('#tp').text(data.tp);
+               $(row_id).children('#tpkk').text(data.tpkk);
+               $(row_id).children('#ini').text(data.ini);
+               var wm;
+               if (data.at == '' && data.pa == '') {
+                  wm = '';
+               } else {
+                  wm = data.at + '/' + data.pa;
+               }
+               $(row_id).children('#wm').text(wm);
+               $(row_id).children('#bf').text(data.bf);
             }
             $(table_id + ' #' + id).effect('highlight', {}, 2000);
          }

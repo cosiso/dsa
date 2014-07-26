@@ -25,7 +25,7 @@
       <tr>
          <td>
             <label for="ini">INI</label>
-            {html_text name='ini' value=$ini style='width: 5em'}
+            <input type="text" id="ini" name="ini" value="{$ini}" style="width: 5em">
          </td>
          <td>
             &nbsp;
@@ -34,11 +34,11 @@
       <tr>
          <td>
             <label for="at">AT</label>
-            {html_text name='at' value=$at style='width: 5em'}
+            <input type="text" id="at" name="at" value="{$at}" style="width: 5em">
          </td>
          <td>
             <label for="pa">PA</label>
-            {html_text name='pa' value=$pa style='width: 5em'}
+            <input type="text" id="pa" name="pa" value="{$pa}" style="width: 5em">
          </td>
       </tr>
          </td>
@@ -46,7 +46,7 @@
       <tr>
          <td>
             <label for="bf">BF</label>
-            {html_text name='bf' value=$bf|escape style='width: 5em'}
+            <input type="text" id="bf" name="bf" value="{$bf|escape}" style="width: 5em">
          </td>
          <td>&nbsp;</td>
       </tr>
