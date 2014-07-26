@@ -7,7 +7,7 @@
       {include file="head.tpl"}
       {include file="setup_menu.tpl" selected_category="Weapons"}
       <div style="float: left">
-         <div id="main">
+         <div id="main" style="max-width: 700px">
             <h3>Weapons</h3>
             <table id="table_weapons" cellspacing="0">
                <thead>
@@ -42,16 +42,17 @@
                         <td id="cell_dk">{$weapons[idx].dk|escape}</td>
                         <td>
                            <span id="link_info_{$weapons[idx].id}" class="link-info">info</span>
-                           <span id="link_edit_{$weapons[idx].id}" class="link-edit">edit</span>
+                           <span id="link_edit_{$weapons[idx].id}" class="link-edit" onclick="edit(this)">edit</span>
                            | <span id="link_remove_{$weapons[idx].id}" class="link-cancel" onclick="remove_weapon({$weapons[idx].id})">remove</span>
                         </td>
                      </tr>
                   {/section}
                </tbody>
             </table><br />
-            <span id="btn_add_weapon" class="link-add">Add weapon</span>
+            <span id="btn_add_weapon" class="link-add" onclick="show_edit_form(0)">Add weapon</span>
          </div>
       </div>
+      <div id="popup" style="display: none"></div>
       {include file='part_script_include.tpl'}
       <script type="text/javascript">
          <!--
@@ -69,24 +70,34 @@
                                                          9: {sorter: false},
                                                         10: {sorter: false},
                                                         11: {sorter: false}}});
-            // Add simpletip to button
-            add_simpletip('#btn_add_weapon', 0);
-            // Add simpletip to links
-            $('#table_weapons span[id^=link_edit]').each(
-               function() {
-                  // Id of element is in form edit_link_<id>
-                  var link_id = $(this).prop('id');
-                  var id = link_id.split('_');
-                  id = id[2];
-                  add_simpletip('#' + link_id, id);
-               }
-            );
+            // Add validation methods
+            $.validator.addMethod('num', function(value, element, parameter) {
+               return this.optional(element) || parseInt(value) == value;
+            }, 'Value must be an integer');
+            $.validator.addMethod('tp', function(value, element) {
+               return this.optional(element) || value.match(/^\d+[dwDW]\d+(\+\d+)$/);
+            }, 'Format like f.e. 1d6+1');
+            $.validator.addMethod('tpkk', function(value, element) {
+               return this.optional(element) || value.match(/^\d+\/\d+$/);
+            }, 'Format like f.e. 2/3');
+            $.validator.addMethod('notempty', function(value, element, parameter) {
+               var v = parseInt(value) || 0;
+               return this.optional(element) || v > 0;
+            }, 'Select an option');
             $('#table_weapons a[id^=link_info]').each(
                function() {
                   add_note_simpletip($(this).prop('id'));
                }
-            )
+            );
          });
+         jQuery.fn.center = function () {
+             this.css("position","absolute");
+             this.css("top", Math.max(0, (($(window).height() - $(this).outerHeight()) / 2) +
+                                                         $(window).scrollTop()) + "px");
+             this.css("left", Math.max(0, (($(window).width() - $(this).outerWidth()) / 2) +
+                                                         $(window).scrollLeft()) + "px");
+             return this;
+         }
          function do_remove_weapon(data) {
             data= extract_json(data);
             if (data.success) {
@@ -140,50 +151,42 @@
                },
             });
          }
-         function add_simpletip(elem, id) {
-            $(elem).unbind('click');
-            $(elem).simpletip({
-               persistent    : true,
-               focus         : true,
-               onBeforeShow  : function() {
-                  this.load('setup_weapons.php', {stage : 'show_form',
-                                                  id    : id});
-               },
-               onContentLoad : function() {
-                  // Selectize select field
-                  $('#frm_weapons #kampftechnik').selectize({
-                     sortField   : 'text',
-                     options     : kampftechniken,
-                     selectOnTab : true,
-                  });
-                  var sel = $('#frm_weapons #kampftechnik_id').val() || 0;
-                  $('#frm_weapons #kampftechnik')[0].selectize.addItem(sel);
-                  // Set focus
-                  $('#frm_weapons #name').focus().select();
-                  // Add validation to form
-                  $('#frm_weapons').validate({
-                     rules        : {
-                        name    : 'required',
-                        tp      : 'required',
-                        tpkk    : 'required',
-                        gewicht : 'number',
-                        lange   : 'number',
-                        bf      : 'number',
-                        ini     : 'number',
-                        wm      : 'required',
-                     },
-                     submitHandler: function(form) {
-                        $(form).ajaxSubmit({
-                           success : do_update_weapon,
-                           type    : 'post',
-                           url     : 'setup_weapons.php',
-                           datatype: 'json'
-                        });
-                        close_box();
-                        return false;
-                     },
-                  });
-               },
+         function edit(span) {
+            // Fetch id from parent span > td > tr
+            var id = $(span).parent().parent().prop('id');
+            id = id.split('_');
+            id = id[1];
+            show_edit_form(id);
+         }
+         function show_edit_form(id) {
+            $('#popup').width('auto').height('auto').css('max-width', '').text('Fetching form').center().show();
+            $('#popup').load('setup_weapons.php', { stage : 'show_form', id : id }, function(response, status, xhr) {
+               // Set focus
+               $('#popup').center();
+               $('#frm_weapons #name').focus().select();
+               // Add validation to form
+               $('#popup #frm_weapons').validate({
+                  rules        : {
+                     name         : { required : true },
+                     kampftechnik : { notempty : true },
+                     tp           : { required : true, tp : true },
+                     tpkk         : { required : true, tpkk : true },
+                     gewicht      : { number : true },
+                     lange        : { number : true },
+                     bf           : { num : true },
+                     ini          : { num : true },
+                     wm           : { required : true },
+                  },
+                  submitHandler: function(form) {
+                     $(form).ajaxSubmit({
+                        success : do_update_weapon,
+                        type    : 'post',
+                        url     : 'setup_weapons.php',
+                        datatype: 'json'
+                     });
+                     $('#popup').hide();
+                  },
+               });
             });
          }
          function do_update_weapon(data) {

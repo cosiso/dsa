@@ -30,10 +30,10 @@
       var is_retrieving = false;
       $(document).ready(function() {
          $.validator.addMethod('tp', function(value, element) {
-            return this.optional(element) || value.match(/\d+[dwDW]\d+(\+\d+)/);
+            return this.optional(element) || value.match(/^\d+[dwDW]\d+(\+\d+)$/);
          }, 'Please format like f.e. 1d6+1');
          $.validator.addMethod('tpkk', function(value, element) {
-            return this.optional(element) || value.match(/\d+\/\d+/);
+            return this.optional(element) || value.match(/^\d+\/\d+$/);
          }, 'Please format like f.e. 2/3');
       })
       function add_simpletip(elem, id, char_id) {

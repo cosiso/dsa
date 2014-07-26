@@ -4,8 +4,8 @@
    {html_hidden name='kampftechnik_id' value=$kampftechnik_id}
    <label for="name">Name</label>
    {html_text name='name' value=$name|escape style='width: 35em'}
-   <label for='kampftechnik'>Kamftechnik</label>
-   <select name="kampftechnik" id="kampftechnik" style="width: 40em"></select>
+   <label for='kampftechnik'>Kampftechnik</label>
+   {html_options id='kampftechnik' name='kampftechnik' options=$kt style='width: 40em' selected=$kampftechnik_id}
    <table cellpadding="0" cellspacing="5" border="0">
       <tr>
          <td>
@@ -59,6 +59,6 @@
    {html_textarea name="note" value=$note style="width: 40em; height: 8em"}
    <div class="button_bar">
       {carto_button type="submit"}
-      {carto_button type='close' onclick="close_box()"}
+      {carto_button type='close' onclick="$('#popup').hide()"}
    </div>
 </form>

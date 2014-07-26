@@ -31,6 +31,13 @@ function show() {
 function show_form() {
    global $db, $debug, $smarty;
 
+   $kt[0] = '-- Select a kampftechnik';
+   $qry = 'SELECT id, name FROM kampftechniken ORDER BY name';
+   $rid = $db->do_query($qry, true);
+   while ($row = $db->get_array($rid)) {
+      $kt[$row['id']] = $row['name'];
+   }
+   $smarty->assign('kt', $kt);
    if ($_REQUEST[id] and
        $_REQUEST[id] == intval($_REQUEST[id])) {
       # Retrieve values
