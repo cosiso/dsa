@@ -41,7 +41,7 @@
                         <td id="cell_wm">{$weapons[idx].wm|escape}</td>
                         <td id="cell_dk">{$weapons[idx].dk|escape}</td>
                         <td>
-                           <span id="link_info_{$weapons[idx].id}" class="link-info">info</span>
+                           <span id="link_info_{$weapons[idx].id}" class="link-info" onclick="note(this)">info</span>
                            <span id="link_edit_{$weapons[idx].id}" class="link-edit" onclick="edit(this)">edit</span>
                            | <span id="link_remove_{$weapons[idx].id}" class="link-cancel" onclick="remove_weapon({$weapons[idx].id})">remove</span>
                         </td>
@@ -55,14 +55,7 @@
       <div id="popup" style="display: none"></div>
       {include file='part_script_include.tpl'}
       <script type="text/javascript">
-         <!--
-         var kampftechniken = new Array(
-            {ldelim} value: 0, text : '  Select a kampftechnik' {rdelim}
-            {section name=idx loop=$kt}
-               ,{ldelim} value: {$kt[idx].id}, text : '{$kt[idx].name|escape}' {rdelim}
-            {/section}
-         )
-         {literal}
+         <!--{literal}
          $(document).ready(function() {
             // Make table sortable
             $('#table_weapons').tablesorter({headers : { 2: {sorter: false},
@@ -84,11 +77,6 @@
                var v = parseInt(value) || 0;
                return this.optional(element) || v > 0;
             }, 'Select an option');
-            $('#table_weapons a[id^=link_info]').each(
-               function() {
-                  add_note_simpletip($(this).prop('id'));
-               }
-            );
          });
          jQuery.fn.center = function () {
              this.css("position","absolute");
@@ -139,17 +127,26 @@
             }
             return data;
          }
-         function add_note_simpletip(elem) {
-            var dummy = elem.split('_');
-            $('#' + elem).unbind('click');
-            $('#' + elem).simpletip({
-               persistent    : true,
-               focus         : true,
-               onBeforeShow  : function() {
-                  this.load('setup_weapons.php', {stage : 'note',
-                                                  id    : dummy[2]});
-               },
+         function note(span) {
+            // Fetch id from parent span > td > tr
+            var id = $(span).parent().parent().prop('id');
+            id = id.split('_');
+            id = id[1];
+            $('#popup').width('auto').height('auto').css('max-width', '400px').text('Fetching note').center().show();
+            $.ajax({
+               datatype : 'json',
+               url      : 'setup_weapons.php',
+               data     : { stage : 'note', id : id },
+               type     : 'get',
+               success  : do_show_note,
             });
+         }
+         function do_show_note(data) {
+            data = extract_json(data);
+            if (data.success) {
+               var note = data.note + '<div class="button_bar"><input type="button" class="menu-button-reset" onclick="$(\'#popup\').hide()" value="Close"></div>';
+               $('#popup').html(note);
+            }
          }
          function edit(span) {
             // Fetch id from parent span > td > tr
@@ -208,12 +205,11 @@
                         '<td id="cell_wm">' + data.wm + '</td>' +
                         '<td id="cell_dk">' + data.dk + '</td>' +
                         '<td>' +
-                        '<span id="link_info_' + data.id + '" class="link-info">info</span>' +
-                        '| <span id="link_edit_' + data.id + '" class="link-edit">edit</span>' +
+                        '<span id="link_info_' + data.id + '" class="link-info" onclick="note(this)">info</span>' +
+                        '| <span id="link_edit_' + data.id + '" class="link-edit" onclick="edit(this)">edit</span>' +
                         '| <span id="link_remove_' + data.id + '" class="link-cancel">remove</span>' +
                         '</td></tr>';
                   $('#table_weapons tbody').append(elem);
-                  attach_simpletip_frm('#table_weapons #link_edit_' + data.id);
                   $('#link_remove_' + data.id).unbind('click').click(function() {remove_weapon(data.id)});
                } else {
                   // Update row
@@ -232,15 +228,6 @@
                   $(row + ' #cell_dk').text(data.dk);
                }
                $('#table_weapons #row_' + data.id).effect('highlight', {}, 2000);
-            }
-         }
-         function close_box() {
-            var id = $('#frm_weapons #id').val();
-            if (id) {
-               $('#link_edit_' + id).eq(0).simpletip().hide();
-               // attached to link
-            } else {
-               $('#btn_add_weapon').eq(0).simpletip().hide();
             }
          }
          //-->{/literal}

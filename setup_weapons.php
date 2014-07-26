@@ -17,15 +17,6 @@ function show() {
       $weapons[] = $row;
    }
    $smarty->assign('weapons', $weapons);
-
-   $qry = 'SELECT id, name ';
-   $qry .= 'FROM  kampftechniken ';
-   $qry .= 'ORDER BY name';
-   $rid = $db->do_query($qry, true);
-   while ($row = $db->get_array($rid)) {
-      $kt[] = $row;
-   }
-   $smarty->assign('kt', $kt);
 }
 
 function show_form() {
@@ -189,12 +180,15 @@ function show_note() {
       return array('message' => 'invalid id specified');
    }
    $qry = 'SELECT note FROM weapons WHERE id = ' . $_REQUEST[id];
-   return nl2br($db->fetch_field($qry, true));
+   $note = $db->fetch_field($qry, true);
+
+   return array('success' => true,
+                'note'    => nl2br(htmlspecialchars($note)));
 }
 
 switch ($_REQUEST[stage]) {
    case 'note':
-      echo show_note();
+      echo json_encode(show_note());
       break;
    case 'remove':
       echo json_encode(remove_weapon());
