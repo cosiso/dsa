@@ -1,0 +1,11 @@
+-- Add table for quellen
+CREATE TABLE quellen (id serial PRIMARY KEY, name varchar(64) NOT NULL UNIQUE, description VARCHAR(4096));
+
+-- Add table for instuktionionen
+CREATE TABLE instruktionen (id serial primary key, name varchar(64) NOT NULL UNIQUE, description VARCHAR(4096));
+
+-- Grants for tables
+GRANT ALL ON quellen to nginx;
+GRANT ALL ON quellen_id_seq to nginx;
+GRANT ALL ON instruktionen to nginx;
+GRANT ALL ON instruktionen_id_seq to nginx;

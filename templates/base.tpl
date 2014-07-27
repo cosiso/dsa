@@ -15,7 +15,7 @@
          {custom_button value='home' onclick="location = 'index.php'"}
          {custom_spacer width=10}
          {custom_button value='characters' onclick="location = 'characters.php'"}
-         {custom_button value='spells' onclick="alert('Spells')"}
+         {custom_button value='magic' onclick="location = 'magic.php'"}
          {custom_spacer width=30}
          {custom_button value='setup' onclick="location = 'setup.php'"}
          {custom_spacer width=100}
@@ -30,7 +30,6 @@
       {/block}
    </div>
    <div id="main" style="float: left">
-      {custom_hidden}
       {block name='main'}
       {/block}
    </div>
