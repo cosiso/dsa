@@ -119,7 +119,7 @@
                   datatype : 'json',
                   url      : 'magic_setup.php',
                   type     : 'post',
-                  data     : { stage : 'remove', id : id },
+                  data     : { stage : 'remove-quelle', id : id },
                   success  : do_remove_quelle
                });
             }
@@ -140,6 +140,100 @@
          var id = $(span).parent().parent().prop('id').split('-')[1];
          $('#popup').text('Retrieving description').width('auto').height('auto').css('max-width', '500').show().center();
          $('#popup').load('magic_setup.php', { stage : 'note-quelle', id : id }, function(response, status, xhr) {
+            if (status != 'success') {
+               alertify.alert('An unknown error occurred');
+               return;
+            }
+            $('#popup').center();
+         });
+      }
+      function add_instruktion() {
+         show_instruktion('');
+      }
+      function show_instruktion(span) {
+         var id = 0
+         if (span != '') {
+            // Fetch id from parent span > td > tr
+            id = $(span).parent().parent().prop('id').split('-')[1];
+         }
+         $('#popup').text('Retrieving form').width('auto').height('auto').css('max-width', '').show().center();
+         $('#popup').load('magic_setup.php', { stage : 'form-instruktion', id : id }, function(response, status, xhr) {
+            if (status != 'success') {
+               alertify.alert('An unknown error occurred');
+               return;
+            }
+            $('#popup').center();
+            $('#form-instruktion > #name').focus().select();
+            $('#form-instruktion').validate({
+               rules : {
+                  name : { required : true, maxlength : 64 },
+                  desc : { maxlength : 4096 },
+               },
+               submitHandler : function(form) {
+                  $(form).ajaxSubmit({
+                     datatype : 'json',
+                     url      : 'magic_setup.php',
+                     type     : 'post',
+                     success  : update_instruktion,
+                  });
+                  $('#popup').hide();
+               }
+            });
+         });
+      }
+      function update_instruktion(data) {
+         data = extract_json(data);
+         if (data.success) {
+            if (data.is_new) {
+               // Add row
+               var row = '<tr id="instruktion-' + data.id + '">' +
+                  '<td>' + htmlescape(data.name) + '</td>' +
+                  '<td><span class="link-info" onclick="note_instruktion(this)">description</span> ' +
+                  '| <span class="link-edit" onclick="show_instruktion(this)">edit</span> ' +
+                  '| <span class="link-cancel" onclick="remove_instruktion(this)">remove</span>' +
+                  '</td></tr>';
+               last = $('#tbl_instruktionen > tbody > tr:last');
+               $(last).before(row);
+               $(last).prev().effect('highlight', {}, 2000);
+            } else {
+               var td = $('#instruktion-' + data.id + ' > td:first');
+               $(td).text(data.name);
+               $(td).parent().effect('highlight', {}, 2000);
+            }
+         }
+      }
+      function remove_instruktion(span) {
+         // Fetch id from parent span > td > tr
+         var id = $(span).parent().parent().prop('id').split('-')[1];
+         // Fetch name
+         var name = $('#instruktion-' + id + ' > td:first').text();
+         alertify.confirm('Remove ' + name + '?', function(e) {
+            if (e) {
+               $.ajax({
+                  datatype : 'json',
+                  url      : 'magic_setup.php',
+                  type     : 'post',
+                  data     : { stage : 'remove-instruktion', id : id },
+                  success  : do_remove_instruktion
+               });
+            }
+         });
+      }
+      function do_remove_instruktion(data) {
+         data = extract_json(data);
+         if (data.success) {
+            var tr = $('#instruktion-' + data.id);
+            $(tr).effect('highlight', {}, 2000);
+            setTimeout(function() {
+               $(tr).remove()
+            }, 500);
+         }
+      }
+      function note_instruktion(span) {
+         // Fetch id from parent span > td > tr
+         var id = $(span).parent().parent().prop('id').split('-')[1];
+         $('#popup').text('Retrieving description').width('auto').height('auto').css('max-width', '500').show().center();
+         $('#popup').load('magic_setup.php', { stage : 'note-instruktion', id : id }, function(response, status, xhr) {
             if (status != 'success') {
                alertify.alert('An unknown error occurred');
                return;
