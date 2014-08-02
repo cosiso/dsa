@@ -3,7 +3,7 @@
 
 require_once('config.inc.php');
 require_once('db.inc.php');
-require_once('smarty.inc.php');
+require_once('smarty3.inc.php');
 
 function show() {
    global $db, $debug, $smarty;
@@ -31,11 +31,6 @@ function show_talente() {
       $kampftechniken[] = $row;
    }
    $smarty->assign('kampftechniken', $kampftechniken);
-
-   $out = $smarty->fetch('div_kampftechniken.tpl');
-
-   return array('success' => true,
-                'div'     => $out);
 }
 
 function frm_kampftechnik() {
@@ -124,10 +119,6 @@ function fetch_sonderfertigkeiten() {
       $sf[] = $row;
    }
    $smarty->assign('sf', $sf);
-
-   $out = $smarty->fetch('div_kampf_sf.tpl');
-   return array('success' => true,
-                'out'     => $out);
 }
 function frm_kampf_sf() {
    global $db, $debug, $smarty;
@@ -224,20 +215,23 @@ function remove_sf() {
                 'id'      => $_REQUEST[id]);
 }
 function note_sf() {
-   global $db, $debug;
+   global $db, $debug, $smarty;
 
    if (! check_int($_REQUEST[id], false)) {
-      return 'No data: invalid id specified';
+      $smarty->assign('error', 'Invalid id specified');
+      return;
    }
 
    $qry = 'SELECT description ';
    $qry .= 'FROM  kampf_sf ';
    $qry .= 'WHERE id = ' . $_REQUEST[id];
-   return nl2br($db->fetch_field($qry, true));
+   $desc = $db->fetch_field($qry, true);
+   $smarty->assign('description', $desc);
 }
 switch ($_REQUEST[stage]) {
    case 'note_sf':
-      echo note_sf();
+      note_sf();
+      $smarty->display('setup/divs/note_kampfsonderfertigkeit.tpl');
       break;
    case 'remove':
       echo json_encode(remove_kampftechnik());
@@ -247,17 +241,19 @@ switch ($_REQUEST[stage]) {
       break;
    case 'frm_kampftechnik':
       frm_kampftechnik();
-      $smarty->display('frm_kampftechniken.tpl');
+      $smarty->display('setup/divs/frm_kampftechniken.tpl');
       break;
    case 'show_talente':
-      echo json_encode(show_talente());
+      show_talente();
+      $smarty->display('setup/divs/show_talente.tpl');
       break;
    case 'fetch_sf':
-      echo json_encode(fetch_sonderfertigkeiten());
+      fetch_sonderfertigkeiten();
+      $smarty->display('setup/divs/kampf_sf.tpl');
       break;
    case 'frm_sonderfertigkeit':
       frm_kampf_sf();
-      $smarty->display('frm_kampf_sf.tpl');
+      $smarty->display('setup/divs/frm_kampf_sf.tpl');
       break;
    case 'update_sf':
       echo json_encode(update_sf());
@@ -267,5 +263,5 @@ switch ($_REQUEST[stage]) {
       break;
    default:
       show();
-      $smarty->display('setup_kampftechniken.tpl');
+      $smarty->display('setup/setup_kampftechniken.tpl');
 }

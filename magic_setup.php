@@ -220,7 +220,7 @@ switch ($_REQUEST['stage']) {
       $smarty->display('magic/divs/form-quelle.tpl');
       break;
    case 'form-instruktion':
-      form_quelle();
+      form_instruktion();
       $smarty->display('magic/divs/form-instruktion.tpl');
       break;
    case 'edit-quelle':

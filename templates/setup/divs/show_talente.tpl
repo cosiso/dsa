@@ -22,11 +22,11 @@
                {/if}
             </td>
             <td>
-               <span id="link_edit_{$kampftechniken[idx].id}" class="link-edit">edit</span>
-               | <span id="link_remove_{$kampftechniken[idx].id}" class="link-cancel">remove</span>
+               <span class="link-edit" onclick="edit_kampftechnik(this)">edit</span>
+               | <span class="link-cancel" onclick="remove_kampftechnik(this)">remove</span>
             </td>
          </tr>
       {/section}
    </tbody>
 </table><br />
-<span id="btn_add_kampftechnik" class="link-add">Add kampftechnik</span>
+<span class="link-add" onclick="edit_kampftechnik('')">Add kampftechnik</span>
