@@ -1,0 +1,17 @@
+{
+  "keyboard_shortcut": "", 
+  "name": "jq-val-num", 
+  "value": [
+    "$.validator.addMethod('num', function(value, element, parameter) {", 
+    "   return this.optional(element) || parseInt(value) == value;", 
+    "}, 'Value must be an integer');", 
+    "!@#_currentPos!@#_anchor"
+  ], 
+  "set_selection": "false", 
+  "version": "1.0.12", 
+  "auto_abbreviation": "false", 
+  "treat_as_ejs": "false", 
+  "type": "snippet", 
+  "indent_relative": "true", 
+  "icon": "chrome://famfamfamsilk/skin/icons/script.png"
+}

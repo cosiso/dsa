@@ -373,6 +373,20 @@ span.link-add, a.link-add {
 span.link-add:hover, a.link-add:hover {
 	background-color: #F5F5B5;
 }
+span.link-add-small {
+	background-image: url('../images/plus-16.png');
+	background-repeat: no-repeat;
+	background-position: left center;
+	border-radius: 9px;
+	padding: 2px;
+	padding-left: 20px;
+	font-variant: small-caps;
+	border: 1px solid #AAA;
+	cursor: pointer;
+}
+span.link-add-small:hover {
+	background-color: #F5F5B5;
+}
 span.link-reload, a.link-reload {
 	background-image: url('../images/sync.png');
 	background-repeat: no-repeat;

@@ -1,0 +1,22 @@
+{
+  "keyboard_shortcut": "", 
+  "name": "jq-val-skt", 
+  "value": [
+    "$.validator.addMethod('skt', function(value, element, parameter) {", 
+    "   var v = value.toUpperCase();", 
+    "   if (v != 'A' && v != 'B' && v != 'C' && v != 'D' && v != 'E' && v != 'F' && v != 'G' && v != 'H' && v != '') {", 
+    "      v = false;", 
+    "   } else {", 
+    "      v = true;", 
+    "   }", 
+    "   return this.optional(element) || v;", 
+    "}, 'Invalid SKT');!@#_currentPos!@#_anchor"
+  ], 
+  "set_selection": "false", 
+  "version": "1.0.12", 
+  "auto_abbreviation": "false", 
+  "treat_as_ejs": "false", 
+  "type": "snippet", 
+  "indent_relative": "true", 
+  "icon": "chrome://famfamfamsilk/skin/icons/script.png"
+}

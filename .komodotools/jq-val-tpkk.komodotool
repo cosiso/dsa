@@ -1,0 +1,17 @@
+{
+  "keyboard_shortcut": "", 
+  "name": "jq-val-tpkk", 
+  "value": [
+    "$.validator.addMethod('tpkk', function(value, element) {", 
+    "   return this.optional(element) || value.match(/^\\d+\\/\\d+$/);", 
+    "}, 'Format like f.e. 2/3');", 
+    "!@#_currentPos!@#_anchor"
+  ], 
+  "set_selection": "false", 
+  "version": "1.0.12", 
+  "indent_relative": "true", 
+  "icon": "chrome://famfamfamsilk/skin/icons/script.png", 
+  "type": "snippet", 
+  "treat_as_ejs": "false", 
+  "auto_abbreviation": "false"
+}

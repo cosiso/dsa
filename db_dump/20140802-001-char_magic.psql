@@ -1,0 +1,20 @@
+CREATE TYPE magic_tradition AS ENUM ('Intuitiv', 'Wissenschaftlich');
+CREATE TYPE magic_beschworung AS ENUM ('Essenz', 'Wesen');
+CREATE TYPE magic_wesen AS ENUM ('Inspiration', 'Invokation');
+CREATE TYPE skt AS ENUM ('A', 'B', 'C', 'D', 'E', 'F', 'G', 'H');
+
+CREATE TABLE char_magic (
+   id SERIAL PRIMARY KEY NOT NULL,
+   character_id INT REFERENCES characters (id) ON DELETE CASCADE ON UPDATE CASCADE NOT NULL,
+   quelle_id INT REFERENCES quellen (id) ON DELETE CASCADE ON UPDATE CASCADE NOT NULL,
+   tradition magic_tradition NOT NULL,
+   beschworung magic_beschworung NOT NULL,
+   wesen magic_wesen,
+   skt skt,
+   value INT
+);
+
+GRANT ALL ON char_magic to nginx;
+GRANT ALL ON char_magic_id_seq to nginx;
+
+CREATE UNIQUE INDEX char_magic_idx ON char_magic (character_id, quelle_id, tradition, beschworung);
