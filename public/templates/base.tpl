@@ -15,7 +15,7 @@
          {custom_button value='home' onclick="location = '/index2.php'"}
          {custom_spacer width=10}
          {custom_button value='characters' onclick="location = 'characters.php'"}
-         {custom_button value='magic' onclick="location = 'magic.php'"}
+         {custom_button value='magic' onclick="location = '/magic'"}
          {custom_spacer width=30}
          {custom_button value='setup' onclick="location = 'setup.php'"}
          {custom_spacer width=100}
