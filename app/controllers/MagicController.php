@@ -7,6 +7,14 @@ class MagicController extends BaseController {
    }
 
    public function characters() {
-      return('ToDo: not yet implemented');
+      $selected = 'characters';
+      $characters = Character::orderBy('name')->get();
+      return View::make('magic/characters', compact('characters', 'selected'));
+   }
+
+   public function show_character($id) {
+      $character = Character::find($id);
+
+      return View::make('magic/char_magic', compact('character'));
    }
 }

@@ -18,8 +18,10 @@ Route::get('/index.php', function() {
    return Redirect::to('/index2.php');
 });
 # Magic
-Route::get('/magic', 'MagicController@setup');
+Route::get('/magic', 'MagicController@characters');
 Route::get('/magic/characters', 'MagicController@characters');
+Route::get('/magic/setup', 'MagicController@setup');
+Route::get('/magic/show_character/{id}', 'MagicController@show_character');
 
 # Quellen
 Route::model('quelle', 'Quelle');
@@ -36,3 +38,7 @@ Route::model('instruktion', 'Instruktion');
 Route::resource('instruktionen', 'InstruktionenController');
 Route::get('/instruktionen/description/{instruktion}', 'InstruktionenController@show_description');
 Route::post('/instruktionen/{instruktion}', 'InstruktionenController@update');
+
+# CharMagic
+Route::model('charmagic', 'CharMagic');
+Route::get('/charmagic/create', 'CharMagicController@create');
