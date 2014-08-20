@@ -4,6 +4,13 @@ class Quelle extends Eloquent {
    public $table = 'quellen';
    public $timestamps = false;
 
+   public static function lst_all($sort = 'name', $order = 'ASC') {
+      $quellen = Quelle::orderBy($sort, $order)->get(array('id', 'name'));
+      foreach ($quellen as $quelle) {
+         $result[$quelle->id] = $quelle->name;
+      }
+      return $result;
+   }
    public function do_update($data) {
       $data = array_map('trim', $data);
       $rules = array('name' => 'required|max:64' . ( ($this->exists) ? '' : '|unique:quellen'),

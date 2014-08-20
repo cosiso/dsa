@@ -22,6 +22,18 @@
                                                       $(window).scrollLeft()) + "px");
           return this;
       }
+      $.validator.addMethod('skt', function(value, element, parameter) {
+         var v = value.toUpperCase();
+         if (v != 'A' && v != 'B' && v != 'C' && v != 'D' && v != 'E' && v != 'F' && v != 'G' && v != 'H' && v != '') {
+            v = false;
+         } else {
+            v = true;
+         }
+         return this.optional(element) || v;
+      }, 'Invalid SKT');
+      $.validator.addMethod('num', function(value, element, parameter) {
+         return this.optional(element) || parseInt(value) == value;
+      }, 'Value must be an integer');
       function show_character(id) {
          var div = '#char-' + id;
          if ($(div).is(':visible')) {
@@ -50,8 +62,18 @@
                alertify.alert('An unknown error occurred');
                return;
             }
+            $('#frm-charmagic').validate({
+               rules : {
+                  skt   : { required : true, skt : true },
+                  value : { required : true, num : true },
+               },
+               submitHandler: function(form) {
+                  alertify.log('Submitting form');
+                  $('#popup').hide();
+               }
+            });
+            $('#popup').center();
          });
-         alertify.log('ID: ' + id);
       }
       //-->
    </script>

@@ -37,7 +37,7 @@ HTML::macro('custom_text', function($params = array()) {
    if (empty($name) and isset($extra['id'])) $name = $extra['id'];
    if (empty($name)) return '<em>custom_textarea: error - attribute "name" must be given</em>';
 
-   $result = (empty($label)) ? Form::label($name, ($label === true) ? null : $label) : '';
+   $result = (empty($label)) ? '' : Form::label($name, ($label === true) ? null : $label);
    $result .= Form::text($name, (empty($value) ? null : $value), $extra);
    return $result;
 });
@@ -61,7 +61,7 @@ HTML::macro('custom_textarea', function($params = array()) {
    if (empty($name) and isset($extra['id'])) $name = $extra['id'];
    if (empty($name)) return '<em>custom_textarea: error - attribute "name" must be given</em>';
 
-   $result = (empty($label)) ? Form::label($name, ($label === true) ? null : $label) : '';
+   $result = (empty($label)) ? '' : Form::label($name, ($label === true) ? null : $label);
    $result .= Form::textarea($name, (empty($value) ? null : $value), $extra);
    return $result;
 });
