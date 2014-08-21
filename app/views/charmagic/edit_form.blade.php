@@ -6,22 +6,39 @@
 @else
 {{ Form::open(array('name' => 'frm-charmagic',
                     'id'   => 'frm-charmagic')) }}
-   <label for="character">Character</label>
-   {{ Form::select('character', $characters, $charmagic->character_id, array('style' => 'width: 200px')) }}<br>
-   <label for="quelle">Quelle</label>
-   {{ Form::select('quelle', $quellen, $charmagic->quelle_id, array('style' => 'width: 200px')) }}<br>
-   <label for="tradition">Tradition</label>
-   {{ Form::select('tradition', $charmagic->lst_tradition(), $charmagic->tradition, array('style' => 'width: 200px')) }}<br>
-   <label for="beschworung">Spell/Summon</label>
-   {{ Form::select('beschworung', $charmagic->lst_beschworung(), $charmagic->beschworung, array('style' => 'width: 200px')) }}<br>
-   <label for="wesen">Type of summoning</label>
-   {{ Form::select('wesen', $charmagic->lst_wesen(), $charmagic->wesen) }}<br>
+   {{ HTML::custom_hidden(array('name' => 'id', 'value' => $charmagic->id)) }}
+   {{ HTML::custom_hidden(array('name' => 'character_id', 'value' => $character->id)) }}
+   {{ HTML::custom_text(array('name'     => 'name',
+                              'value'    => $character->name,
+                              'style'    => 'width: 200px',
+                              'label'    => true,
+                              'disabled' => true)) }}<br>
+   {{ HTML::custom_select(array('name'     => 'quelle',
+                                'output'   => $quellen,
+                                'selected' => $charmagic->quelle_id,
+                                'style'    => 'width: 200px',
+                                'label'    => true)) }}<br>
+   {{ HTML::custom_select(array('name'     => 'tradition',
+                                'output'   => $charmagic->lst_tradition(),
+                                'selected' => $charmagic->tradition,
+                                'style'    => 'width: 200px',
+                                'label'    => true)) }}<br>
+   {{ HTML::custom_select(array('name'     => 'beschworung',
+                                'output'   => $charmagic->lst_beschworung(),
+                                'selected' => $charmagic->beschworung,
+                                'style'    => 'width: 200px',
+                                'label'    => 'Spell/Summon')) }}<br>
+   {{ HTML::custom_select(array('name'     => 'wesen',
+                                'output'   => $charmagic->lst_wesen(),
+                                'selected' => $charmagic->wesen,
+                                'style'    => 'width: 200px',
+                                'label'    => 'Type of summoning')) }}<br>
    {{ HTML::custom_text(array('name'  => 'skt',
-                              'value' => e($charmagic->skt),
+                              'value' => $charmagic->skt,
                               'label' => 'SKT',
                               'style' => 'width: 45px')) }}<br>
    {{ HTML::custom_text(array('name'  => 'value',
-                              'value' => e($charmagic->value),
+                              'value' => $charmagic->value,
                               'label' => true,
                               'style' => 'width: 45px')) }}<br>
    <div class="button_bar">

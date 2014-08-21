@@ -1,6 +1,7 @@
 <?php
 
 HTML::macro('custom_hidden', function($params = array()) {
+   $extra = array();
    foreach($params as $key => $val) {
       if (is_array($val)) return "<em>custom_hidden: error - $key cannot be an array</em>";
       switch($key) {
@@ -149,5 +150,35 @@ HTML::macro('custom_button', function($params = array()) {
    $data = compact('class', 'id');
    if (count($extra)) $data = array_merge($data, $extra);
    $result = Form::input($type, (empty($name)) ? null : $name, $value, $data);
+   return $result;
+});
+HTML::macro('custom_select', function($params = array()) {
+   $extar = array();
+   foreach ($params as $key => $val) {
+      switch ($key) {
+         case 'output':
+            if (! is_array($val)) return "<em>custom_select: error - $key must be an array</em>";
+            $$key = $val;
+            break;
+         case 'id':
+         case 'name':
+         case 'selected':
+         case 'label':
+            if (is_array($val)) return "<em>custom_select: error - $key cannot be an array</em>";
+            $$key = $val;
+            break;
+         default:
+            if (is_array($val)) return "<em>custom_select: error - $key cannot be an array</em>";
+            $extra[$key] = $val;
+      }
+   }
+   if (empty($id) and ! empty($name)) $id = $name;
+   if (empty($name) and ! empty($id)) $name = $id;
+   if (empty($name)) return "<em>custom_select: error - name not set</em>";
+   if (empty($output)) return "<em>cusom_select: error - no output given</em>";
+   if (! isset($selected)) $selected = '';
+
+   $result = (empty($label)) ? '' : Form::label($name, ($label === true) ? null : $label);
+   $result .= Form::select($name, $output, $selected, $extra);
    return $result;
 });

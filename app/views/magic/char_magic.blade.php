@@ -1,4 +1,4 @@
-<table>
+<table id="tbl_charmagic">
    <thead>
       <tr>
          <th>Quelle</th>
@@ -14,7 +14,7 @@
       @foreach($character->charmagic as $cm)
          <tr id="cm-{{ $cm->id }}">
             <td>{{{ $cm->quelle->name }}}</td>
-            <td contenteditable="true">{{{ $cm->value }}}</td>
+            <td>{{{ $cm->value }}}</td>
             <td>{{{ $cm->tradition }}}</td>
             <td>{{{ $cm->beschworung }}}</td>
             <td>{{{ $cm->wesen }}}</td>

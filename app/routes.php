@@ -41,4 +41,5 @@ Route::post('/instruktionen/{instruktion}', 'InstruktionenController@update');
 
 # CharMagic
 Route::model('charmagic', 'CharMagic');
-Route::get('/charmagic/create', 'CharMagicController@create');
+Route::get('/charmagic/create/{character_id}', 'CharMagicController@create');
+Route::post('/charmagic/create', 'CharMagicController@do_create');
