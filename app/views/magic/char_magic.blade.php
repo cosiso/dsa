@@ -19,7 +19,10 @@
             <td>{{{ $cm->beschworung }}}</td>
             <td>{{{ $cm->wesen }}}</td>
             <td>{{{ $cm->skt }}}</td>
-            <td>edit, remove</td>
+            <td>
+               <span class="link-edit" onclick="edit_source(this)">edit</span>
+               | <span class="link-cancel" onclick="remove_source(this)">remove</span>
+            </td>
          </tr>
       @endforeach
       <tr>

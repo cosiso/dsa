@@ -4,8 +4,8 @@ class CharMagic extends Eloquent {
    protected $table = 'char_magic';
    public $timestamps = false;
 
-   # Create new
-   public function do_create($data) {
+   # Create/Update
+   public function do_update($data) {
       $data = array_map('trim', $data);
       $validate = $this->validate($data);
       if ($validate !== true) {
@@ -26,14 +26,14 @@ class CharMagic extends Eloquent {
    }
    # Input validation
    protected function validate($data) {
-      $cnt_tradition = count($this->lst_tradition()) - 1;
-      $cnt_beschworung = count($this->lst_beschworung()) - 1;
-      $cnt_wesen = count($this->lst_wesen()) - 1;
+      $tradition = implode(',', array_keys($this->lst_tradition()));
+      $beschworung = implode(',', array_keys($this->lst_beschworung()));
+      $wesen = implode(',', array_keys($this->lst_wesen()));
       $rules = array('character_id' => 'integer|exists:characters,id',
                      'quelle'       => 'integer|exists:quellen,id',
-                     'tradition'    => "required|integer|min:0|max:$cnt_tradition",
-                     'beschworung'  => "required|integer|min:0|max:$cnt_beschworung",
-                     'wesen'        => "required|integer|min:0|max:$cnt_wesen",
+                     'tradition'    => "required|in:$tradition",
+                     'beschworung'  => "required|in:$beschworung",
+                     'wesen'        => "required|in:$wesen",
                      'skt'          => 'required|in:a,A,b,B,c,C,d,D,e,E,f,F,g,G,h,H',
                      'value'        => 'integer|min:0');
       $validator = Validator::make($data, $rules);
@@ -43,9 +43,9 @@ class CharMagic extends Eloquent {
    protected function populate($data) {
       $this->character_id = $data['character_id'];
       $this->quelle_id    = $data['quelle'];
-      $this->tradition    = $this->lst_tradition()[$data['tradition']];
-      $this->beschworung  = $this->lst_beschworung()[$data['beschworung']];
-      $this->wesen        = ($data['wesen'] == 0) ? null : $this->lst_wesen()[$data['beschworung']];
+      $this->tradition    = $data['tradition'];
+      $this->beschworung  = $data['beschworung'];
+      $this->wesen        = ($data['wesen'] == '0') ? null : $data['wesen'];
       $this->skt          = strtoupper($data['skt']);
       $this->value        = $data['value'];
    }
@@ -58,12 +58,16 @@ class CharMagic extends Eloquent {
    }
    # Return the possible values for corresponding database types
    public function lst_tradition() {
-      return array('Intuitiv', 'Wissenschaftlich');
+      return array('Intuitiv'         => 'Intuitiv',
+                   'Wissenschaftlich' => 'Wissenschaftlich');
    }
    public function lst_beschworung() {
-      return array('Essenz', 'Wesen');
+      return array('Essenz' => 'Essenz',
+                   'Wesen'  => 'Wesen');
    }
    public function lst_wesen() {
-      return array('--Not applicable', 'Inspiration', 'Invokation');
+      return array('0'           => '--Not applicable',
+                   'Inspiration' => 'Inspiration',
+                   'Invokation'  => 'Invokation');
    }
 }

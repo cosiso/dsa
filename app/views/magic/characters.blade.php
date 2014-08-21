@@ -69,12 +69,9 @@
          }
          $(div).show();
       }
-      function add_source(span) {
-         // locate character id span > td > tr > tbody > table > div
-         var id = $(span).parent().parent().parent().parent().parent().prop('id');
-         id = id.split('-')[1];
+      function fetch_edit_form(url, success) {
          $('#popup').text('Retrieving form').width('auto').height('auto').css('max-width', '500').show().center();
-         $('#popup').load('{{ url('charmagic/create') }}/' + id, function(response, status, xhr) {
+         $('#popup').load(url , function(response, status, xhr) {
             if (status != 'success') {
                alertify.alert('An unknown error occurred');
                return;
@@ -87,17 +84,25 @@
                submitHandler: function(form) {
                   $(form).ajaxSubmit({
                      datatype : 'json',
-                     url      : '{{ url('charmagic/create') }}',
+                     url      : url,
                      type     : 'post',
-                     success  : do_add_source
+                     success  : success,
                   });
-                  alertify.log('Submitting form');
                   $('#popup').hide();
                }
             });
             $('#popup').center();
             $('#frm-charmagic #quelle').focus();
          });
+      }
+      function add_source(span) {
+         // locate character id span > td > tr > tbody > table > div
+         var id = $(span).parent().parent().parent().parent().parent().prop('id');
+         id = id.split('-')[1];
+         {{-- set variables and call function --}}
+         var url = '{{ url('charmagic/create') }}/' + id;
+         var on_success = do_add_source;
+         fetch_edit_form(url, on_success);
       }
       function do_add_source(data) {
          data = extract_json(data);
@@ -109,11 +114,61 @@
                '<td>' + htmlescape(data.beschworung) + '</td>' +
                '<td>' + htmlescape(data.wesen) + '</td>' +
                '<td>' + data.skt + '</td>' +
-               '<td>links</td>' +
+               '<td> <span class="link-edit" onclick="edit_source(this)">edit</span> | <span class="link-cancel" onclick="remove_source(this)">remove</span></td>' +
                '</tr>';
             var last = $('div#char-' + data.character_id + ' tbody > tr:last');
             $(last).before(row);
             $(last).prev().effect('highlight', {}, 2000);
+         }
+      }
+      function edit_source(span) {
+         {{-- Get id from parent: span > td > tr --}}
+         var id = $(span).parent().parent().prop('id');
+         id = id.split('-')[1];
+         {{-- set variables and call function --}}
+         var url = '{{ url('charmagic/edit') }}/' + id;
+         alertify.alert('ID: ' + id + ', URL: ' + url);
+         var on_success = do_edit_source;
+         fetch_edit_form(url, on_success);
+      }
+      function remove_source(span) {
+         // Get tr: span > td > tr
+         var row = $(span).parent().parent();
+         var id = $(row).prop('id');
+         id = id.split('-')[1];
+         var name = $(row).children('td:first-child').text();
+         alertify.confirm('Remove ' + name + '?', function(e) {
+            if (e) {
+               $.ajax({
+                  datatype : 'json',
+                  url      : '{{ url('charmagic/remove') }}/' + id,
+                  type     : 'post',
+                  data     : { _method : 'DELETE' },
+                  success  : do_remove_source
+               });
+            }
+         });
+      }
+      function do_remove_source(data) {
+         data = extract_json(data);
+         if (data.id) {
+            $('#cm-' + data.id).effect('highlight', {}, 2000);
+            setTimeout(function() {
+               $('#cm-' + data.id).remove();
+            }, 500);
+         }
+      }
+      function do_edit_source(data) {
+         data = extract_json(data);
+         if (data.success) {
+            var tr = '#cm-' + data.id;
+            $(tr + ' td:nth-child(1)').text(data.quelle);
+            $(tr + ' td:nth-child(2)').text(data.value);
+            $(tr + ' td:nth-child(3)').text(data.tradition);
+            $(tr + ' td:nth-child(4)').text(data.beschworung);
+            $(tr + ' td:nth-child(5)').text(data.wesen);
+            $(tr + ' td:nth-child(6)').text(data.skt);
+            $(tr).effect('highlight', {}, 2000);
          }
       }
       //-->
