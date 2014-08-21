@@ -127,7 +127,6 @@
          id = id.split('-')[1];
          {{-- set variables and call function --}}
          var url = '{{ url('charmagic/edit') }}/' + id;
-         alertify.alert('ID: ' + id + ', URL: ' + url);
          var on_success = do_edit_source;
          fetch_edit_form(url, on_success);
       }

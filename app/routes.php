@@ -42,7 +42,7 @@ Route::post('/instruktionen/{instruktion}', 'InstruktionenController@update');
 # CharMagic
 Route::model('charmagic', 'CharMagic');
 Route::get('/charmagic/create/{character_id}', 'CharMagicController@create');
-Route::post('/charmagic/create', 'CharMagicController@do_create');
+Route::post('/charmagic/create/{character_id}', 'CharMagicController@do_create');
 Route::delete('/charmagic/remove/{charmagic}', 'CharMagicController@remove');
 Route::get('/charmagic/edit/{charmagic}', 'CharMagicController@edit');
 Route::post('/charmagic/edit/{charmagic}', 'CharMagicController@update');

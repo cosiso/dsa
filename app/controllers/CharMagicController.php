@@ -11,7 +11,7 @@ class CharMagicController extends BaseController {
       $quellen = Quelle::lst_all('name', 'ASC');
       return View::make('charmagic/edit_form', compact('charmagic', 'character', 'quellen'));
    }
-   public function do_create () {
+   public function do_create ($character_id) {
       $charmagic = new CharMagic;
       return $this->do_update($charmagic);
    }
