@@ -17,11 +17,15 @@ Route::get('/', function() {
 Route::get('/index.php', function() {
    return Redirect::to('/index2.php');
 });
+# Character
+Route::model('character', 'Character');
+Route::post('/magic/instruktion/{character}', 'CharacterController@add_instruktion');
 # Magic
 Route::get('/magic', 'MagicController@characters');
 Route::get('/magic/characters', 'MagicController@characters');
 Route::get('/magic/setup', 'MagicController@setup');
 Route::get('/magic/show_character/{id}', 'MagicController@show_character');
+Route::get('/magic/instruktion/{character_id}', 'MagicController@show_instruktionen');
 
 # Quellen
 Route::model('quelle', 'Quelle');

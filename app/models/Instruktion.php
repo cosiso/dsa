@@ -29,4 +29,9 @@ class Instruktion extends Eloquent {
          return array('message' => 'Found errors: ' . $validator->messages());
       }
    }
+
+   # database relations
+   public function characters() {
+      return $this->belongsToMany('Character', 'char_instruktion');
+   }
 }

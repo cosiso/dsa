@@ -1,6 +1,6 @@
 @if (isset($error))
    <script type="text/javascript">
-      alertify.alert('{$error}');
+      alertify.alert('{{ $error }}');
       $('#popup').hide();
    </script>
 @else

@@ -1,0 +1,8 @@
+-- Create table char_instruktionen
+CREATE TABLE char_instruktion (
+   id             SERIAL PRIMARY KEY,
+   character_id   INT REFERENCES characters(id) ON DELETE CASCADE ON UPDATE CASCADE NOT NULL,
+   instruktion_id INT REFERENCES instruktionen(id) ON DELETE CASCADE ON UPDATE CASCADE NOT NULL);
+
+GRANT ALL ON char_instruktion TO nginx;
+GRANT ALL ON char_instruktion_id_seq TO nginx;

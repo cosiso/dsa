@@ -7,7 +7,7 @@
 @section('content')
    @foreach($characters as $character)
       <h3 onclick="show_character({{ $character->id }})">{{{ $character->name }}}</h3>
-      <div id="char-{{ $character->id }}" style="display: none; max-width: 800px"></div>
+      <div id="char-{{ $character->id }}" style="display: none; max-width: 800px; padding-left: 20px"></div>
    @endforeach
 @stop
 
@@ -169,6 +169,39 @@
             $(tr + ' td:nth-child(6)').text(data.skt);
             $(tr).effect('highlight', {}, 2000);
          }
+      }
+      function add_instruktion(span) {
+         {{-- Retrieve id: span > div > div --}}
+         var id = $(span).parent().parent().prop('id');
+         id = id.split('-')[1];
+         $('#popup').text('Retrieving form').width('auto').height('auto').css('max-width', '500').show().center();
+         $('#popup').load('/magic/instruktion/' + id, function(response, status, xhr) {
+            if (status != 'success') {
+               alertify.alert('An unknown error occurred');
+               $('#popup').hide();
+            } else {
+               $('#frm-instruktion').validate({
+                  rules : {
+                     instruktion : { required : true },
+                  },
+                  submitHandler: function(form) {
+                     $(form).ajaxSubmit({
+                        datatype : 'json',
+                        url      : '/magic/instruktion/' + id,
+                        type     : 'post',
+                        success  : do_add_instruktion,
+                     });
+                     $('#popup').hide();
+                  }
+               });
+               $('#popup').center();
+               $('#frm-charmagic #quelle').focus();
+
+            }
+         });
+      }
+      function do_add_instruktion(data) {
+         alertify.alert('Added');
       }
       //-->
    </script>

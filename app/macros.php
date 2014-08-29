@@ -153,7 +153,7 @@ HTML::macro('custom_button', function($params = array()) {
    return $result;
 });
 HTML::macro('custom_select', function($params = array()) {
-   $extar = array();
+   $extra = array();
    foreach ($params as $key => $val) {
       switch ($key) {
          case 'output':
@@ -163,6 +163,7 @@ HTML::macro('custom_select', function($params = array()) {
          case 'id':
          case 'name':
          case 'selected':
+         case 'placeholder':
          case 'label':
             if (is_array($val)) return "<em>custom_select: error - $key cannot be an array</em>";
             $$key = $val;
@@ -172,13 +173,24 @@ HTML::macro('custom_select', function($params = array()) {
             $extra[$key] = $val;
       }
    }
+   if (empty($output)) return "<em>custom_select: error - no output given</em>";
    if (empty($id) and ! empty($name)) $id = $name;
    if (empty($name) and ! empty($id)) $name = $id;
    if (empty($name)) return "<em>custom_select: error - name not set</em>";
-   if (empty($output)) return "<em>cusom_select: error - no output given</em>";
    if (! isset($selected)) $selected = '';
 
    $result = (empty($label)) ? '' : Form::label($name, ($label === true) ? null : $label);
-   $result .= Form::select($name, $output, $selected, $extra);
+   $result .= '<select name="' . $name . '" id="' . $id . '"';
+   foreach ($extra as $key => $val) {
+      $result .= ' ' . $key . '="' . $val . '"';
+   }
+   $result .= '>';
+   if (! empty($placeholder) and empty($selected)) {
+      $result .= '<option value="" disabled selected>' . $placeholder . '</option>';
+   }
+   foreach ($output as $key => $val) {
+      $result .= '<option value="' . $key . '"' . ( ($selected === $key) ? ' selected' : '') . '>' . $val . '</option>';
+   }
+   $result .= '</select>';
    return $result;
 });

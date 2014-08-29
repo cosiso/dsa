@@ -1,4 +1,5 @@
-<table id="tbl_charmagic">
+<img src="/images/bullet_orange.png"><b>Quellen: </b>
+<table>
    <thead>
       <tr>
          <th>Quelle</th>
@@ -31,4 +32,15 @@
          </td>
       </tr>
    </tbody>
-</table>
+</table><br>
+<div style="padding-top: 8px">
+   <img src="/images/bullet_orange.png"><b>Instruktionen: </b>
+   <ul>
+      @foreach($character->instruktionen as $instruktion)
+         <li>{{ $instruktion->name }}</li>
+      @endforeach
+   </ul>
+   <span class="link-add" onclick="add_instruktion(this)">Add instruktion</span><br>
+   <br>
+</div>
+<hr>
