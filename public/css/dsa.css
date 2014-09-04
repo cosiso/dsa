@@ -111,6 +111,20 @@ input.error {
    background-color: #FFBBBB !important;
 }
 
+/* list for things as instruktionen with all items on one line */
+ul.single-line > li {
+	display: inline-block;
+	border: #a64646 1px dotted;
+	padding: 3px 10px 3px 3px;
+	margin: 2px;
+	background-color: #DDD;
+	cursor: pointer;
+}
+/* add bullet */
+ul.single-line > li:before {
+	content: '\2022';
+}
+
 /* tabs */
 ul.tabs {
    list-style: none;

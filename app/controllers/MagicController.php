@@ -33,4 +33,19 @@ class MagicController extends BaseController {
       }
       return View::make('magic/frm_instruktion', compact('character', 'error'));
    }
+
+   /*
+    * Remove the instruktion from a charater
+    */
+   public function remove_instruktion($char_instruktion_id) {
+      if (! ctype_digit($char_instruktion_id)) return json_encode(array('message' => 'invalid id specified'));
+      try {
+         DB::table('char_instruktion')->delete($char_instruktion_id);
+      } catch (Exception $e) {
+         return json_encode(array('message' => 'unknown database error'));
+      }
+      return json_encode(array('success' => true,
+                               'id'      => $char_instruktion_id));
+
+   }
 }

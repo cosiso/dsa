@@ -201,7 +201,38 @@
          });
       }
       function do_add_instruktion(data) {
-         alertify.alert('Added');
+         data = extract_json(data);
+         if (data.success) {
+            var ul = '#char-' + data.character_id + ' ul';
+            var li = '<li id="' + data.instruktion_id + '">' + htmlescape(data.name) + '</li>';
+            $(ul).append(li);
+            $(ul + ' li#' + data.instruktion_id).effect('highlight', {}, 2000);
+         }
+      }
+      function remove_instruktion(li) {
+         var id = $(li).prop('id');
+         var name = $(li).text();
+         alertify.confirm('Remove ' + name + '?', function(e) {
+            if (e) {
+               $.ajax({
+                  datatype : 'json',
+                  url      : '/magic/instruktion/' + id,
+                  type     : 'post',
+                  data     : { _method : 'DELETE' },
+                  success  : do_remove_instruktion,
+               });
+            }
+         })
+      }
+      function do_remove_instruktion(data) {
+         data = extract_json(data);
+         if (data.success) {
+            var li = 'div[id^=char] ul li#' + data.id;
+            $(li).effect('highlight', {}, 2000);
+            setTimeout(function() {
+               $(li).remove();
+            }, 500);
+         }
       }
       //-->
    </script>

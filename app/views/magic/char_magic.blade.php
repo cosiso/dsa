@@ -35,11 +35,11 @@
 </table><br>
 <div style="padding-top: 8px">
    <img src="/images/bullet_orange.png"><b>Instruktionen: </b>
-   <ul>
+   <ul class="single-line">
       @foreach($character->instruktionen as $instruktion)
-         <li>{{ $instruktion->name }}</li>
+         <li id="{{ $instruktion->id }}" onclick="remove_instruktion(this)">{{{ $instruktion->name }}}</li>
       @endforeach
-   </ul>
+   </ul><br style="float: none"><br>
    <span class="link-add" onclick="add_instruktion(this)">Add instruktion</span><br>
    <br>
 </div>

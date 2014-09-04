@@ -28,10 +28,14 @@ class Character extends Eloquent {
       $rules = array('instruktion' => 'required|integer');
       $validator = Validator::Make($input, $rules);
       if (! $validator->passes()) return array('message' => 'Found errors: ' . $validator->messages());
+      $name = DB::table('instruktionen')->select('name')->where('id', $input['instruktion'])->get();
+      if (empty($name)) return array('message' => 'invalid instruktion specified');
       $id = DB::table('char_instruktion')->insertGetId(array('character_id' => $this->id,
                                                              'instruktion_id' => $input['instruktion']));
       if (! $id) return array('message' => 'Unknown database error occurred');
+
       return array('instruktion_id' => $id,
+                   'name'           => $name[0]->name,
                    'success'        => true,
                    'character_id'   => $this->id);
    }
