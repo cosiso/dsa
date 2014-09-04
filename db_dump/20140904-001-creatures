@@ -1,0 +1,22 @@
+-- Table version
+DROP TABLE IF EXISTS version;
+CREATE TABLE IF NOT EXISTS version (
+   id      SERIAL PRIMARY KEY,
+   version INT UNIQUE NOT NULL, current BOOLEAN NOT NULL);
+GRANT ALL ON version TO nginx;
+GRANT ALL ON version_id_seq TO nginx;
+
+INSERT INTO version (version, current) VALUES (1, 't');
+
+-- Table creatures
+DROP TABLE IF EXISTS creatures;
+CREATE TABLE creatures (
+   id SERIAL PRIMARY KEY,
+   name VARCHAR(64) NOT NULL UNIQUE,
+   description TEXT,
+   quelle_id INT REFERENCES quellen(id) ON DELETE CASCADE ON UPDATE CASCADE NOT NULL,
+   beschworung INT NOT NULL,
+   beherrschung INT NOT NULL
+);
+GRANT ALL ON creatures TO nginx;
+GRANT ALL ON creatures_id_seq TO nginx;

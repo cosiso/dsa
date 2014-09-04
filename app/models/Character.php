@@ -4,14 +4,6 @@ class Character extends Eloquent {
    protected $table = 'characters';
    public $timestamps = false;
 
-   # Retrieve all characters in array id => name
-   public static function lst_all($sort = 'name', $order = 'ASC') {
-      $chars = Character::orderBy($sort, $order)->get();
-      foreach ($chars as $char) {
-         $result[$char->id] = $char->name;
-      }
-      return $result;
-   }
 
    # Fetch all instruktions this character does not know yet
    public function available_instruktionen() {
@@ -38,6 +30,26 @@ class Character extends Eloquent {
                    'name'           => $name[0]->name,
                    'success'        => true,
                    'character_id'   => $this->id);
+   }
+
+   # Database functions
+
+   /*
+    * Retrieves a list of all characters that have a quelle
+    */
+   public static function available_casters() {
+      return DB::select(DB::raw('SELECT characters.id, characters.name FROM characters, char_magic WHERE char_magic.character_id = characters.id ORDER BY name'));
+   }
+
+   /*
+    * Retrieve all characters in array id => name
+    */
+   public static function lst_all($sort = 'name', $order = 'ASC') {
+      $chars = Character::orderBy($sort, $order)->get();
+      foreach ($chars as $char) {
+         $result[$char->id] = $char->name;
+      }
+      return $result;
    }
 
    # Database relations

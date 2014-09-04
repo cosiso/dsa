@@ -51,3 +51,7 @@ Route::post('/charmagic/create/{character_id}', 'CharMagicController@do_create')
 Route::delete('/charmagic/remove/{charmagic}', 'CharMagicController@remove');
 Route::get('/charmagic/edit/{charmagic}', 'CharMagicController@edit');
 Route::post('/charmagic/edit/{charmagic}', 'CharMagicController@update');
+
+# Creatures (summoning)
+Route::get('/creatures', 'CreaturesController@index');
+Route::get('/creatures/get_characters', 'CreaturesController@characters');
