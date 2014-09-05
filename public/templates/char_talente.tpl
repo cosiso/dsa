@@ -4,7 +4,7 @@
 {block name='main'}
    {section name='idx' loop=$categories}
       <h3 class="toggle" onclick="toggle($(this).next())">{$categories[idx].name|escape}</h3>
-      <div id="cat_{$categories[idx].id}" style="display: none; padding-left: 20px; max-width: 800px"></div>
+      <div id="cat_{$categories[idx].id}" class="maxed" style="display: none"></div>
       <br>
    {sectionelse}
       <b>No talente defined yet</b>

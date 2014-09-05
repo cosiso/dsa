@@ -7,11 +7,11 @@
       Close all
    </div>
    <h3 class="toggle" onclick="toggle_base()">Basiswerte &amp; Eigenschafte</h3>
-   <div id="basiswerte" style="display: none; padding-left: 20px"></div>
+   <div id="basiswerte" class="maxed" style="display: none"></div>
    <h3 class="toggle" onclick="toggle_vorteile()">Vor- &amp; Nachteile</h3>
-   <div id="vor_nach_teile" style="display: none; padding-left: 20px; max-width: 700px"></div>
+   <div id="vor_nach_teile" class="maxed" style="display: none"></div>
    <h3 class="toggle" onclick="toggle_kampftechniken()">Kampftechniken</h3>
-   <div id="kampftechniken" style="display: none; padding-left: 20px; max-width: 700px"></div>
+   <div id="kampftechniken" class="maxed" style="display: none"></div>
    {section name=idx loop=$chars}
       <h3 id="{$chars[idx].id}" class="toggle" onclick="toggle({$chars[idx].id})">{$chars[idx].name|escape}</h3>
       <div id="char_{$chars[idx].id}" style="display: none; padding-left: 20px"></div>

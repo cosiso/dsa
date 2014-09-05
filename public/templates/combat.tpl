@@ -3,14 +3,14 @@
 {block name='menu_left'}{include file='character_menu.tpl' selected='combat'}{/block}
 {block name='main'}
    <div id="div" style="float: left">
-      <div id="main" style="max-width: 800px">
+      <div id="main">
          <div onclick="close_all_divs()" style="cursor: pointer">
             <img src="images/badge-square-direction-up-24.png" border="0" width="24" height="24" />
             Close all
          </div>
          {section name=idx loop=$chars}
             <h3 id="h3_{$chars[idx].id}" class="toggle" onclick="toggle({$chars[idx].id})">{$chars[idx].name|escape}</h3>
-            <div id="char_{$chars[idx].id}" style="display: none; padding-left: 20px"></div>
+            <div id="char_{$chars[idx].id}" class="maxed" style="display: none"></div>
          {sectionelse}
             <script type="text/javascript">
                alert('No characters defined yet');

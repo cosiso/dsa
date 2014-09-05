@@ -2,11 +2,11 @@
 {block name='title'}DSA - setup{/block}
 {block name='menu_left'}{include file='setup_menu.tpl' selected_category='Kampftechniken'}{/block}
 {block name='main'}
-   <div id="main" style="max-width: 700px">
+   <div id="main">
       <h3 onclick="toggle_h3('talente')">Talente</h3>
-      <div id='talente' style="display: none"></div>
+      <div id='talente' class="maxed" style="display: none"></div>
       <h3 onclick="toggle_h3('sonderfertigkeiten')">Sonderfertigkeiten</h3>
-      <div id='sonderfertigkeiten' style="display: none"></div>
+      <div id='sonderfertigkeiten' class="maxed" style="display: none"></div>
    </div>
 {/block}
 {block name='javascript'}

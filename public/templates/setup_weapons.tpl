@@ -7,7 +7,7 @@
       {include file="head.tpl"}
       {include file="setup_menu.tpl" selected_category="Weapons"}
       <div style="float: left">
-         <div id="main" style="max-width: 700px">
+         <div id="main" style="max-width: 800px">
             <h3>Weapons</h3>
             <table id="table_weapons" cellspacing="0">
                <thead>

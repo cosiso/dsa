@@ -25,6 +25,15 @@ a:visited, a:link {
    background-color: #c5e9e9 !important;
 }
 
+/* divs following a h3, should indent */
+h3 + div {
+	margin-left: 20px;
+}
+/* Div with a maximum width, used as main content */
+div.maxed {
+	max-width: 800px;
+}
+
 /* Tables */
 table {
    border: none;
@@ -123,6 +132,10 @@ ul.single-line > li {
 /* add bullet */
 ul.single-line > li:before {
 	content: '\2022';
+}
+/* set background if selected */
+ul.single-line > li.highlight {
+	background-color: #f5f5b5;
 }
 
 /* tabs */

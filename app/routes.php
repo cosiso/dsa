@@ -55,3 +55,9 @@ Route::post('/charmagic/edit/{charmagic}', 'CharMagicController@update');
 # Creatures (summoning)
 Route::get('/creatures', 'CreaturesController@index');
 Route::get('/creatures/get_characters', 'CreaturesController@characters');
+Route::get('/creatures/get_quellen/{character_id}', 'CreaturesController@quellen');
+Route::get('/creatures/list', 'CreaturesController@cList');
+Route::get('/creatures/setup/{quelle}', 'CreaturesController@overview');
+Route::get('/creatures/new', 'CreaturesController@show');
+Route::get('/creatures/edit/{creature}', 'CreaturesController@show');
+Route::post('/creatures/edit', 'CreaturesController@update');

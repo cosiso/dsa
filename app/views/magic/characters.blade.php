@@ -7,7 +7,7 @@
 @section('content')
    @foreach($characters as $character)
       <h3 onclick="show_character({{ $character->id }})">{{{ $character->name }}}</h3>
-      <div id="char-{{ $character->id }}" style="display: none; max-width: 800px; padding-left: 20px"></div>
+      <div id="char-{{ $character->id }}" class="maxed" style="display: none"></div>
    @endforeach
 @stop
 

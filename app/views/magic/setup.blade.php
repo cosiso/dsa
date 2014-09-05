@@ -5,10 +5,12 @@
 @stop
 
 @section('content')
-   <h3 onclick='toggle(this)'>Quellen</h3>
-   <div id='quellen' style='display: none; max-width: 800px'></div>
-   <h3 onclick='toggle(this)'>Instruktionen</h3>
-   <div id='instruktionen' style='display: none; max-width: 800px'></div>
+   <h3 onclick="toggle(this)">Quellen</h3>
+   <div id="quellen" class="maxed" style="display: none"></div>
+   <h3 onclick="toggle(this)">Instruktionen</h3>
+   <div id="instruktionen" class="maxed" style="display: none"></div>
+   <h3 onclick="toggle(this)">Creatures</h3>
+   <div id="creatures" class="maxed" style="display: none"></div>
 @stop
 
 @section('javascript')
@@ -20,6 +22,9 @@
          this.css("left", Math.max(0, (($(window).width() - $(this).outerWidth()) / 2) + $(window).scrollLeft()) + "px");
          return this;
       }
+      $.validator.addMethod('num', function(value, element, parameter) {
+         return this.optional(element) || parseInt(value) == value;
+      }, 'Value must be an integer');
       function extract_json(data) {
          try {
             data = $.parseJSON(data);
@@ -43,22 +48,20 @@
             $(div).hide();
             return;
          }
-         if ($(div).html()) {
-            $(div).show();
+         if (id == 'quellen') {
+            url = '{{ action('QuellenController@index') }}';
+         } else if (id == 'instruktionen') {
+            url = '{{ action('InstruktionenController@index') }}';
          } else {
-            if (id == 'quellen') {
-               url = '{{ action('QuellenController@index') }}';
-            } else {
-               url = '{{ action('InstruktionenController@index') }}';
-            }
-            $(div).load(url, function(response, status, xhr) {
-               if (status != 'success') {
-                  alertify.alert('Error: ' + status + ' occurred');
-                  return;
-               }
-               $(div).show();
-            });
+            url = '/creatures/list';
          }
+         $(div).load(url, function(response, status, xhr) {
+            if (status != 'success') {
+               alertify.alert('Error: ' + status + ' occurred');
+               return;
+            }
+            $(div).show();
+         });
       }
       function add_quelle() {
          show_quelle('');
@@ -255,6 +258,74 @@
             }
             $('#popup').center();
          });
+      }
+      function select_quelle(li) {
+         var $li = $(li);
+         var id = $li.prop('id').split('-')[1];
+         $li.parent().children('li').removeClass('highlight');
+         $li.addClass('highlight');
+         $('div#quelle-creatures').html('<hr>Retrieving creatures')
+                                  .load('/creatures/setup/' + id, function(response, status, xhr) {
+            if (status != 'success') {
+               alertify.alert('Unknown error occurred');
+            }
+         });
+      }
+      function edit_creature(li) {
+         var url = '/creatures/new/';
+         if (li !== null) {
+            var id = $(li).prop('id').split('-')[1];
+            url = '/creatures/edit/' + id;
+         }
+         var $popup = $('#popup');
+         $popup.text('Retrieving creature data')
+               .width('auto')
+               .height('auto')
+               .css('max-width', '500')
+               .show()
+               .center()
+               .load(url, function(response, status, xhr) {
+            if (status != 'success') {
+               alertify.alert('Unknown error occurred');
+               return;
+            }
+            $popup.center();
+            $popup.find('#name').focus().select();
+            if (li === null) {
+               {{-- Set the quelle to the highlighted one --}}
+               var quelle_id = $('ul#list-quellen > li.highlight').first().prop('id').split('-')[1];
+               $popup.find('#quelle').val(quelle_id);
+            }
+            $popup.find('#frm-creature').validate({
+               rules : {
+                  name         : { required : true, maxlength : 64 },
+                  beschworung  : { required : true, num : true },
+                  beherrschung : { required : true, num : true },
+               },
+               submitHandler : function(form) {
+                  $(form).ajaxSubmit({
+                     datatype : 'json',
+                     url      : '/creatures/edit',
+                     type     : 'post',
+                     success  : do_edit_creature,
+                  });
+                  $popup.hide();
+               },
+            });
+         });
+      }
+      function do_edit_creature(data) {
+         data = extract_json(data);
+         if (data.success) {
+            if (data.is_new) {
+               // Add creature to list
+               $('ul#creature-list').append('<li id="creature-' + data.id + '" onclick="edit_creature(this)">' + htmlescape(data.name) + '</li>')
+                                    .effect('highlight', {}, 2000);
+            } else {
+               // Edit name of creature
+               alertify.alert('ToDo');
+            }
+         }
       }
       //-->
    </script>

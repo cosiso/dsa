@@ -36,4 +36,19 @@ class Quelle extends Eloquent {
          return array('message' => 'Found errors: ' . $validator->messages());
       }
    }
+   ########################################################
+   ### Database functions
+   ########################################################
+   public function list_creatures() {
+      return Creature::orderBy('name')
+                              ->where('quelle_id', $this->id)
+                              ->get();
+   }
+
+   ########################################################
+   ##### Relations
+   ########################################################
+   public function creatures() {
+      return $this->hasMany('Creature', 'quelle_id');
+   }
 }

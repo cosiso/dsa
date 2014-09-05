@@ -5,7 +5,7 @@
    <div style="float: left">
       <div id="main">
          <h3 onclick="toggle_h3(this)">Vorteile</h3>
-         <div id="vorteile" style="display: none; max-width: 800px">
+         <div id="vorteile" class="maxed" style="display: none">
             <table id="table_vorteile" cellspacing="0" cellpadding="1" class="sortable">
                <thead>
                   <tr>
@@ -40,7 +40,7 @@
             <span class="link-add" onclick="show_edit_cont(0, 1)">Add vorteil</span>
          </div>
          <h3 onclick="toggle_h3(this)">Nachteile</h3>
-         <div id="nachteile" style="display: none; max-width: 800px">
+         <div id="nachteile" class="maxed" style="display: none">
             <table id="table_nachteile" cellspacing="0" cellpadding="1" class="sortable">
                <thead>
                   <tr>
