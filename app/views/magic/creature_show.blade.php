@@ -10,7 +10,7 @@
       {{ HTML::custom_hidden(array('name'  => 'id',
                                    'value' => $creature->id)) }}
       {{ HTML::custom_text(array('name'  => 'name',
-                                 'label' => 'Name',
+                                 'label' => true,
                                  'style' => 'width: 225px',
                                  'value' => $creature->name,
                                  'placeholder' => 'Type a name')) }}<br>
@@ -20,23 +20,81 @@
                                    'placeholder' => 'Select a quelle',
                                    'style'       => 'width: 225px',
                                    'label'       => true)) }}<br>
-      <div style="width: 300px">
-         <div style="width: 150px; float: left">
-            {{ HTML::custom_text(array('name'  => 'beschworung',
-                                       'label' => 'Beschwörung',
-                                       'value' => $creature->beschworung,
-                                       'style' => 'width: 80px',
-                                       'placeholder' => 'Enter value')) }}
-         </div>
-         <div style="width: 150px; float: left">
-            {{ HTML::custom_text(array('name'  => 'beherrschung',
-                                       'label' => true,
-                                       'value' => $creature->beschworung,
-                                       'style' => 'width: 80px',
-                                       'placeholder' => 'Enter value')) }}
-         </div>
-         <br style="clear: both">
-      </div>
+      <table>
+         <tr>
+            <td>
+               {{ HTML::custom_text(array('name'  => 'beschworung',
+                                          'label' => 'Beschwörung',
+                                          'value' => $creature->beschworung,
+                                          'style' => 'width: 80px',
+                                          'placeholder' => 'Enter value')) }}
+            </td>
+            <td>
+               {{ HTML::custom_text(array('name'  => 'beherrschung',
+                                          'label' => true,
+                                          'value' => $creature->beschworung,
+                                          'style' => 'width: 80px',
+                                          'placeholder' => 'Enter value')) }}
+            </td>
+            <td></td>
+         </tr>
+         <tr>
+            <td>
+               {{ HTML::custom_text(array('name'  => 'le',
+                                          'label' => 'LE',
+                                          'value' => $creature->le,
+                                          'style' => 'width: 80px',
+                                          'placeholder' => 'Enter value')) }}
+            </td>
+            <td>
+               {{ HTML::custom_text(array('name'  => 'ae',
+                                          'label' => 'AE',
+                                          'value' => $creature->ae,
+                                          'style' => 'width: 80px',
+                                          'placeholder' => 'Enter value')) }}
+            </td>
+            <td>
+               {{ HTML::custom_text(array('name'  => 'rs',
+                                          'label' => 'RS',
+                                          'value' => $creature->rs,
+                                          'style' => 'width: 80px',
+                                          'placeholder' => 'Enter value')) }}
+            </td>
+         </tr>
+         <tr>
+            <td>
+               {{ HTML::custom_text(array('name'  => 'ini',
+                                          'label' => 'INI',
+                                          'value' => $creature->ini,
+                                          'style' => 'width: 80px',
+                                          'placeholder' => 'Enter value')) }}
+            </td>
+            <td>
+               {{ HTML::custom_text(array('name'  => 'gs',
+                                          'label' => 'GS',
+                                          'value' => $creature->gs,
+                                          'style' => 'width: 80px',
+                                          'placeholder' => 'Enter value')) }}
+            </td>
+            <td>
+               {{ HTML::custom_text(array('name'  => 'mr',
+                                          'label' => 'MR',
+                                          'value' => $creature->mr,
+                                          'style' => 'width: 80px',
+                                          'placeholder' => 'Enter value')) }}
+            </td>
+         </tr>
+         <tr>
+            <td>
+               {{ HTML::custom_text(array('name'  => 'gw',
+                                          'label' => 'GW',
+                                          'value' => $creature->gw,
+                                          'style' => 'width: 80px',
+                                          'placeholder' => 'Enter value')) }}
+            </td>
+            <td colspan="2"></td>
+         </tr>
+      </table><br>
       {{ HTML::custom_textarea(array('name'  => 'description',
                                      'value' => $creature->description,
                                      'label' => true,

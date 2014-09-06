@@ -1,0 +1,34 @@
+-- Updates to version 2
+ALTER TABLE version ADD COLUMN timestamp TIMESTAMP;
+ALTER TABLE version ALTER COLUMN timestamp SET DEFAULT current_timestamp;
+
+CREATE OR REPLACE FUNCTION version_check(this_version INT) RETURNS void AS $$
+   DECLARE
+      c INT;
+   BEGIN
+      SELECT version INTO c FROM version WHERE current = 't';
+      IF c >= this_version THEN
+         RAISE EXCEPTION 'Current version too high';
+      END IF;
+   END
+$$ LANGUAGE plpgsql;
+CREATE OR REPLACE FUNCTION version_update(this_version INT) RETURNS void AS $$
+   BEGIN
+      UPDATE version SET current = 'f';
+      INSERT INTO version (version, current) VALUES (this_version, 't');
+   END
+$$ LANGUAGE plpgsql;
+
+SELECT version_check(2);
+
+-- Add values to creatures table
+ALTER TABLE creatures ADD COLUMN ini VARCHAR;
+ALTER TABLE creatures ADD COLUMN pa INTEGER;
+ALTER TABLE creatures ADD COLUMN le INTEGER;
+ALTER TABLE creatures ADD COLUMN ae INTEGER;
+ALTER TABLE creatures ADD COLUMN rs INTEGER;
+ALTER TABLE creatures ADD COLUMN gs INTEGER;
+ALTER TABLE creatures ADD COLUMN mr INTEGER;
+ALTER TABLE creatures ADD COLUMN gw INTEGER;
+
+SELECT version_update(2);

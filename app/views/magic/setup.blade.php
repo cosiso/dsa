@@ -25,6 +25,10 @@
       $.validator.addMethod('num', function(value, element, parameter) {
          return this.optional(element) || parseInt(value) == value;
       }, 'Value must be an integer');
+      $.validator.addMethod('tp', function(value, element) {
+         return this.optional(element) || value.match(/^\d+[dwDW]\d+(\+\d+)$/);
+      }, 'Format like f.e. 1d6+1');
+
       function extract_json(data) {
          try {
             data = $.parseJSON(data);
@@ -289,8 +293,7 @@
                alertify.alert('Unknown error occurred');
                return;
             }
-            $popup.center();
-            $popup.find('#name').focus().select();
+            $popup.center().find('#name').focus().select();
             if (li === null) {
                {{-- Set the quelle to the highlighted one --}}
                var quelle_id = $('ul#list-quellen > li.highlight').first().prop('id').split('-')[1];
@@ -301,6 +304,14 @@
                   name         : { required : true, maxlength : 64 },
                   beschworung  : { required : true, num : true },
                   beherrschung : { required : true, num : true },
+                  quelle       : { required : true },
+                  le           : { digits : true },
+                  ae           : { digits : true },
+                  rs           : { digits : true },
+                  ini          : { tp : true },
+                  gs           : { number : true, min : 0 },
+                  mr           : { digits : true },
+                  gw           : { digits : true },
                },
                submitHandler : function(form) {
                   $(form).ajaxSubmit({
