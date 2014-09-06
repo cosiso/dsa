@@ -11,26 +11,43 @@ class CreaturesController extends BaseController {
     */
    public function update() {
       Input::merge(array_map('trim', Input::all()));
-      if (Input::has('id')) {
-         $creature = new Creature(Input::get('id'));
-      } else {
-         $creature = new Creature;
+      try {
+         $id = Input::get('id');
+         if (empty($id)) {
+            $creature = new Creature;
+         } else {
+            if (! ctype_digit($id)) throw new InvalidArgumentException('invalid id specified');
+            $creature = Creature::find($id);
+            if (empty($creature)) throw new InvalidArgumentException('invalid id specified');
+         }
+         $result = $creature->do_update(Input::all());
+      } catch (InvalidArgumentException $e) {
+         $result = array('message' => 'invalid id specified');
       }
-      $result = $creature->do_update(Input::all());
       return json_encode($result);
    }
    /*
     * Show creature for editing
     */
    public function show($creature = null) {
-      if (empty($creature)) { $creature = new Creature; }
-      $q= Quelle::all()->sortBy('name');
-      #$q = Quelle::orderBy('name')->get();
-      $quellen = [];
-      foreach ($q as $quelle) {
-         $quellen[$quelle->id] = $quelle->name;
+      try {
+         if ($creature === null) {
+            $creature = new Creature;
+         } else {
+            if (! ctype_digit($creature)) throw new InvalidArgumentException('invalid id specified');
+            $creature = Creature::find($creature);
+            if (empty($creature)) throw new InvalidArgumentException('invalid id specified');
+         }
+         $q= Quelle::all()->sortBy('name');
+         $quellen = [];
+         foreach ($q as $quelle) {
+            $quellen[$quelle->id] = $quelle->name;
+         }
+
+      } catch (InvalidArgumentException $e) {
+         $error = $e->getMessage();
       }
-      return View::make('magic/creature_show', compact('creature', 'quellen'));
+      return View::make('magic/creature_show', compact('creature', 'quellen', 'error'));
    }
    /*
     * Lists creatures from a quelle
@@ -67,16 +84,18 @@ class CreaturesController extends BaseController {
     * Returns a list of quellen for the given character
     */
    public function quellen($character_id) {
-      $char = Character::find($character_id);
-      if (empty($char)) {
-         $data['error'] = 'Invalid character specified';
-         return View::make('creatures/quellen', $data);
-      }
-      $data['quellen'] = [];
-      foreach ($char->summon_quellen() as $quelle) {
-         $data['quellen'][] = array('id'    => $quelle->id,
-                                    'name'  => $quelle->name,
-                                    'value' => $quelle->value);
+      try {
+         if (! ctype_digit($character_id)) throw new InvalidArgumentException('invalid id specified');
+         $char = Character::find($character_id);
+         if (empty($char)) throw new InvalidArgumentException('invalid id specified');
+         $data['quellen'] = [];
+         foreach ($char->summon_quellen() as $quelle) {
+            $data['quellen'][] = array('id'    => $quelle->id,
+                                       'name'  => $quelle->name,
+                                       'value' => $quelle->value);
+         }
+      } catch (InvalidArgumentException $e) {
+         $data['error'] = $e->getMessage();
       }
       return View::make('creatures/quellen', $data);
    }

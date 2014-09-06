@@ -30,7 +30,7 @@ class Creature extends Eloquent {
                throw new Exception('Unknown error');
             }
          } catch (Exception $e) {
-            return array('message' => 'Error: database-error while saving');
+            return array('message' => 'database-error while saving');
          }
       }
       return array('message' => 'updating');

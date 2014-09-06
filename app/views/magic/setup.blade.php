@@ -323,7 +323,8 @@
                                     .effect('highlight', {}, 2000);
             } else {
                // Edit name of creature
-               alertify.alert('ToDo');
+               $('ul#creature-list li#creature-' + data.id).text(htmlescape(data.name))
+                                                           .effect('highlight', {}, 2000);
             }
          }
       }

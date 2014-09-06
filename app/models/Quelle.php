@@ -30,7 +30,7 @@ class Quelle extends Eloquent {
                throw new Exception('unknown error');
             }
          } catch (Exception $e) {
-            return array('message' => 'Error: database-error while saving');
+            return array('message' => 'database-error while saving');
          }
       } else {
          return array('message' => 'Found errors: ' . $validator->messages());
