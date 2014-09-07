@@ -1,0 +1,14 @@
+-- Adds more columns to creatures, updates to version 3
+SELECT version_check(3);
+
+CREATE TYPE creature_rank AS ENUM ('Geist', 'Genius', 'Archon');
+
+ALTER TABLE creatures ADD COLUMN rank creature_rank;
+ALTER TABLE creatures ADD COLUMN kampfregeln TEXT;
+ALTER TABLE creatures ADD COLUMN eigenschaften TEXT;
+ALTER TABLE creatures ADD COLUMN dienste TEXT;
+ALTER TABLE creatures ADD COLUMN leihgaben TEXT;
+ALTER TABLE creatures ADD COLUMN zauber TEXT;
+ALTER TABLE creatures ADD COLUMN nachteil TEXT;
+
+SELECT version_update(3);
