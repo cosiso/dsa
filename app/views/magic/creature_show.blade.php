@@ -10,29 +10,29 @@
                                    'value' => $creature->id)) }}
       <table>
          <tr>
-            <td colspan="4">
+            <td colspan="8">
                {{ HTML::custom_text(array('name'  => 'name',
                                           'label' => true,
-                                          'style' => 'width: 225px',
+                                          'style' => 'width: 250px',
                                           'value' => $creature->name,
                                           'placeholder' => 'Type a name')) }}
             </td>
          </tr>
          <tr>
-            <td colspan="2">
+            <td colspan="4">
                {{ HTML::custom_select(array('name'        => 'quelle',
                                             'output'      => $quellen,
                                             'selected'    => $creature->quelle_id,
                                             'placeholder' => 'Select a quelle',
-                                            'style'       => 'width: 225px',
+                                            'style'       => 'width: 250px',
                                             'label'       => true)) }}
             </td>
-            <td colspan="2">
+            <td colspan="4">
                {{ HTML::custom_select(array('name'   => 'rank',
                                             'label'  => true,
                                             'output' => $creature->ranks,
                                             'selected' => $creature->rank,
-                                            'style'  => 'width: 225px',
+                                            'style'  => 'width: 250px',
                                             'placeholder' => 'Select a rank')) }}
             </td>
          </tr>
@@ -44,10 +44,10 @@
                                           'style' => 'width: 80px',
                                           'placeholder' => 'Enter value')) }}
             </td>
-            <td colspan="2">
+            <td colspan="6">
                {{ HTML::custom_text(array('name'  => 'beherrschung',
                                           'label' => true,
-                                          'value' => $creature->beschworung,
+                                          'value' => $creature->beherrschung,
                                           'style' => 'width: 80px',
                                           'placeholder' => 'Enter value')) }}
             </td>
@@ -81,8 +81,6 @@
                                           'style' => 'width: 80px',
                                           'placeholder' => 'Enter value')) }}
             </td>
-         </tr>
-         <tr>
             <td>
                {{ HTML::custom_text(array('name'  => 'pa',
                                           'label' => 'PA',
@@ -112,42 +110,91 @@
                                           'placeholder' => 'Enter value')) }}
             </td>
          </tr>
-      </table><br>
-      {{ HTML::custom_textarea(array('name'  => 'kampfregeln',
+         <tr>
+            <td colspan="8">
+               <label>Attacks</label>
+            </td>
+         </tr>
+         <tr>
+            <td colspan="3">
+               <b>Name:</b>
+               {{ HTML::custom_text(array('name' => 'at-name', 'style' => 'width: 200px', 'placeholder' => 'Name of attack')) }}
+            </td>
+            <td>
+               <b>DK:</b>
+               {{ HTML::custom_text(array('name' => 'at-dk', 'style' => 'width: 50px', 'placeholder' => 'DK')) }}
+            </td>
+            <td>
+               <b>AT:</b>
+               {{ HTML::custom_text(array('name' => 'at-at', 'style' => 'width: 50px', 'placeholder' => 'AT')) }}
+            </td>
+            <td>
+               <b>TP:</b>
+               {{ HTML::custom_text(array('name' => 'at-tp', 'style' => 'width: 50px', 'placeholder' => 'TP')) }}
+            </td>
+            <td colspan="2" style="text-align: right">
+               {{ HTML::custom_text(array('name' => 'at-remark', 'style' => 'width: 150px', 'placeholder' => 'Remark')) }}
+               add
+            </td>
+         </tr>
+         <tr>
+            <td colspan="4" style="padding-right: 8px">
+               {{ HTML::custom_textarea(array('name'  => 'kampfregeln',
                                      'value' => $creature->kampfregeln,
                                      'label' => true,
                                      'style' => 'width: 100%; height: 60px',
                                      'placeholder' => 'Enter kampfregeln')) }}<br>
-      {{ HTML::custom_textarea(array('name'  => 'eigenschaften',
+            </td>
+            <td colspan="4">
+               {{ HTML::custom_textarea(array('name'  => 'eigenschaften',
                                      'value' => $creature->eigenschaften,
                                      'label' => true,
                                      'style' => 'width: 100%; height: 60px',
                                      'placeholder' => 'Enter eigenschaften')) }}<br>
-      {{ HTML::custom_textarea(array('name'  => 'zauber',
+            </td>
+         </tr>
+         <tr>
+            <td colspan="4" style="padding-right: 8px">
+               {{ HTML::custom_textarea(array('name'  => 'zauber',
                                      'value' => $creature->zauber,
                                      'label' => true,
                                      'style' => 'width: 100%; height: 60px',
                                      'placeholder' => 'Enter zauber')) }}<br>
-      {{ HTML::custom_textarea(array('name'  => 'leihgaben',
+            </td>
+            <td colspan="4">
+               {{ HTML::custom_textarea(array('name'  => 'leihgaben',
                                      'value' => $creature->leihgaben,
                                      'label' => true,
                                      'style' => 'width: 100%; height: 60px',
                                      'placeholder' => 'Enter leihgaben')) }}<br>
-      {{ HTML::custom_textarea(array('name'  => 'dienste',
+            </td>
+         </tr>
+         <tr>
+            <td colspan="4" style="padding-right: 8px">
+               {{ HTML::custom_textarea(array('name'  => 'dienste',
                                      'value' => $creature->dienste,
                                      'label' => true,
                                      'style' => 'width: 100%; height: 60px',
                                      'placeholder' => 'Enter dienste')) }}<br>
-      {{ HTML::custom_textarea(array('name'  => 'nachteil',
+            </td>
+            <td colspan="4">
+               {{ HTML::custom_textarea(array('name'  => 'nachteil',
                                      'value' => $creature->nachteil,
                                      'label' => true,
-                                     'style' => 'width: 100%; height: 20px',
+                                     'style' => 'width: 100%; height: 60px',
                                      'placeholder' => 'Enter nachteil')) }}<br>
-      {{ HTML::custom_textarea(array('name'  => 'description',
+            </td>
+         </tr>
+         <tr>
+            <td colspan="8">
+               {{ HTML::custom_textarea(array('name'  => 'description',
                                      'value' => $creature->description,
                                      'label' => true,
                                      'style' => 'width: 100%; height: 80px',
                                      'placeholder' => 'Enter description')) }}<br>
+            </td>
+         </tr>
+      </table><br>
       <div class="button_bar">
          {{ HTML::custom_button(array('type' => 'submit')) }}
          {{ HTML::custom_button(array('type' => 'close-popup')) }}

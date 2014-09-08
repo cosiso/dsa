@@ -18,6 +18,7 @@
 @section('javascript')
    <script type="text/javascript">
       <!--
+      $('body').css('background-image', 'url(/images/bg-zant.png)');
       function summon() {
          {{-- Initialize divs --}}
          $('#characters').text('Retrieving characters');

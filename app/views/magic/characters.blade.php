@@ -14,6 +14,7 @@
 @section('javascript')
    <script type="text/javascript">
       <!--
+      $('body').css('background-image', 'url(/images/bg-magicchars.png)');
       jQuery.fn.center = function () {
           this.css("position","absolute");
           this.css("top", Math.max(0, (($(window).height() - $(this).outerHeight()) / 2) +
