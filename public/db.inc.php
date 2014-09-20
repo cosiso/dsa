@@ -52,6 +52,23 @@ class db {
    function start_trans() {
       $this->do_query("BEGIN", true);
    }
+   /*
+    * Retrieves the values possible for the given name
+    */
+   public function get_enum_values($enum_name) {
+      $qry = 'SELECT e.enumlabel as enum_value ' .
+             'FROM pg_type t ' .
+             'JOIN pg_enum e ON t.oid = e.enumtypid  ' .
+             'JOIN pg_catalog.pg_namespace n ON n.oid = t.typnamespace ' .
+             "WHERE t.typname = '%s' " .
+             'ORDER BY enum_value';
+      $qry = sprintf($qry, $enum_name);
+      $rid = $this->do_query($qry);
+      while ($row = $this->get_array($rid)) {
+         $values[$row['enum_value']] = $row['enum_value'];
+      }
+      return $values;
+   }
 }
 
 $db = new db;

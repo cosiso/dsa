@@ -7,15 +7,21 @@ class MagicController extends BaseController {
    }
 
    public function characters() {
+      ### Should not be used anymore
+      /*
       $selected = 'characters';
       $characters = Character::orderBy('name')->get();
       return View::make('magic/characters', compact('characters', 'selected'));
+      */
    }
 
    public function show_character($id) {
+      ### Should not be used anymore
+      /*
       $character = Character::find($id);
 
       return View::make('magic/char_magic', compact('character'));
+      */
    }
 
    /* Return a drop down list with the still available instruktionen

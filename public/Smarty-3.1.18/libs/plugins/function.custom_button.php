@@ -53,6 +53,12 @@ function smarty_function_custom_button($params, &$smarty)
          if (empty($params['value'])) $params['value'] = 'Close';
          if (empty($params['class'])) $params['class'] = 'menu-button-reset';
          break;
+      case 'close-popup':
+         $params['type'] = 'button';
+         if (empty($params['onclick'])) $params['onclick'] = "$('#popup').hide()";
+         if (empty($params['value'])) $params['value'] = 'Close';
+         if (empty($params['class'])) $params['class'] = 'menu-button-reset';
+         break;
       case "submit":
          if (empty($params['value'])) $params['value'] = 'Save';
          if (empty($params['class'])) $params['class'] = 'menu-button-submit';
@@ -77,6 +83,7 @@ function smarty_function_custom_button($params, &$smarty)
             break;
          case 'id':
             $id = $_val;
+            if (! $name) $name = $id;
             break;
          default:
             if ( is_array($_val) )

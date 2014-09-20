@@ -1,9 +1,11 @@
 <?php
 function smarty_block_custom_form($params, $content, &$smarty, &$repeat) {
+   $extra = [];
    $method = 'post';
    foreach($params as $_key => $_val) {
+      if ( is_array($_val) )
+         $smarty->trigger_error("custom_form: attribute '$_key' cannot be an array", E_USER_NOTICE);
       switch($_key) {
-         case 'class':
          case 'method':
          case 'id':
          case 'name':
@@ -13,7 +15,7 @@ function smarty_block_custom_form($params, $content, &$smarty, &$repeat) {
                $$_key = $_val;
             break;
          default:
-            $extra .= " " . $_key . '="' . $_val . '"';
+            $extra[$_key] = $_val;
             break;
       }
    }
@@ -23,10 +25,13 @@ function smarty_block_custom_form($params, $content, &$smarty, &$repeat) {
       $result = $content . '</form>';
    } else {
       # Opening tag
-      if (! $name) $smarty->trigger_error("carto_form: missing required attribute 'name'", E_USER_NOTICE);
+      if ($id and ! $name) $name = $id;
+      if (! $name) $smarty->trigger_error("custom_form: missing required attribute 'name'", E_USER_NOTICE);
       if (! $id) $id = $name;
       $result = '<form name="' . $name . '" id="' . $id . '" method="' . $method . '"';
-      if ($extra) $result .= $extra;
+      foreach ($extra as $_key => $_val) {
+         $result .= " $_key=\"$_val\"";
+      }
       $result .= '>';
    }
    return $result;

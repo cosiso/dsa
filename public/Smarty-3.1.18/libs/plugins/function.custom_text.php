@@ -17,32 +17,28 @@
  */
 function smarty_function_custom_text($params, &$smarty)
 {
+   $extra = [];
    foreach($params as $_key => $_val) {
+      if ( is_array($_val) )
+         trigger_error("custom_text: attribute '$_key' cannot be an array", E_USER_NOTICE);
       switch($_key) {
          case 'label':
          case 'name':
-         case 'value':
-         case 'class':
-         case 'style':
-         case 'extra':
          case 'id':
-            if ( is_array($_val) )
-               trigger_error("custom_text: attribute '$_key' cannot be an array", E_USER_NOTICE);
-            else
-               $$_key = $_val;
+            $$_key = $_val;
             break;
          default:
-            $extra .= "$_key=\"$_val\" ";
+            $extra[$_key] = $_val;
       }
    }
+   if ($id and ! $name) $name = $id;
    if (! $name) trigger_error('custom_text: attribute "name" must be given', E_USER_ERROR);
+   if (! $id) $id = $name;
+   if ($label === true) $label = ucfirst($name);
    $result = ( ($label) ? '<label for="' . $name . '">' . $label . '</label>' : '') .
          '<input type="text" name="' . $name . '"' .
-         ' id="' . ( ($id) ? $id : $name) . '"';
-   if ($value) $result .= ' value="' . $value . '"';
-   if ($class) $result .= ' class="' . $class . '"';
-   if ($style) $result .= ' style="' . $style . '"';
-   if ($extra) $result .= ' ' . $extra;
+         ' id="' . $id . '"';
+   foreach ($extra as $_key => $_val) $result .= " $_key=\"$_val\"";
    $result .= ">";
    return $result;
 }

@@ -110,33 +110,35 @@
                                           'placeholder' => 'Enter value')) }}
             </td>
          </tr>
-         <tr>
-            <td colspan="8">
-               <label>Attacks</label>
-            </td>
-         </tr>
-         <tr>
-            <td colspan="3">
-               <b>Name:</b>
-               {{ HTML::custom_text(array('name' => 'at-name', 'style' => 'width: 200px', 'placeholder' => 'Name of attack')) }}
-            </td>
-            <td>
-               <b>DK:</b>
-               {{ HTML::custom_text(array('name' => 'at-dk', 'style' => 'width: 50px', 'placeholder' => 'DK')) }}
-            </td>
-            <td>
-               <b>AT:</b>
-               {{ HTML::custom_text(array('name' => 'at-at', 'style' => 'width: 50px', 'placeholder' => 'AT')) }}
-            </td>
-            <td>
-               <b>TP:</b>
-               {{ HTML::custom_text(array('name' => 'at-tp', 'style' => 'width: 50px', 'placeholder' => 'TP')) }}
-            </td>
-            <td colspan="2" style="text-align: right">
-               {{ HTML::custom_text(array('name' => 'at-remark', 'style' => 'width: 150px', 'placeholder' => 'Remark')) }}
-               add
-            </td>
-         </tr>
+         @if ($creature->exists)
+            <tr>
+               <td colspan="8">
+                  <label>Attacks</label>
+               </td>
+            </tr>
+            <tr>
+               <td colspan="3">
+                  <b>Name:</b>
+                  {{ HTML::custom_text(array('name' => 'at-name', 'style' => 'width: 200px', 'placeholder' => 'Name of attack')) }}
+               </td>
+               <td>
+                  <b>DK:</b>
+                  {{ HTML::custom_text(array('name' => 'at-dk', 'style' => 'width: 50px', 'placeholder' => 'DK')) }}
+               </td>
+               <td>
+                  <b>AT:</b>
+                  {{ HTML::custom_text(array('name' => 'at-at', 'style' => 'width: 50px', 'placeholder' => 'AT')) }}
+               </td>
+               <td>
+                  <b>TP:</b>
+                  {{ HTML::custom_text(array('name' => 'at-tp', 'style' => 'width: 50px', 'placeholder' => 'TP')) }}
+               </td>
+               <td colspan="2" style="text-align: right">
+                  {{ HTML::custom_text(array('name' => 'at-remark', 'style' => 'width: 150px', 'placeholder' => 'Remark')) }}
+                  <span class="link-add-small">add</span>
+               </td>
+            </tr>
+         @endif
          <tr>
             <td colspan="4" style="padding-right: 8px">
                {{ HTML::custom_textarea(array('name'  => 'kampfregeln',
