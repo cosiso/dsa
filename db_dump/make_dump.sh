@@ -1,6 +1,6 @@
 #!/bin/bash
 
-PATH='/var/www/nginx/dsa/db_dump'
+PATH='/var/www/dsa/db_dump'
 FILENAME="dsa.dump.$(/usr/bin/date '+%Y%m%d').sql"
 
 cd "$PATH"

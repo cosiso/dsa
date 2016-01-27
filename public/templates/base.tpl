@@ -12,7 +12,7 @@
 <body>
    <div id="head">
       {block name='head'}
-         {custom_button value='home' onclick="location = '/index2.php'"}
+         {custom_button value='home' onclick="location = '/index.php'"}
          {custom_spacer width=10}
          {custom_button value='characters' onclick="location = 'characters.php'"}
          {custom_button value='magic' onclick="location = '/magic.php'"}

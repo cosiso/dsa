@@ -13,7 +13,7 @@
 <body>
    <div id="head">
       @section('head')
-         {{ HTML::custom_button(array('value' => 'Home', 'onclick' => "location = '/index2.php'")) }}
+         {{ HTML::custom_button(array('value' => 'Home', 'onclick' => "location = '/index.php'")) }}
          {{ HTML::custom_spacer(array('width' => 10)) }}
          {{ HTML::custom_button(array('value' => 'Characters', 'onclick' => "location = 'characters.php'")) }}
          {{ HTML::custom_button(array('value' => 'Magic', 'onclick' => "location = '/magic.php'")) }}

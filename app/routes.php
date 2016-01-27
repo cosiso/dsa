@@ -12,10 +12,7 @@
 */
 
 Route::get('/', function() {
-   return Redirect::to('/index2.php');
-});
-Route::get('/index.php', function() {
-   return Redirect::to('/index2.php');
+   return Redirect::to('/index.php');
 });
 # Character
 Route::model('character', 'Character');
